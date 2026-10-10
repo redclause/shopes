@@ -64,3 +64,7 @@
 .emptyState button,.projectCard button,.reportCard button,.keywordSetCard button{border-color:#354353}
 @media(max-width:800px){.sidebar{background:#11151C}.topbar{background:rgba(11,13,18,.94)}.content{padding-top:26px}}
 @media(prefers-reduced-motion:reduce){.shell *{transition:none!important;animation:none!important}}
+
+/* Keep dashboard headings readable on the dark workspace surfaces. */
+.shell .panelHead h3,.shell .sectionHeading h2,.shell .welcome h1,.shell .accountPanelCopy h2{color:#F4F7FB}
+@media(max-width:720px){.navigation a:nth-of-type(n+3){display:flex}.navigation{flex-wrap:nowrap}}
