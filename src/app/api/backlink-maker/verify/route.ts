@@ -70,15 +70,17 @@ export async function POST(request: Request) {
         chunks.push(value);
         total += value.byteLength;
         if (total >= MAX_HTML_BYTES) {
-          // Read one more chunk to distinguish an exactly-at-limit response
-          // from a larger one without buffering beyond the configured limit.
-          continue;
+          // Probe once more without buffering the next chunk to distinguish an
+          // exactly-at-limit response from a larger one.
+          const next = await reader.read();
+          oversized = !next.done && Boolean(next.value?.byteLength);
+          break;
         }
       }
     } finally {
       await reader.cancel().catch(() => undefined);
     }
-    if (oversized || total >= MAX_HTML_BYTES) {
+    if (oversized) {
       return NextResponse.json({ status: "too-large", message: "The candidate page exceeds the 1 MB HTML verification limit. No verification result was recorded.", httpStatus: response.status }, { status: 413 });
     }
 
