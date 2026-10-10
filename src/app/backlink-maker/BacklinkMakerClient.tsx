@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Check, Clipboard, Download, ExternalLink, Link2, ShieldCheck, Sparkles } from "lucide-react";
@@ -9,6 +9,7 @@ import styles from "./page.module.css";
 
 type Props = { userName: string; userEmail: string; userImage?: string | null; signOutAction: () => Promise<void> };
 type Snippet = { id: string; title: string; description: string; value: string };
+type SubmissionRecord = { id: string; targetUrl: string; candidateUrl: string; status: "review" | "submitted" | "published" | "rejected"; createdAt: string; updatedAt: string; note?: string };
 
 function normalizeUrl(value: string) {
   const input = value.trim();
@@ -31,6 +32,27 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   const [candidateUrl, setCandidateUrl] = useState("");
   const [verifyResult, setVerifyResult] = useState<{status:string; message:string; checkedUrl?:string; targetUrl?:string; checkedAt?:string; note?:string; httpStatus?:number} | null>(null);
   const [verifying, setVerifying] = useState(false);
+  const [submissionRecords, setSubmissionRecords] = useState<SubmissionRecord[]>([]);
+  const [submissionNote, setSubmissionNote] = useState("");
+  const [publisherPermission, setPublisherPermission] = useState(false);
+  const [recordsLoaded, setRecordsLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("shopes-backlink-submissions-v1");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) setSubmissionRecords(parsed.filter((item) => item && typeof item.id === "string" && typeof item.targetUrl === "string" && typeof item.candidateUrl === "string"));
+      }
+    } catch { /* Ignore malformed local history and keep the tool usable. */ }
+    setRecordsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!recordsLoaded) return;
+    try { window.localStorage.setItem("shopes-backlink-submissions-v1", JSON.stringify(submissionRecords)); }
+    catch { setError("Browser storage is unavailable; submission history may not persist after this session."); }
+  }, [submissionRecords, recordsLoaded]);
 
   const snippets = useMemo<Snippet[]>(() => {
     if (!generatedUrl) return [];
@@ -82,6 +104,20 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
     } finally {
       setVerifying(false);
     }
+  }
+
+  function addSubmissionRecord(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!generatedUrl || !candidateUrl.trim() || !publisherPermission) return;
+    const now = new Date().toISOString();
+    const record: SubmissionRecord = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, targetUrl: generatedUrl, candidateUrl: candidateUrl.trim(), status: "review", createdAt: now, updatedAt: now, note: submissionNote.trim() || undefined };
+    setSubmissionRecords((current) => [record, ...current].slice(0, 100));
+    setSubmissionNote("");
+    setPublisherPermission(false);
+  }
+
+  function updateSubmissionStatus(id: string, status: SubmissionRecord["status"]) {
+    setSubmissionRecords((current) => current.map((record) => record.id === id ? { ...record, status, updatedAt: new Date().toISOString() } : record));
   }
 
   async function copySnippet(id: string, value: string) {
@@ -164,6 +200,27 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
               <label className={styles.field}><span>Candidate page URL <b>*</b></span><input type="url" inputMode="url" placeholder="https://example.com/resources" value={candidateUrl} onChange={(event) => setCandidateUrl(event.target.value)} required /></label>
               <button className={styles.primary} type="submit" disabled={verifying} style={verifying ? { opacity: .7, cursor: "wait" } : undefined}>{verifying ? "Checking page…" : "Check for backlink"} <ArrowRight size={16} /></button>
             </form>
+            <form onSubmit={addSubmissionRecord} style={{ marginTop: 22 }}>
+              <div className={styles.cardHeading}><span className={styles.iconTile}><Clipboard size={19} /></span><div><h2>Submission tracker</h2><p>Track only a form you reviewed and that explicitly permits this type of relevant submission.</p></div></div>
+              <label className={styles.field}><span>Submission note <small>(optional)</small></span><textarea value={submissionNote} onChange={(event) => setSubmissionNote(event.target.value)} rows={2} maxLength={300} placeholder="e.g. Resource directory form; submission requires editor approval." /></label>
+              <label className={styles.checkRow}><input type="checkbox" checked={publisherPermission} onChange={(event) => setPublisherPermission(event.target.checked)} /><span><strong>I reviewed this site and its rules permit this submission.</strong><small>Adding a record does not submit the form. Do not submit unsolicited links or bypass CAPTCHA, login, or anti-spam controls.</small></span></label>
+              <button className={styles.primary} type="submit" disabled={!publisherPermission || !candidateUrl.trim()}><Clipboard size={16} /> Add to submission tracker</button>
+            </form>
+            {submissionRecords.length > 0 && <div style={{ marginTop: 20 }}>
+              <div className={styles.cardHeading}><span className={styles.iconTile}><Check size={19} /></span><div><h2>Submission history</h2><p>Stored in this browser only; up to 100 records.</p></div></div>
+              <div className={styles.snippetList}>
+                {submissionRecords.map((record) => <article className={styles.snippet} key={record.id}>
+                  <div className={styles.snippetHead}><div><h3>{record.status === "review" ? "Ready for review" : record.status === "submitted" ? "Submission sent" : record.status === "published" ? "Backlink verified" : "Not accepted"}</h3><p>{record.candidateUrl}</p><p>Target: {record.targetUrl}</p><p>Updated {new Date(record.updatedAt).toLocaleString()}</p></div><a className={styles.export} href={record.candidateUrl} target="_blank" rel="noreferrer">Open page <ExternalLink size={13} /></a></div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+                    {record.status !== "submitted" && record.status !== "published" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "submitted")}>Mark as submitted</button>}
+                    {record.status !== "published" && <button type="button" className={styles.export} onClick={() => { setCandidateUrl(record.candidateUrl); setVerifyResult(null); }}>Verify backlink</button>}
+                    {record.status !== "published" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "published")}>Mark published after verification</button>}
+                    {record.status !== "rejected" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "rejected")}>Mark not accepted</button>}
+                  </div>
+                </article>)}
+              </div>
+              <div className={styles.notice} style={{ marginTop: 12 }}><ShieldCheck size={18} /><p>Use “Mark published” only after the verification tool finds the target link on that page. Submission status is a user-confirmed record, not proof that the publisher accepted it.</p></div>
+            </div>}
             {verifyResult && <div className={styles.notice} role="status" style={{ marginTop: 16, borderColor: verifyResult.status === "found" ? "#2c7569" : "#6c5960" }}><ShieldCheck size={18} /><p><strong>{verifyResult.status === "found" ? "Link found" : verifyResult.status === "not-found" ? "Link not found" : verifyResult.status === "redirect" ? "Page redirected" : "Could not verify"}</strong><br />{verifyResult.message}{verifyResult.httpStatus ? ` (HTTP ${verifyResult.httpStatus})` : ""}{verifyResult.checkedAt ? ` Checked at ${new Date(verifyResult.checkedAt).toLocaleString()}.` : ""}{verifyResult.note ? ` ${verifyResult.note}` : ""}</p></div>}
           </section>
         )}
