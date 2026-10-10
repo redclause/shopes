@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -37,6 +38,7 @@ type GoogleOneTapButtonProps = {
   label?: string;
   redirectTo?: string;
   autoPrompt?: boolean;
+  fallbackHref?: string;
 };
 
 export default function GoogleOneTapButton({
@@ -44,6 +46,7 @@ export default function GoogleOneTapButton({
   label = "Continue with Google",
   redirectTo,
   autoPrompt = true,
+  fallbackHref,
 }: GoogleOneTapButtonProps) {
   const router = useRouter();
   const initialized = useRef(false);
@@ -156,7 +159,7 @@ export default function GoogleOneTapButton({
         {label}
         {!busy && <ArrowRight size={14} aria-hidden="true" />}
       </button>
-      {message && <span className="google-one-tap-status" role="status" aria-live="polite">{message}</span>}
+      {message && <span className="google-one-tap-status" role="status" aria-live="polite">{message}{fallbackHref && !message.toLowerCase().includes("signed in") && <Link className="google-one-tap-fallback" href={fallbackHref}>Use standard Google sign-in</Link>}</span>}
     </span>
   );
 }
