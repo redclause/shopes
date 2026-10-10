@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
-  ArrowLeft, ArrowRight, BarChart3, Check, ChevronRight, CircleAlert, Clipboard,
+  ArrowRight, BarChart3, Check, ChevronRight, CircleAlert, Clipboard,
   FileUp, Globe2, Layers3, LoaderCircle, PackageSearch, Search, ShieldCheck, Sparkles, Target, TrendingUp
 } from "lucide-react";
 import {
