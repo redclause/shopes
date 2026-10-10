@@ -232,7 +232,10 @@ export function parseImportedSerpData(input: string, format: "csv" | "json", sou
     if (!["http:", "https:"].includes(url.protocol) || !keyword) continue;
     const rawRank = Number(row.rank ?? row.position);
     const rank = Number.isInteger(rawRank) && rawRank >= 1 && rawRank <= 1000 ? rawRank : undefined;
-    output.push({ keyword, url: url.toString(), domain: url.hostname.toLowerCase().replace(/^www\./, ""), title, description, ...(rank ? { rank } : {}), source: sourceLabel.slice(0, 120), importedAt });
+    const rawDate = String(row.source_date ?? row.date ?? row.fetched_at ?? "").trim();
+    const parsedDate = rawDate ? new Date(rawDate) : null;
+    const sourceDate = parsedDate && Number.isFinite(parsedDate.getTime()) ? parsedDate.toISOString() : undefined;
+    output.push({ keyword, url: url.toString(), domain: url.hostname.toLowerCase().replace(/^www\./, ""), title, description, ...(rank ? { rank } : {}), source: sourceLabel.slice(0, 120), ...(sourceDate ? { sourceDate } : {}), importedAt });
   }
   if (!output.length) throw new Error("No valid results found. Include keyword/query and an absolute http(s) URL/link column.");
   return output;
