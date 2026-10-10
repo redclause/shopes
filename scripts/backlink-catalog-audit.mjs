@@ -12,6 +12,7 @@ import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { backlinkSiteCatalog } from "../src/app/backlink-maker/site-catalog.ts";
 import { extractPageEvidence, classifySubmissionPage } from "../src/app/backlink-maker/submission-analysis.mjs";
+import { summarizeAuditRecords } from "../src/app/backlink-maker/audit-summary.mjs";
 
 const args = process.argv.slice(2);
 function option(name, fallback) {
@@ -189,10 +190,16 @@ for (const [index, site] of pending.entries()) {
       checkedAt, checkResult: page.status >= 200 && page.status < 300 ? "homepage_reachable" : "homepage_unavailable",
       httpStatus: page.status, finalUrl: page.finalUrl, contentType: page.contentType || null,
       truncated: Boolean(page.truncated), submissionCandidates: candidates, pageEvidence,
-      submissionEndpointVerified: pageEvidence.some((item) => item.classification === "endpoint_evidence_found"),
+      submissionMethodDetected: pageEvidence.some((item) => item.classification === "endpoint_evidence_found"),
+      submissionCapabilityConfirmed: false,
+      submissionAttempted: false,
+      submissionAccepted: false,
+      pendingModeration: false,
+      publicationIndicated: false,
+      publicationVerified: false,
       automationVerified: false,
-      classification: pageEvidence.some((item) => item.classification === "endpoint_evidence_found") ? "endpoint_evidence_found" : "candidate_discovered",
-      note: "Endpoint evidence is based on an actual same-origin form plus page intent. This is not proof of permission to automate, successful publication, or a verified backlink. No forms were submitted.",
+      classification: pageEvidence.some((item) => item.classification === "endpoint_evidence_found") ? "submission_method_detected_unapproved" : "candidate_discovered",
+      note: "A same-origin form and submission intent are discovery evidence only. Permission, an implemented submission adapter, an actual submission, acceptance, and public publication remain unconfirmed. This audit never submits forms.",
     };
     console.log(`[${index + 1}/${pending.length}] ${site.id}: HTTP ${page.status}; candidates=${candidates.length}; form-evidence=${pageEvidence.filter((item) => item.classification === "endpoint_evidence_found").length}; automation remains unverified`);
   } catch (error) {
@@ -207,4 +214,7 @@ for (const [index, site] of pending.entries()) {
   await writeFile(statePath, JSON.stringify({ ...previous, updatedAt: new Date().toISOString() }, null, 2) + "\n", "utf8");
   if (index < pending.length - 1) await new Promise((resolve) => setTimeout(resolve, delayMs));
 }
-console.log(`Saved ${Object.keys(previous.records).length} audit records. This tool discovers candidates only; it never submits content or upgrades a site to automated support.`);
+const summary = summarizeAuditRecords(previous.records);
+console.log(`Saved ${Object.keys(previous.records).length} audit records.`);
+console.log("Stage summary (counts are evidence-based; audit never submits forms):");
+console.log(JSON.stringify(summary, null, 2));
