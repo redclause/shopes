@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { page: raw } = await params;
   const page = Number(raw);
   if (!Number.isInteger(page) || page < 2 || page > PAGE_COUNT) return { title: "Shopes Blog" };
-  return { title: `Shopes Blog — Page ${page}`, description: `Shopes online shopping articles, page ${page} of ${PAGE_COUNT}.`, alternates: { canonical: `/blog/page/${page}` } };
+  return { title: `Shopes Blog — Page ${page}`, description: `Shopes online shopping articles, page ${page} of ${PAGE_COUNT}.`, alternates: { canonical: `https://shopes.online/blog/page/${page}` } };
 }
 
 export default async function BlogPaginationPage({ params }: Props) {
