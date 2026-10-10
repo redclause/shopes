@@ -45,6 +45,32 @@ export function submissionStatusLabel(status) {
   }
 }
 
+/**
+ * Site-specific assisted workflows based on the destination's public submission information.
+ * These guides never submit forms, bypass access controls, or initiate payments.
+ */
+export function getManualWorkflow(siteId) {
+  const workflows = {
+    "mavtools-com": {
+      mode: "manual",
+      label: "MavTools — submit a tool",
+      destination: "https://mavtools.com/list-my-tool",
+      requirements: ["Tool or website URL", "Product name and description", "Relevant category and pricing details"],
+      steps: ["Open the official tool-submission page.", "Complete the destination's form yourself; sign-in or human verification may be required.", "Save any confirmation and verify the public listing later."],
+      caution: "Shopes does not submit the form or handle account credentials. Confirm current eligibility and terms on MavTools before proceeding.",
+    },
+    "monkeyaitools-com": {
+      mode: "manual-paid",
+      label: "Monkey AI Tools — paid directory submission",
+      destination: "https://www.monkeyaitools.com/submit-tool",
+      requirements: ["Tool or website URL", "Product name and description", "Category and supporting details"],
+      steps: ["Review the current listing options and editorial rules.", "Decide independently whether the stated fee is acceptable.", "If you proceed, submit through the official page yourself and keep the confirmation."],
+      caution: "The official page advertises paid listings (basic pricing was shown as a one-time fee). Shopes never purchases a listing or initiates payment; check the current price and terms directly.",
+    },
+  };
+  return workflows[siteId] || null;
+}
+
 /** @param {string} status */
 export function verificationStatusLabel(status) {
   switch (status) {
