@@ -32,8 +32,8 @@ export default async function BlogArticlePage({ params }: Props) {
     "@type": "Article",
     headline: article.title,
     description: article.description,
-    mainEntityOfPage: `/blog/${article.slug}`,
-    url: `/blog/${article.slug}`,
+    mainEntityOfPage: `https://shopes.online/blog/${article.slug}`,
+    url: `https://shopes.online/blog/${article.slug}`,
     articleSection: article.topic,
     author: { "@type": "Organization", name: "Shopes Blog" },
     publisher: { "@type": "Organization", name: "Shopes", url: "https://shopes.online" }
