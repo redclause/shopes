@@ -68,3 +68,12 @@
 /* Keep dashboard headings readable on the dark workspace surfaces. */
 .shell .panelHead h3,.shell .sectionHeading h2,.shell .welcome h1,.shell .accountPanelCopy h2{color:#F4F7FB}
 @media(max-width:720px){.navigation a:nth-of-type(n+3){display:flex}.navigation{flex-wrap:nowrap}}
+
+
+/* Stronger blue-cyan navigation contrast without changing the workspace layout. */
+.navigation .navItem{color:#087f9e}
+.navigation .navItem:hover{background:#e7f8fc;color:#00647f}
+.navigation .navItemActive{background:#e1f7fc;color:#006d8b;box-shadow:inset 0 0 0 1px #b8eaf4}
+.navigation .navItemActive svg,.navigation .navItem svg{color:#008bad}
+.topbarRight{gap:12px}
+@media(max-width:800px){.navigation .navItem{color:#71e9f7}.navigation .navItem:hover{background:#142c35;color:#a2f4ff}.navigation .navItemActive{background:#132e38;color:#71e9f7;box-shadow:inset 0 0 0 1px #26505c}.navigation .navItem svg,.navigation .navItemActive svg{color:#49DDF5}}
