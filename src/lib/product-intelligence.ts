@@ -77,14 +77,61 @@ export function buildRecommendations(product: ProductData): ProductRecommendatio
   } else if (description.length < 120) {
     recommendations.push({ id: "description-short", priority: "Recommended", category: "Content", title: "Expand the product description", detail: "Add useful, factual details that answer buyer questions. Avoid unsupported claims and repetitive keywords.", target: "description", draft: description + (description.endsWith(".") ? "" : ".") + " Add verified specifications, key benefits, dimensions or compatibility, usage guidance, and care or warranty information where applicable." });
   }
-  if (!product.productSchema) recommendations.push({ id: "schema", priority: "Recommended", category: "Technical SEO", title: "Add valid Product structured data", detail: "Include accurate Product JSON-LD for name, image, description, SKU, brand, and eligible offer/review fields. Validate before publishing."});
-  if (!product.canonical) recommendations.push({ id: "canonical", priority: "Recommended", category: "Technical SEO", title: "Review the canonical URL", detail: "Set a self-referencing canonical URL for the preferred product page and verify variants do not conflict."});
-  if (!product.imageCount) recommendations.push({ id: "images", priority: "Critical", category: "Visuals", title: "Add clear product imagery", detail: "Provide several distinct, high-resolution product views and ensure images load on mobile."});
-  else if ((product.imagesWithAlt || 0) < product.imageCount) recommendations.push({ id: "image-alt", priority: "Recommended", category: "Accessibility", title: "Improve image alternative text", detail: "Write concise alt text for meaningful product images. Describe what is visible; do not stuff keywords."});
-  if (!(typeof product.price === "number" && product.price > 0)) recommendations.push({ id: "price", priority: "Critical", category: "Conversion", title: "Make the current price clear", detail: "Confirm the price, currency, and applicable offer are visible and consistent with structured data and the checkout."});
-  if (!product.availability) recommendations.push({ id: "availability", priority: "Recommended", category: "Conversion", title: "Expose accurate stock availability", detail: "Show current availability and keep it synchronized with the inventory source."});
-  if (!product.rating || !product.reviewCount) recommendations.push({ id: "reviews", priority: "Optional", category: "Trust", title: "Provide authentic customer feedback", detail: "If available, show genuine customer ratings and review counts. Never fabricate reviews or ratings."});
-  if (recommendations.length < 3) recommendations.push({ id: "qa", priority: "Optional", category: "Quality assurance", title: "Run a final product-page QA check", detail: "Verify mobile layout, image loading, price consistency, variant selection, shipping information, and the checkout path."});
+  if (!product.productSchema) {
+    recommendations.push({
+      id: "schema", priority: "Recommended", category: "Technical SEO",
+      title: "Add valid Product structured data",
+      detail: "Include accurate Product JSON-LD for name, image, description, SKU, brand, and eligible offer/review fields. Validate before publishing.",
+    });
+  }
+  if (!product.canonical) {
+    recommendations.push({
+      id: "canonical", priority: "Recommended", category: "Technical SEO",
+      title: "Review the canonical URL",
+      detail: "Set a self-referencing canonical URL for the preferred product page and verify variants do not conflict.",
+    });
+  }
+  if (!product.imageCount) {
+    recommendations.push({
+      id: "images", priority: "Critical", category: "Visuals",
+      title: "Add clear product imagery",
+      detail: "Provide several distinct, high-resolution product views and ensure images load on mobile.",
+    });
+  } else if ((product.imagesWithAlt || 0) < product.imageCount) {
+    recommendations.push({
+      id: "image-alt", priority: "Recommended", category: "Accessibility",
+      title: "Improve image alternative text",
+      detail: "Write concise alt text for meaningful product images. Describe what is visible; do not stuff keywords.",
+    });
+  }
+  if (!(typeof product.price === "number" && product.price > 0)) {
+    recommendations.push({
+      id: "price", priority: "Critical", category: "Conversion",
+      title: "Make the current price clear",
+      detail: "Confirm the price, currency, and applicable offer are visible and consistent with structured data and the checkout.",
+    });
+  }
+  if (!product.availability) {
+    recommendations.push({
+      id: "availability", priority: "Recommended", category: "Conversion",
+      title: "Expose accurate stock availability",
+      detail: "Show current availability and keep it synchronized with the inventory source.",
+    });
+  }
+  if (!product.rating || !product.reviewCount) {
+    recommendations.push({
+      id: "reviews", priority: "Optional", category: "Trust",
+      title: "Provide authentic customer feedback",
+      detail: "If available, show genuine customer ratings and review counts. Never fabricate reviews or ratings.",
+    });
+  }
+  if (recommendations.length < 3) {
+    recommendations.push({
+      id: "qa", priority: "Optional", category: "Quality assurance",
+      title: "Run a final product-page QA check",
+      detail: "Verify mobile layout, image loading, price consistency, variant selection, shipping information, and the checkout path.",
+    });
+  }
   return recommendations;
 }
 
