@@ -6,6 +6,7 @@ import styles from "./WorkspaceProjects.module.css";
 
 type Project = { id: string; name: string; url: string; market: string; language: string; createdAt: string };
 type SavedAudit = { url?: string; checkedAt?: string; savedAt?: string; status?: number; summary?: { errors?: number; warnings?: number }; findings?: unknown[] };
+type SavedKeywordSet = { id?: string; seed?: string; country?: string; language?: string; savedAt?: string; keywords?: unknown[] };
 
 const PROJECTS_KEY = "shopes:projects:v1";
 const AUDITS_KEY = "shopes:audit-history:v1";
@@ -20,6 +21,7 @@ function safeRead<T>(key: string): T[] {
 export default function WorkspaceProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [audits, setAudits] = useState<SavedAudit[]>([]);
+  const [keywordSets, setKeywordSets] = useState<SavedKeywordSet[]>([]);
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [market, setMarket] = useState("US");
@@ -29,6 +31,7 @@ export default function WorkspaceProjects() {
   useEffect(() => {
     setProjects(safeRead<Project>(PROJECTS_KEY));
     setAudits(safeRead<SavedAudit>(AUDITS_KEY));
+    setKeywordSets(safeRead<SavedKeywordSet>("shopes:keyword-sets:v1"));
   }, []);
 
   function persist(next: Project[]) {
@@ -72,6 +75,15 @@ export default function WorkspaceProjects() {
     URL.revokeObjectURL(blobUrl);
   }
 
+  function downloadKeywordSet(item: SavedKeywordSet) {
+    const blobUrl = URL.createObjectURL(new Blob([JSON.stringify(item, null, 2)], { type: "application/json" }));
+    const anchor = document.createElement("a");
+    anchor.href = blobUrl;
+    anchor.download = "shopes-keyword-set.json";
+    anchor.click();
+    URL.revokeObjectURL(blobUrl);
+  }
+
   return (
     <div className={styles.workspace}>
       <div className={styles.panel}>
@@ -96,6 +108,10 @@ export default function WorkspaceProjects() {
       <div className={styles.panel}>
         <div className={styles.panelHead}><div><h3>Saved audit reports</h3><p>Reports saved from the Technical SEO Audit on this browser.</p></div><span>{audits.length} reports</span></div>
         {audits.length === 0 ? <div className={styles.empty}><strong>No saved reports</strong><p>Run an audit and choose “Save in this browser” to keep a local snapshot.</p></div> : <ul className={styles.auditList}>{audits.slice(0, 10).map((audit, index) => <li key={(audit.checkedAt || "") + index}><div><strong>{audit.url || "Website audit"}</strong><small>{audit.savedAt ? new Date(audit.savedAt).toLocaleString() : audit.checkedAt ? new Date(audit.checkedAt).toLocaleString() : "Saved report"} · {audit.summary?.errors ?? 0} errors · {audit.summary?.warnings ?? 0} warnings</small></div><button type="button" onClick={() => downloadAudit(audit)}><Download size={15} /> Export</button></li>)}</ul>}
+        <div className={styles.keywordSaved}>
+          <div className={styles.panelHead}><div><h3>Saved keyword sets</h3><p>Locally saved ideas from Keyword Research.</p></div><span>{keywordSets.length} sets</span></div>
+          {keywordSets.length === 0 ? <p className={styles.keywordEmpty}>No saved keyword sets yet. Generate ideas and choose “Save set locally” in Keyword Research.</p> : <ul className={styles.auditList}>{keywordSets.slice(0, 10).map((item, index) => <li key={(item.id || item.savedAt || "") + index}><div><strong>{item.seed || "Keyword set"}</strong><small>{item.country || "Market not set"} · {item.language || "Language not set"} · {item.keywords?.length || 0} ideas · {item.savedAt ? new Date(item.savedAt).toLocaleString() : "Saved locally"}</small></div><button type="button" onClick={() => downloadKeywordSet(item)}><Download size={15} /> Export</button></li>)}</ul>}
+        </div>
         <p className={styles.storageNote}>Browser-local data may be lost if browser data is cleared. It does not sync across devices or users. No credentials are stored here.</p>
       </div>
     </div>
