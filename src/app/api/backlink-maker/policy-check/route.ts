@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "../../../../../auth";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { backlinkSiteCatalog } from "../../../backlink-maker/site-catalog";
@@ -142,6 +143,8 @@ function discoverSubmissionCandidates(html: string, origin: string) {
 }
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ status: "unauthorized", message: "Sign in to use the Backlink Maker." }, { status: 401 });
   try {
     const body = await request.json();
     const siteId = typeof body?.siteId === "string" ? body.siteId : "";
