@@ -17,3 +17,50 @@
 @media(max-width:980px){.sidebar{flex-basis:220px;width:220px;padding-right:12px;padding-left:12px}.noticeStatus{display:none}.emptyState{gap:20px}.emptyArtwork{flex-basis:120px;width:120px}.metricCard{padding:13px}.metricLabel{font-size:7px}}
 @media(max-width:720px){.shell{display:block}.sidebar{position:relative;top:auto;width:100%;height:auto;min-height:0;padding:13px 18px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:0 0 12px}.workspaceLabel,.workspaceCard,.helpCard,.navigation .navLabel,.navigation a:nth-of-type(n+3){display:none}.sidebarBottom{display:block;margin-top:10px}.account{padding-top:10px}.navigation{flex-direction:row;gap:5px;margin:0;overflow-x:auto;padding-bottom:1px}.navigation a{min-height:35px;padding:0 10px;white-space:nowrap}.navigation a:nth-of-type(1),.navigation a:nth-of-type(2){display:flex}.topbar{position:relative;height:53px;padding:0 18px}.content{padding:25px 18px 20px}.welcome{align-items:flex-start;flex-direction:column;gap:16px}.welcome h1{font-size:30px}.notice{align-items:flex-start;padding:12px}.noticeIcon{flex-basis:30px;width:30px;height:30px}.emptyState{align-items:flex-start;flex-direction:column;gap:8px;padding:21px}.emptyArtwork{align-self:center;height:120px}.metricGrid{grid-template-columns:1fr}.metricCard{grid-template-columns:35px 1fr;padding:14px}.metricLabel{font-size:8px}.metricCard>p{margin-top:11px}.accountPanel{align-items:flex-start;flex-wrap:wrap}.accountPanelCopy{flex-basis:calc(100% - 50px)}.accountPanel form{margin-left:47px}.footer{flex-direction:column}.sessionBadge{font-size:8px}.avatarSmall{width:29px;height:29px;flex-basis:29px}}
 @media(prefers-reduced-motion:reduce){.shell *{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* Futuristic command-center theme */
+.shell{--ink:#F4F7FB;--muted:#B2BDCC;--line:#293342;--green:#49DDF5;background:#0B0D12;color:#F4F7FB;font-size:15px}
+.sidebar{background:rgba(17,21,28,.96);border-color:#293342}
+.brandMark{background:#49DDF5;color:#07131a}.brandDot{color:#49DDF5}
+.workspaceLabel,.navLabel{color:#8997AA;font-size:11px}
+.workspaceCard{background:#141A23;border-color:#293342}
+.workspaceIcon{background:#172d38;color:#49DDF5}
+.workspaceCopy strong,.accountText strong{color:#F4F7FB;font-size:13px}
+.workspaceCopy small,.accountText small{color:#B2BDCC;font-size:11px}
+.freeBadge{background:#1b2925;border-color:#3b5144;color:#B8F36B;font-size:10px}
+.navItem,.navItemActive{min-height:44px;font-size:13px}
+.navItem{color:#B2BDCC}.navItem:hover{background:#171D27;color:#F4F7FB}
+.navItemActive{background:#132a34;color:#49DDF5;box-shadow:inset 0 0 0 1px #28515d}
+.navItemActive svg{color:#49DDF5}.navCount{background:#171D27;border-color:#293342;color:#B2BDCC}
+.helpCard{background:linear-gradient(145deg,#141e28,#11151c);border-color:#293342}
+.helpIcon{background:#171D27;border-color:#293342;color:#49DDF5}
+.helpCard>strong{color:#F4F7FB;font-size:13px}.helpCard p{color:#B2BDCC;font-size:12px}
+.helpCard>a{color:#49DDF5;font-size:12px}
+.account{border-color:#293342}.avatar,.avatarSmall{background:#172d38;border-color:#293342;color:#49DDF5}
+.signOut{color:#B2BDCC}.signOut:hover{background:#171D27;border-color:#293342;color:#49DDF5}
+.topbar{background:rgba(11,13,18,.88);border-color:#293342}
+.breadcrumb{color:#8997AA;font-size:12px}.breadcrumb strong{color:#F4F7FB}
+.sessionBadge{background:#11151C;border-color:#293342;color:#B2BDCC;font-size:11px}
+.sessionBadge>span{background:#B8F36B}
+.content{color:#F4F7FB}
+.eyebrow{color:#49DDF5;font-size:11px}
+.welcome h1{color:#F4F7FB;font-size:clamp(32px,3.2vw,44px)}
+.welcome p{color:#B2BDCC;font-size:14px}
+.primaryButton{background:#49DDF5;border-color:#49DDF5;color:#07131a;font-size:12px}
+.primaryButton:hover{background:#7be8f8}
+.secondaryButton{background:#171D27;border-color:#354353;color:#F4F7FB;font-size:12px}
+.secondaryButton:hover{background:#202b38}
+.notice{background:linear-gradient(105deg,#12232b,#11151C);border-color:#293342}
+.noticeIcon{background:#171D27;border-color:#293342;color:#49DDF5}
+.notice strong{color:#F4F7FB;font-size:13px}.notice p{color:#B2BDCC;font-size:12px}
+.noticeStatus{color:#B8F36B;font-size:11px}
+.sectionHeading h2{color:#F4F7FB;font-size:18px}
+.sectionHeading p{color:#B2BDCC;font-size:12px}
+.countBadge{background:#11151C;border-color:#293342;color:#B2BDCC;font-size:11px}
+.emptyState,.projectCard,.reportCard,.keywordSetCard,.activityCard,.metricCard,.statCard,.workspaceCardItem{background:#11151C;border-color:#293342;color:#F4F7FB;box-shadow:0 12px 32px #0002}
+.emptyState h3,.projectCard h3,.reportCard h3,.keywordSetCard h3{color:#F4F7FB}
+.emptyState p,.projectCard p,.reportCard p,.keywordSetCard p{color:#B2BDCC}
+.emptyState svg,.projectCard svg,.reportCard svg,.keywordSetCard svg{color:#49DDF5}
+.emptyState button,.projectCard button,.reportCard button,.keywordSetCard button{border-color:#354353}
+@media(max-width:800px){.sidebar{background:#11151C}.topbar{background:rgba(11,13,18,.94)}.content{padding-top:26px}}
+@media(prefers-reduced-motion:reduce){.shell *{transition:none!important;animation:none!important}}
