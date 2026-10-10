@@ -2,7 +2,6 @@ import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { request as httpRequest, type IncomingMessage } from "node:http";
 import { request as httpsRequest } from "node:https";
-import type { LookupFunction } from "node:dns";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -82,12 +81,13 @@ async function validateAndResolve(input: string): Promise<{ url: URL; address: s
 function requestPage(target: URL, address: string, family: number): Promise<IncomingMessage> {
   return new Promise((resolve, reject) => {
     const transport = target.protocol === "https:" ? httpsRequest : httpRequest;
-    const pinnedLookup: LookupFunction = (_hostname, options, callback) => {
-      if (typeof options === "object" && options !== null && "all" in options && options.all) {
-        callback(null, [{ address, family }]);
-      } else {
-        callback(null, address, family);
-      }
+    const pinnedLookup = (
+      _hostname: string,
+      options: { all?: boolean },
+      callback: (error: NodeJS.ErrnoException | null, address: string | { address: string; family: number }[], family?: number) => void,
+    ) => {
+      if (options.all) callback(null, [{ address, family }]);
+      else callback(null, address, family);
     };
 
     const request = transport(
@@ -103,7 +103,7 @@ function requestPage(target: URL, address: string, family: number): Promise<Inco
           "accept-encoding": "identity",
           connection: "close",
         },
-        lookup: pinnedLookup,
+        lookup: pinnedLookup as never,
         ...(target.protocol === "https:" ? { servername: target.hostname } : {}),
         agent: false,
       },
