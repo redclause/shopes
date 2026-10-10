@@ -19,7 +19,8 @@ type AnalysisResponse = {
   limitations: string[];
 };
 
-function parseCsv(input: string): Record<string, unknown>[] {\n  const text = input.replace(/^\\uFEFF/, "");
+function parseCsv(input: string): Record<string, unknown>[] {
+  const text = input.replace(/^\uFEFF/, "");
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = "";
