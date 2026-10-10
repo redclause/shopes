@@ -7,6 +7,7 @@ import {
   Download, FileSearch, LoaderCircle, ShieldCheck, TriangleAlert, XCircle,
 } from "lucide-react";
 import styles from "./page.module.css";
+import UserMenu from "../../components/UserMenu";
 import { useShopesTranslation } from "../../lib/i18n/useShopesTranslation";
 
 type Finding = {
@@ -29,7 +30,7 @@ function formatTime(value: string): string {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 }
 
-export default function AuditClient() {
+export default function AuditClient({ userName, userEmail, userImage, signOutAction }: { userName: string; userEmail: string; userImage?: string | null; signOutAction: () => Promise<void> }) {
   const { t } = useShopesTranslation();
   const [url, setUrl] = useState("");
   const [result, setResult] = useState<AuditResult | null>(null);
@@ -123,9 +124,12 @@ export default function AuditClient() {
     <main className={styles.page}>
       <header className={styles.header}>
         <Link href="/dashboard" className={styles.brand}><span className={styles.brandMark}><FileSearch size={18} /></span><span>shopes<span className={styles.brandDot}>.</span></span></Link>
-        <nav className={styles.backLink} aria-label="Main navigation">
-          <Link href="/dashboard">Dashboard</Link><Link href="/audit" aria-current="page">Site audit</Link><Link href="/keyword-research">Keyword research</Link><Link href="/product-intelligence">Product analysis</Link><Link href="/">Home</Link>
-        </nav>
+        <div className={styles.headerActions}>
+          <nav className={styles.backLink} aria-label="Main navigation">
+            <Link href="/dashboard">Dashboard</Link><Link href="/audit" aria-current="page">Site Audit</Link><Link href="/keyword-research">Keyword Research</Link><Link href="/product-intelligence">Product Analysis</Link><Link href="/">Home</Link>
+          </nav>
+          <UserMenu name={userName} email={userEmail} image={userImage} signOutAction={signOutAction} />
+        </div>
       </header>
 
       <div className={styles.content}>
