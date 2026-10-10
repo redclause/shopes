@@ -15,6 +15,7 @@ const INTENTS: Array<"All" | SearchIntent> = ["All", "Informational", "Commercia
 
 export default function KeywordResearchClient() {
   const [seed, setSeed] = useState("");
+  const [submittedSeed, setSubmittedSeed] = useState("");
   const [country, setCountry] = useState("US");
   const [language, setLanguage] = useState<KeywordLanguage>("English");
   const [query, setQuery] = useState("");
@@ -31,8 +32,8 @@ export default function KeywordResearchClient() {
 
   const allIdeas = useMemo(() => {
     if (!generated) return [];
-    try { return generateKeywordIdeas(seed, language); } catch { return []; }
-  }, [generated, seed, language]);
+    try { return generateKeywordIdeas(submittedSeed, language); } catch { return []; }
+  }, [generated, submittedSeed, language]);
 
   const filtered = useMemo(() => allIdeas
     .filter((item) => item.phrase.toLocaleLowerCase().includes(query.toLocaleLowerCase()))
@@ -55,6 +56,7 @@ export default function KeywordResearchClient() {
     if (clean.length > 120) { setError("Seed keyword must be 120 characters or fewer."); return; }
     setError("");
     setSeed(clean);
+    setSubmittedSeed(clean);
     setGenerated(true);
     setPage(1);
     setSelected([]);
