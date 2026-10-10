@@ -191,7 +191,7 @@ export default function KeywordResearchClient() {
     <section className={styles.results} aria-live="polite">
       <div className={styles.resultsHead}>
         <div><h2>{t("keywordResearch")}</h2><p>{generated ? (filtered.length + " suggestions · " + country + " · " + language) : "Start with a seed keyword to generate related ideas."}</p></div>
-        <div className={styles.actionGroup}><button className={styles.export} onClick={saveKeywordSet} disabled={!generated}><Save size={15} /> Save set locally</button><button className={styles.export} onClick={exportCsv} disabled={!generated}><Download size={15} /> {t("exportCsv")}</button></div>
+        <div className={styles.actionGroup}><button className={styles.export} onClick={saveKeywordSet} disabled={!generated}><Save size={15} /> {t("saveSetLocally")}</button><button className={styles.export} onClick={exportCsv} disabled={!generated}><Download size={15} /> {t("exportCsv")}</button></div>
       </div>
       {saveMessage && <p className={styles.fieldHelp} role="status">{saveMessage}</p>}
       <div className={styles.sourceNote}><Target size={17} /><div><strong>Source: Shopes local algorithms</strong><p>Opportunity and relevance are transparent heuristics. Modelled CPC is a broad, low-confidence range based on estimated intent—not Google Ads bids or measured keyword data. Verified search volume, competition metrics, and live SERP data are unavailable unless you import a dataset.</p></div></div>
