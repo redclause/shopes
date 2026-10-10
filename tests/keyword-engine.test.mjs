@@ -83,3 +83,26 @@ test("imports JSON and rejects malformed or oversized inputs", () => {
   assert.throws(() => parseImportedSerpData("x".repeat(2_000_001), "csv"), /2 MB/);
   assert.throws(() => generateKeywordIdeas("x".repeat(121), "English"), /120 characters/);
 });
+
+test("supports local generation and intent rules for all declared research languages", async () => {
+  const { KEYWORD_LANGUAGE_RULES, SUPPORTED_KEYWORD_LANGUAGES } = await import("../src/app/keyword-research/engine.ts");
+  assert.equal(SUPPORTED_KEYWORD_LANGUAGES.length, 20);
+  for (const language of SUPPORTED_KEYWORD_LANGUAGES) {
+    const rules = KEYWORD_LANGUAGE_RULES[language];
+    assert.ok(rules.modifiers.length >= 8, language + " should have commercial and transactional modifiers");
+    assert.ok(rules.questions.length >= 5, language + " should have question patterns");
+    assert.ok(rules.suffixes.length >= 5, language + " should have topic suffixes");
+    const ideas = generateKeywordIdeas("shop", language);
+    assert.ok(ideas.length > 10, language + " should generate local keyword ideas");
+    assert.equal(new Set(ideas.map((idea) => idea.normalized)).size, ideas.length);
+    assert.ok(ideas.every((idea) => idea.provenance === "locally-generated" && idea.metricsStatus === "unavailable"));
+  }
+});
+
+test("classifies transactional and commercial modifiers in non-English supported languages", async () => {
+  assert.equal(classifyIntent("comprar zapatos", "Spanish"), "Transactional");
+  assert.equal(classifyIntent("mejor teléfono", "Spanish"), "Commercial");
+  assert.equal(classifyIntent("купить телефон", "Russian"), "Transactional");
+  assert.equal(classifyIntent("أفضل هاتف", "Arabic"), "Commercial");
+  assert.equal(classifyIntent("가격 구매", "Korean"), "Transactional");
+});
