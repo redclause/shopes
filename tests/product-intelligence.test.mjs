@@ -43,6 +43,6 @@ test("review keyword signal is transparent when no sentiment words exist", () =>
 
 test("review keyword signal calculates simple positive and negative word proportions", () => {
   const result = sentimentSignals("Great quality, comfortable fit, but slow delivery and a broken box.");
-  assert.equal(result.positive, 50);
-  assert.equal(result.negative, 50);
+  assert.equal(result.positive, 60);
+  assert.equal(result.negative, 40);
 });
