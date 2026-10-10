@@ -18,5 +18,11 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
     redirect("/login?callbackUrl=" + encodeURIComponent(callbackUrl));
   }
 
-  async function signOutAction() {\n    "use server";\n    await signOut({ redirectTo: "/" });\n  }\n\n  const user = session.user;\n  return <AuditClient userName={user.name?.trim() || user.email?.split("@")[0] || "Shopes user"} userEmail={user.email || ""} userImage={user.image} signOutAction={signOutAction} />;
+  async function signOutAction() {
+    "use server";
+    await signOut({ redirectTo: "/" });
+  }
+
+  const user = session.user;
+  return <AuditClient userName={user.name?.trim() || user.email?.split("@")[0] || "Shopes user"} userEmail={user.email || ""} userImage={user.image} signOutAction={signOutAction} />;
 }
