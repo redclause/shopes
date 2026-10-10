@@ -133,7 +133,7 @@ export default function GoogleOneTapButton({
   }
 
   return (
-    <>
+    <span className="google-one-tap-control">
       <Script
         src="https://accounts.google.com/gsi/client"
         strategy="afterInteractive"
@@ -151,7 +151,7 @@ export default function GoogleOneTapButton({
         {label}
         {!busy && <ArrowRight size={14} aria-hidden="true" />}
       </button>
-      {message && <p className="google-one-tap-status" role="status" aria-live="polite">{message}</p>}
-    </>
+      {message && <span className="google-one-tap-status" role="status" aria-live="polite">{message}</span>}
+    </span>
   );
 }
