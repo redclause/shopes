@@ -239,20 +239,20 @@ function auditHtml(html: string, status: number, pageUrl: string): Finding[] {
 
   const canonicals = linkTags.filter((tag) => {
     const attrs = attributes(tag);
-    return (attrs.rel || "").toLowerCase().split(/\\s+/).includes("canonical") && Boolean(attrs.href);
+    return (attrs.rel || "").toLowerCase().split(/\s+/).includes("canonical") && Boolean(attrs.href);
   });
   findings.push({ id: "canonical-count", title: "Canonical consistency", status: canonicals.length > 1 ? "warning" : "pass", detail: canonicals.length > 1 ? "Multiple canonical link elements were found; inspect them for conflicting URLs." : canonicals.length === 1 ? "Exactly one canonical link element was found." : "No canonical link was found; review whether this page needs one." });
 
-  const jsonLdScripts = Array.from(html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script\\s*>/gi))
-    .filter((match) => /application\\/ld\\+json/i.test(attributes("<script " + match[1] + ">")["type"] || ""));
+  const jsonLdScripts = Array.from(html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi))
+    .filter((match) => /application\/ld\+json/i.test(attributes("<script " + match[1] + ">")["type"] || ""));
   let invalidJsonLd = 0;
   for (const match of jsonLdScripts) {
-    try { JSON.parse(match[2].replace(/^\\s*<!--|-->\\s*$/g, "").trim()); }
+    try { JSON.parse(match[2].replace(/^\s*<!--|-->\s*$/g, "").trim()); }
     catch { invalidJsonLd += 1; }
   }
   findings.push({ id: "structured-data", title: "JSON-LD syntax", status: jsonLdScripts.length === 0 ? "warning" : invalidJsonLd ? "warning" : "pass", detail: jsonLdScripts.length === 0 ? "No JSON-LD script was found in the returned HTML." : invalidJsonLd ? invalidJsonLd + " JSON-LD block(s) could not be parsed as JSON." : jsonLdScripts.length + " JSON-LD block(s) parsed as JSON. Schema semantics and search-engine eligibility were not verified." });
 
-  const h1Matches = Array.from(html.matchAll(/<h1\\b[^>]*>([\\s\\S]*?)<\\/h1\\s*>/gi));
+  const h1Matches = Array.from(html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1\s*>/gi));
   const emptyH1 = h1Matches.filter((match) => !cleanText(match[1])).length;
   findings.push({ id: "heading-content", title: "H1 content", status: headings.h1 > 0 && emptyH1 === 0 ? "pass" : "warning", detail: headings.h1 === 0 ? "No H1 element was found." : emptyH1 ? emptyH1 + " H1 element(s) have no readable text." : headings.h1 + " H1 element(s) contain readable text; heading hierarchy across the page was not fully evaluated." });
   return findings;
