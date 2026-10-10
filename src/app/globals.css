@@ -112,3 +112,58 @@ body{font-size:17px;line-height:1.65}
 .dash-heading h3,.chart-head strong,.integration-panel-head h3{font-size:20px}
 .footer-column b{font-size:16px}
 @media(max-width:640px){body{font-size:16px}.site-header{padding:0 20px}.nav-links{font-size:16px}.header-actions{font-size:15px}.hero h1{font-size:clamp(3rem,12vw,4.3rem)}.hero-description,.section-intro>p,.integration-copy>p{font-size:17px}.feature-card h3,.workflow-grid h3{font-size:23px}}
+
+
+/* Responsive finishing pass and persistent Google sign-in entry point */
+html,body{max-width:100%;overflow-x:clip}
+img,svg,video,canvas{max-width:100%}
+.mobile-google-cta{display:none!important}
+.google-cta{font-size:13px!important;min-height:42px;white-space:nowrap}
+.login-shell{width:100%;min-height:100svh!important;padding:clamp(14px,4vw,28px)!important}
+.login-card{min-width:0}
+.login-title{font-size:clamp(32px,7vw,40px)!important;overflow-wrap:anywhere}
+.login-description{font-size:clamp(15px,3.5vw,17px)!important}
+.google-signin-button{border-color:#dadce0!important;background:#fff!important;color:#3c4043!important;min-height:52px!important;box-shadow:0 1px 2px #0002;font-size:16px!important}
+.google-signin-button:hover{background:#f8faff!important;box-shadow:0 1px 3px #0003}
+@media(max-width:760px){
+  .header-actions{display:none}
+  .nav-links.open .mobile-google-cta{display:flex!important;align-items:center;justify-content:center;gap:8px;margin-top:12px;padding:13px 14px;border:1px solid #293342;border-radius:9px;background:#11151C;color:#F4F7FB;font-weight:800}
+  .nav-links.open .mobile-google-cta svg{color:#49DDF5}
+  .hero{min-width:0}
+  .hero-copy,.hero-visual{min-width:0}
+  .hero-visual{overflow:visible}
+  .dashboard-window{max-width:100%}
+  .feature-card,.integration-panel,.workflow-grid article{min-width:0}
+  .integration-items{min-width:0}
+  .footer-column a,.integration-item-copy b{overflow-wrap:anywhere}
+}
+@media(max-width:480px){
+  .announcement{height:auto;min-height:34px;padding:8px 12px;text-align:center;line-height:1.45}
+  .site-header{padding-left:15px;padding-right:15px}
+  .section-wrap{padding-left:16px;padding-right:16px}
+  .hero{padding-top:42px;gap:32px}
+  .hero h1{font-size:clamp(40px,12vw,54px);overflow-wrap:normal}
+  .url-form{width:100%;min-width:0}
+  .url-form input{width:0}
+  .hero-proof{align-items:flex-start}
+  .note-one{left:-4px;bottom:76px}
+  .note-two{right:-4px;top:42px}
+  .floating-note{max-width:calc(100% - 4px)}
+  .trust-inner>b{flex:1 1 42%;min-width:0}
+  .feature-large{min-height:370px}
+  .mini-audit{right:12px;width:47%}
+  .integration-panel-head{align-items:flex-start;flex-direction:column}
+  .integration-items{grid-template-columns:1fr}
+  .footer-main{grid-template-columns:1fr 1fr}
+  .login-card{padding:28px 22px!important;border-radius:15px!important}
+  .login-title{font-size:34px!important}
+}
+@media(max-width:360px){
+  .brand{font-size:20px}
+  .hero h1{font-size:39px}
+  .url-form{gap:5px;padding-left:8px}
+  .url-form button{padding:0 8px;font-size:9px}
+  .floating-note{gap:6px;padding:7px}
+  .note-icon{width:25px;height:25px}
+  .login-card{padding:24px 17px!important}
+}
