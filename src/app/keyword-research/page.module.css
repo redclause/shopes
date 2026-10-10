@@ -69,3 +69,4 @@
   .tableWrap th{font-size:10px}
   .tableWrap td{font-size:13px}
 }
+.actionGroup{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.actionGroup .export{font-size:13px;min-height:40px}.fieldHelp[role="status"]{padding:10px 12px;border-radius:9px;background:#edf8f0;color:#315b40;font-weight:600}@media(max-width:640px){.actionGroup{width:100%;justify-content:stretch}.actionGroup .export{flex:1;white-space:normal}}
