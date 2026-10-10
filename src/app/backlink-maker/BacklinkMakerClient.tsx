@@ -220,14 +220,14 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
               </article>)}
             </div>
             <section aria-labelledby="site-catalog-title" style={{ marginTop: 24 }}>
-              <div className={styles.cardHeading}><span className={styles.iconTile}><Link2 size={19} /></span><div><h2 id="site-catalog-title">Website opportunity catalog</h2><p>{backlinkSiteCatalog.length} starter websites across communities, forums, publishing, directories, reviews, startups and social platforms. Every entry requires current policy review.</p></div></div>
+              <div className={styles.cardHeading}><span className={styles.iconTile}><Link2 size={19} /></span><div><h2 id="site-catalog-title">Website opportunity catalog</h2><p>{backlinkSiteCatalog.length.toLocaleString()} website candidates across communities, publishing, directories, reviews, startups, software marketplaces and social platforms. Each entry requires current policy review; catalog inclusion does not mean backlink placement is permitted.</p></div></div>
               <label className={styles.field}><span>Search catalog</span><input value={catalogSearch} onChange={(event) => setCatalogSearch(event.target.value)} placeholder="Search site name, domain, category or submission method" /></label>
               <label className={styles.field}><span>Category</span><select value={catalogCategory} onChange={(event) => setCatalogCategory(event.target.value)} style={{ width: "100%", minHeight: 46, padding: "10px 12px", border: "1px solid #334352", borderRadius: 10, background: "#0b1118", color: "#f3f8fc", font: "inherit", fontSize: 14 }}>
                 {backlinkSiteCategories.map((category) => <option key={category} value={category}>{category}</option>)}
               </select></label>
               <div className={styles.snippetList}>
                 {backlinkSiteCatalog.filter((site) => (catalogCategory === "All" || site.category === catalogCategory) && [site.name, site.domain, site.category, site.submissionMethod, site.notes].some((value) => value.toLowerCase().includes(catalogSearch.trim().toLowerCase()))).map((site) => <article className={styles.snippet} key={site.id}>
-                  <div className={styles.snippetHead}><div><h3>{site.name} <span style={{ color: "#8da2b3", fontWeight: 500 }}>· {site.category}</span></h3><p>{site.domain} · {site.submissionMethod}</p><p>{site.notes}</p><p style={{ color: "#f0c879", marginTop: 6 }}>Policy status: needs manual review</p></div><a className={styles.export} href={site.url} target="_blank" rel="noopener noreferrer">Review site <ExternalLink size={13} /></a></div>
+                  <div className={styles.snippetHead}><div><h3>{site.name} <span style={{ color: "#8da2b3", fontWeight: 500 }}>· {site.category}</span></h3><p>{site.domain} · {site.submissionMethod}</p><p>{site.notes}</p><p style={{ color: "#f0c879", marginTop: 6 }}>Policy status: needs manual review</p>{site.sourceUrl && <p style={{ marginTop: 6 }}><a href={site.sourceUrl} target="_blank" rel="noopener noreferrer">Source list <ExternalLink size={12} /></a></p>}</div><a className={styles.export} href={site.url} target="_blank" rel="noopener noreferrer">Review site <ExternalLink size={13} /></a></div>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
                     <button type="button" className={styles.export} onClick={() => { setCandidateUrl(site.url); setVerifyResult(null); }}>Use as candidate page</button>
                     <button type="button" className={styles.export} disabled={checkingPolicySite === site.id} onClick={() => checkSitePolicy(site.id)}>{checkingPolicySite === site.id ? "Checking rules…" : "Inspect public rules"}</button>
@@ -240,7 +240,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
                         <p><strong>{item.path}</strong> · HTTP {item.httpStatus}{item.matchedKeywords?.length ? ` · Terms: ${item.matchedKeywords.join(", ")}` : ""}</p>
                         {item.summary?.directives?.length ? <p>robots.txt directives: {item.summary.directives.join("; ")}</p> : null}
                         {item.excerpt && <p style={{ overflowWrap: "anywhere" }}>{item.excerpt.slice(0, 420)}{item.excerpt.length > 420 ? "…" : ""}</p>}
-                        <a href={site.url.replace(/\/$/, "") + item.path} target="_blank" rel="noopener noreferrer" className={styles.export}>Open page <ExternalLink size={13} /></a>
+                        <a href={new URL(item.path, site.url).toString()} target="_blank" rel="noopener noreferrer" className={styles.export}>Open page <ExternalLink size={13} /></a>
                       </div>)}
                       {policyResults[site.id].note && <p>{policyResults[site.id].note}</p>}
                     </div>
@@ -248,7 +248,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
                 </article>)}
                 {backlinkSiteCatalog.filter((site) => (catalogCategory === "All" || site.category === catalogCategory) && [site.name, site.domain, site.category, site.submissionMethod, site.notes].some((value) => value.toLowerCase().includes(catalogSearch.trim().toLowerCase()))).length === 0 && <p style={{ color: "#aabac8", fontSize: 13 }}>No catalog entries match this search.</p>}
               </div>
-              <div className={styles.notice}><ShieldCheck size={18} /><p><strong>Important:</strong> Catalog inclusion is not confirmation that a site accepts backlinks. The current seed is a discovery shortlist, not a completed 500-site verified directory. Review each site's official rules before submitting anything; only approved site-specific integrations may automate submission.</p></div>
+              <div className={styles.notice}><ShieldCheck size={18} /><p><strong>Important:</strong> Catalog entries are candidate websites, not verified backlink placements. Check each site’s current official rules and relevance before submitting anything; only explicitly approved site-specific integrations may automate submission.</p></div>
             </section>
             <div className={styles.notice} style={{ marginTop: 16 }}><ShieldCheck size={18} /><p><strong>Honest status reporting:</strong> Search links open public search results in your browser; Shopes does not claim that a backlink has been submitted or published. Direct automated scraping of search engines is intentionally not used.</p></div>
             <form onSubmit={verifyBacklink} style={{ marginTop: 22 }}>
