@@ -109,3 +109,14 @@
 @media(max-width:1120px){.shell{grid-template-columns:205px minmax(0,1fr)}.main{padding:0 23px 25px}.ingestGrid{grid-template-columns:1fr 1fr}.resultsGrid{grid-template-columns:1fr}.rightColumn{grid-template-columns:1fr 1fr}.scoreStat{min-width:115px}.categoryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.shell{display:block}.sidebar{position:relative;height:auto;padding:15px 16px;display:flex;flex-direction:row;align-items:center;gap:8px;overflow:auto;border-right:0;border-bottom:1px solid #202936}.brand{flex:0 0 auto;padding:0 10px 0 0;font-size:20px}.brandMark{width:30px;height:30px}.sidebarLabel,.sidebarFoot{display:none}.navItem,.navItemActive{flex:0 0 auto;min-height:35px;padding:0 9px;font-size:10px}.navItem svg,.navItemActive svg{width:13px}.main{padding:0 15px 23px}.topbar{height:55px}.topbarBadge{font-size:9px}.pageHeading{padding:26px 0 20px}.pageHeading h1{font-size:30px}.pageHeading p{font-size:12px}.headingIcon{display:none}.ingestGrid{grid-template-columns:1fr}.sourceCard{padding:17px}.scoreHero{flex-wrap:wrap;padding:16px;gap:13px}.scoreRing{width:78px;height:78px;flex-basis:78px}.scoreRing strong{font-size:23px}.scoreCopy{flex-basis:calc(100% - 100px)}.scoreCopy h2{font-size:16px}.scoreStat{width:100%;padding:12px 0 0;border-left:0;border-top:1px solid #2c3a46}.categoryGrid{grid-template-columns:1fr 1fr;gap:9px}.categoryCard{padding:12px}.categoryHead>span{font-size:10px}.categoryCard p{font-size:9px}.rightColumn{grid-template-columns:1fr}.benchmarkGrid{grid-template-columns:1fr}.benchmarkCard h3,.benchmarkCard>p{min-height:0}.sectionHeading{align-items:flex-start}.sectionHeading .mutedText{max-width:120px;text-align:right;line-height:1.5}.footer{align-items:flex-start;flex-direction:column}.emptyChecklist{flex-direction:column;align-items:flex-start}.emptyState{padding:23px 15px}}
 @media(max-width:400px){.categoryGrid{grid-template-columns:1fr}.pageHeading h1{font-size:27px}.topbarBadge{max-width:155px;line-height:1.4}.sidebar{gap:4px}.navItem,.navItemActive{gap:5px;padding:0 7px}}
+
+
+/* Consistent cyan navigation and account controls across the SEO workspace. */
+.topbar{gap:18px}
+.mainNav{display:flex;align-items:center;gap:clamp(10px,1.5vw,20px);min-width:0;flex-wrap:wrap}
+.mainNav a{color:#49DDF5;font-size:12px;font-weight:800;white-space:nowrap;transition:color .16s}
+.mainNav a:hover,.mainNav a[aria-current="page"]{color:#a0f3ff}
+.mainNav a[aria-current="page"]{text-decoration:underline;text-decoration-color:#49DDF5;text-underline-offset:7px}
+.topbarActions{display:flex;align-items:center;gap:12px;flex-shrink:0}
+@media(max-width:1000px){.topbar{height:auto;min-height:69px;padding:12px 0;align-items:flex-start;flex-wrap:wrap}.mainNav{flex:1}.topbarActions{margin-left:auto}}
+@media(max-width:600px){.mainNav{gap:9px}.mainNav a{font-size:11px}.topbarActions{width:100%;justify-content:space-between}}
