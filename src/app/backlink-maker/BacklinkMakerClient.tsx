@@ -99,6 +99,9 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
       const response = await fetch("/api/backlink-maker/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetUrl: generatedUrl, candidateUrl: candidateUrl.trim() }) });
       const result = await response.json();
       setVerifyResult(result);
+      if (result.status === "found") {
+        setSubmissionRecords((current) => current.map((record) => record.targetUrl === generatedUrl && record.candidateUrl === candidateUrl.trim() ? { ...record, status: "published", updatedAt: new Date().toISOString() } : record));
+      }
     } catch {
       setVerifyResult({ status: "error", message: "The verification request failed. Please try again." });
     } finally {
@@ -214,7 +217,6 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
                     {record.status !== "submitted" && record.status !== "published" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "submitted")}>Mark as submitted</button>}
                     {record.status !== "published" && <button type="button" className={styles.export} onClick={() => { setCandidateUrl(record.candidateUrl); setVerifyResult(null); }}>Verify backlink</button>}
-                    {record.status !== "published" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "published")}>Mark published after verification</button>}
                     {record.status !== "rejected" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "rejected")}>Mark not accepted</button>}
                   </div>
                 </article>)}
