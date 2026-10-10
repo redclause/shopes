@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import ts from "typescript";
 import { LOCALES, getDirection, getLocale } from "../src/lib/i18n/languages.ts";
 import { hasFullCoreTranslation, translate } from "../src/lib/i18n/messages.ts";
 import { hasUiTextTranslation, translateUiText } from "../src/lib/i18n/ui-text.ts";
@@ -66,4 +68,48 @@ test("static UI text translations work and missing copy remains explicitly detec
   assert.equal(hasUiTextTranslation("es", "Analyze store"), true);
   assert.equal(hasUiTextTranslation("fr", "A phrase not yet translated"), false);
   assert.equal(translateUiText("en", "A phrase not yet translated"), "A phrase not yet translated");
+});
+
+test("static JSX copy on primary routes has translations for every offered UI locale", () => {
+  const files = [
+    "src/app/page.tsx",
+    "src/app/login/page.tsx",
+    "src/app/dashboard/page.tsx",
+    "src/app/dashboard/loading.tsx",
+    "src/app/audit/AuditClient.tsx",
+    "src/app/keyword-research/KeywordResearchClient.tsx",
+  ];
+  const visibleText = new Set();
+  for (const file of files) {
+    const source = readFileSync(file, "utf8");
+    const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+    const visit = (node) => {
+      if (node.kind === ts.SyntaxKind.JsxText) {
+        const text = node.getText(ast)
+          .replace(/&apos;/g, "'")
+          .replace(/&amp;/g, "&")
+          .replace(/&quot;/g, '"')
+          .replace(/\s+/g, " ")
+          .trim();
+        if (
+          text &&
+          /[A-Za-zÀ-ž]/.test(text) &&
+          !/^shopes$/i.test(text) &&
+          !/^[A-Z]{1,3}$/.test(text) &&
+          !/^https?:\/\//i.test(text) &&
+          !/^[\d.,/%$–—·\s]+$/.test(text)
+        ) visibleText.add(text);
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(ast);
+  }
+  const missing = {};
+  for (const locale of ["es", "fr", "de"]) {
+    missing[locale] = [...visibleText].filter((text) => !hasUiTextTranslation(locale, text));
+  }
+  const summary = Object.entries(missing)
+    .filter(([, phrases]) => phrases.length)
+    .map(([locale, phrases]) => locale + ": " + phrases.join(" | "));
+  assert.deepEqual(summary, [], "Add translations for every static JSX text node:\n" + summary.join("\n"));
 });
