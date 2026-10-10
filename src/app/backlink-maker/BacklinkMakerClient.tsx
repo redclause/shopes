@@ -7,11 +7,12 @@ import { ArrowLeft, ArrowRight, Check, Clipboard, Download, ExternalLink, Link2,
 import UserMenu from "../../components/UserMenu";
 import styles from "./page.module.css";
 import { backlinkSiteCatalog, backlinkSiteCategories } from "./site-catalog";
+import { canReopenManualWorkflow, getManualWorkflow, hasActiveDuplicate, normalizeStoredRecord, submissionStatusLabel, verificationStatusLabel } from "./submission-tracker.mjs";
 
 type Props = { userName: string; userEmail: string; userImage?: string | null; signOutAction: () => Promise<void> };
 type Snippet = { id: string; title: string; description: string; value: string };
 type VerificationEvidence = { anchorText: string; href: string; resolvedUrl: string; rel: string[]; isNofollow: boolean };
-type SubmissionRecord = { id: string; targetUrl: string; candidateUrl: string; status: "prepared" | "user-reported-submitted" | "backlink_verified" | "rejected"; createdAt: string; updatedAt: string; note?: string; title?: string; description?: string; submissionMethod?: string; siteId?: string; siteName?: string; siteDomain?: string; submissionUrl?: string; verification?: VerificationEvidence; canonicalUrl?: string; httpStatus?: number };
+type SubmissionRecord = { id: string; targetUrl: string; candidateUrl: string; status: "prepared" | "user-reported-submitted" | "rejected"; submissionStatus?: string; verificationStatus?: "not-checked" | "found" | "not-found" | "error" | "redirect"; createdAt: string; updatedAt: string; note?: string; title?: string; description?: string; submissionMethod?: string; siteId?: string; siteName?: string; siteDomain?: string; submissionUrl?: string; verification?: VerificationEvidence; canonicalUrl?: string; httpStatus?: number };
 
 function normalizeUrl(value: string) {
   const input = value.trim();
@@ -35,6 +36,9 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   const [verifyResult, setVerifyResult] = useState<{status:string; message:string; checkedUrl?:string; targetUrl?:string; checkedAt?:string; note?:string; httpStatus?:number; canonicalUrl?:string | null; redirectUrl?:string; evidence?:VerificationEvidence | null} | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [submissionRecords, setSubmissionRecords] = useState<SubmissionRecord[]>([]);
+  const [historySearch, setHistorySearch] = useState("");
+  const [historyStatus, setHistoryStatus] = useState("all");
+  const [historyVerificationStatus, setHistoryVerificationStatus] = useState("all");
   const [submissionNote, setSubmissionNote] = useState("");
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedSubmissionUrl, setSelectedSubmissionUrl] = useState("");
@@ -51,7 +55,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
       const saved = window.localStorage.getItem("shopes-backlink-submissions-v1");
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setSubmissionRecords(parsed.filter((item) => item && typeof item.id === "string" && typeof item.targetUrl === "string" && typeof item.candidateUrl === "string").map((item) => ({ ...item, status: item.status === "backlink_verified" && item.verification?.resolvedUrl ? "backlink_verified" : item.status === "submitted" || item.status === "user-reported-submitted" ? "user-reported-submitted" : item.status === "rejected" ? "rejected" : "prepared" })));
+        if (Array.isArray(parsed)) setSubmissionRecords(parsed.filter((item) => item && typeof item.id === "string" && typeof item.targetUrl === "string" && typeof item.candidateUrl === "string").map((item) => ({ ...item, ...normalizeStoredRecord(item) })));
       }
     } catch { /* Ignore malformed local history and keep the tool usable. */ }
     setRecordsLoaded(true);
@@ -108,13 +112,14 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
       const response = await fetch("/api/backlink-maker/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetUrl: generatedUrl, candidateUrl: candidateUrl.trim() }) });
       const result = await response.json();
       setVerifyResult(result);
-      if (result.status === "found") {
-        const checkedHost = new URL(candidateUrl.trim()).hostname.toLowerCase();
+      if (["found", "not-found", "error", "redirect"].includes(result.status)) {
+        let checkedHost = "";
+        try { checkedHost = new URL(candidateUrl.trim()).hostname.toLowerCase(); } catch { /* The API reports malformed URLs. */ }
         setSubmissionRecords((current) => current.map((record) => {
           const sameTarget = record.targetUrl === generatedUrl;
           const samePage = record.candidateUrl === candidateUrl.trim();
           const belongsToSelectedSite = !record.candidateUrl && record.siteDomain && (checkedHost === record.siteDomain || checkedHost.endsWith("." + record.siteDomain));
-          return sameTarget && (samePage || belongsToSelectedSite) ? { ...record, candidateUrl: candidateUrl.trim(), status: "backlink_verified", verification: result.evidence ?? undefined, canonicalUrl: result.canonicalUrl ?? undefined, httpStatus: result.httpStatus, updatedAt: new Date().toISOString() } : record;
+          return sameTarget && (samePage || belongsToSelectedSite) ? { ...record, candidateUrl: candidateUrl.trim(), verificationStatus: result.status, verification: result.evidence ?? undefined, canonicalUrl: result.canonicalUrl ?? undefined, httpStatus: result.httpStatus, updatedAt: new Date().toISOString() } : record;
         }));
       }
     } catch {
@@ -128,6 +133,11 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
     event.preventDefault();
     const site = backlinkSiteCatalog.find((entry) => entry.id === selectedSiteId);
     if (!generatedUrl || !site || !publisherPermission) return;
+    if (hasActiveDuplicate(submissionRecords, generatedUrl, site.id)) {
+      setError("A record for this target and site already exists in your local history. Open that record or choose another site.");
+      return;
+    }
+    setError("");
     const now = new Date().toISOString();
     const candidateHost = candidateUrl.trim() ? (() => { try { return new URL(candidateUrl.trim()).hostname.toLowerCase(); } catch { return ""; } })() : "";
     const candidateBelongsToSite = candidateHost === site.domain || candidateHost.endsWith("." + site.domain);
@@ -138,7 +148,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   }
 
   function updateSubmissionStatus(id: string, status: SubmissionRecord["status"]) {
-    setSubmissionRecords((current) => current.map((record) => record.id === id ? { ...record, status, updatedAt: new Date().toISOString() } : record));
+    setSubmissionRecords((current) => current.map((record) => record.id === id ? { ...record, status, submissionStatus: status, updatedAt: new Date().toISOString() } : record));
   }
 
   const filteredCatalog = useMemo(() => {
@@ -148,6 +158,16 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
       [site.name, site.domain, site.category, site.submissionMethod, site.notes].some((value) => value.toLowerCase().includes(query))
     );
   }, [catalogCategory, catalogSearch]);
+
+  const filteredSubmissionRecords = useMemo(() => {
+    const query = historySearch.trim().toLowerCase();
+    return submissionRecords.filter((record) =>
+      (historyStatus === "all" || record.status === historyStatus) &&
+      (historyVerificationStatus === "all" || (record.verificationStatus || "not-checked") === historyVerificationStatus) &&
+      [record.siteName, record.siteDomain, record.targetUrl, record.candidateUrl, record.title, record.description, record.status]
+        .some((value) => (value || "").toLowerCase().includes(query))
+    );
+  }, [submissionRecords, historySearch, historyStatus, historyVerificationStatus]);
 
   const catalogPageSize = 25;
   const catalogPageCount = Math.max(1, Math.ceil(filteredCatalog.length / catalogPageSize));
@@ -295,23 +315,30 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
               <div className={styles.cardHeading}><span className={styles.iconTile}><Clipboard size={19} /></span><div><h2>Submission tracker</h2><p>Choose a catalog site first. This prepares a user-assisted workflow; it does not submit anything automatically.</p></div></div>
               <p style={{ color: "#aabac8", fontSize: 13, lineHeight: 1.7 }}>Selected site: <strong style={{ color: "#f3f8fc" }}>{backlinkSiteCatalog.find((site) => site.id === selectedSiteId)?.name || "None — choose Prepare manual workflow in the catalog"}</strong></p>
               {selectedSiteId && (() => { const site = backlinkSiteCatalog.find((item) => item.id === selectedSiteId); return site ? <p style={{ marginTop: 0, fontSize: 13, lineHeight: 1.7 }}><a href={selectedSubmissionUrl || site.submissionUrl || site.url} target="_blank" rel="noopener noreferrer" className={styles.export}>{selectedSubmissionUrl || site.submissionUrl ? "Open discovered submission candidate" : "Open official site to find its submission process"} <ExternalLink size={13} /></a> <span style={{ color: "#aabac8" }}>No automated submission is performed.</span></p> : null; })()}
+              {selectedSiteId && (() => { const workflow = getManualWorkflow(selectedSiteId); return workflow ? <div className={styles.notice} style={{ marginTop: 12, alignItems: "flex-start" }}><Clipboard size={18} /><div><p><strong>{workflow.label}</strong></p><p>{workflow.caution}</p><p><strong>Prepare these details:</strong> {workflow.requirements.join(" · ")}</p><ol style={{ paddingLeft: 20, margin: "8px 0" }}>{workflow.steps.map((step) => <li key={step} style={{ marginBottom: 5 }}>{step}</li>)}</ol><p><a href={workflow.destination} target="_blank" rel="noopener noreferrer">Open official submission page <ExternalLink size={12} /></a></p></div></div> : null; })()}
               <label className={styles.field}><span>Submission note <small>(optional)</small></span><textarea value={submissionNote} onChange={(event) => setSubmissionNote(event.target.value)} rows={2} maxLength={300} placeholder="e.g. Resource directory form; submission requires editor approval." /></label>
               <label className={styles.checkRow}><input type="checkbox" checked={publisherPermission} onChange={(event) => setPublisherPermission(event.target.checked)} /><span><strong>I reviewed this site and its rules permit this submission.</strong><small>Adding a record does not submit the form. “I submitted this manually” records your own report only. Do not submit unsolicited links or bypass CAPTCHA, login, or anti-spam controls.</small></span></label>
               <button className={styles.primary} type="submit" disabled={!publisherPermission || !selectedSiteId || !generatedUrl}><Clipboard size={16} /> Prepare submission record</button>
             </form>
             {submissionRecords.length > 0 && <div style={{ marginTop: 20 }}>
-              <div className={styles.cardHeading}><span className={styles.iconTile}><Check size={19} /></span><div><h2>Submission history</h2><p>Stored in this browser only; up to 100 records.</p></div></div>
+              <div className={styles.cardHeading}><span className={styles.iconTile}><Check size={19} /></span><div><h2>Submission history</h2><p>Stored in this browser only; up to 100 records. {filteredSubmissionRecords.length} shown.</p></div></div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, margin: "12px 0" }}>
+                <label className={styles.field} style={{ flex: "1 1 220px", margin: 0 }}><span>Search history</span><input type="search" value={historySearch} onChange={(event) => setHistorySearch(event.target.value)} placeholder="Site, target URL, title…" /></label>
+                <label className={styles.field} style={{ flex: "0 1 220px", margin: 0 }}><span>Submission status</span><select value={historyStatus} onChange={(event) => setHistoryStatus(event.target.value)}><option value="all">All statuses</option><option value="prepared">Prepared</option><option value="user-reported-submitted">User-reported submitted</option><option value="rejected">Rejected</option></select></label>
+                <label className={styles.field} style={{ flex: "0 1 220px", margin: 0 }}><span>Verification status</span><select value={historyVerificationStatus} onChange={(event) => setHistoryVerificationStatus(event.target.value)}><option value="all">All verification states</option><option value="not-checked">Not checked</option><option value="found">Independently verified</option><option value="not-found">Not found</option><option value="redirect">Redirected</option><option value="error">Verification failed</option></select></label>
+              </div>
               <div className={styles.snippetList}>
-                {submissionRecords.map((record) => <article className={styles.snippet} key={record.id}>
-                  <div className={styles.snippetHead}><div><h3>{record.status === "prepared" ? "Prepared — not submitted" : record.status === "user-reported-submitted" ? "User-reported submission — unverified" : record.status === "backlink_verified" ? "Backlink verified in page HTML" : "User-reported rejection"}</h3><p>{record.siteName || record.siteDomain || "Unspecified site"}{record.submissionMethod ? ` · ${record.submissionMethod}` : ""}</p>{record.title && <p>Title: {record.title}</p>}{record.description && <p>Description: {record.description}</p>}<p>Target: {record.targetUrl}</p>{record.candidateUrl && <p>Verified/candidate page: {record.candidateUrl}</p>}<p>Updated {new Date(record.updatedAt).toLocaleString()}</p>{record.verification && <p>Anchor: {record.verification.anchorText || "(empty anchor)"} · rel: {record.verification.rel.join(" ") || "none"} · {record.verification.isNofollow ? "nofollow/sponsored/ugc" : "not marked nofollow/sponsored/ugc"}{record.httpStatus ? ` · HTTP ${record.httpStatus}` : ""}</p>}{record.canonicalUrl && <p>Canonical: {record.canonicalUrl}</p>}</div>{record.submissionUrl && <a className={styles.export} href={record.submissionUrl} target="_blank" rel="noopener noreferrer">Open workflow <ExternalLink size={13} /></a>}</div>
+                {filteredSubmissionRecords.map((record) => <article className={styles.snippet} key={record.id}>
+                  <div className={styles.snippetHead}><div><h3>{submissionStatusLabel(record.status)}</h3><p><strong>Verification:</strong> {verificationStatusLabel(record.verificationStatus || "not-checked")}</p><p>{record.siteName || record.siteDomain || "Unspecified site"}{record.submissionMethod ? ` · ${record.submissionMethod}` : ""}</p>{record.title && <p>Title: {record.title}</p>}{record.description && <p>Description: {record.description}</p>}<p>Target: {record.targetUrl}</p>{record.candidateUrl && <p>Verified/candidate page: {record.candidateUrl}</p>}<p>Updated {new Date(record.updatedAt).toLocaleString()}</p>{record.verification && <p>Anchor: {record.verification.anchorText || "(empty anchor)"} · rel: {record.verification.rel.join(" ") || "none"} · {record.verification.isNofollow ? "nofollow/sponsored/ugc" : "not marked nofollow/sponsored/ugc"}{record.httpStatus ? ` · HTTP ${record.httpStatus}` : ""}</p>}{record.canonicalUrl && <p>Canonical: {record.canonicalUrl}</p>}</div>{record.submissionUrl && <a className={styles.export} href={record.submissionUrl} target="_blank" rel="noopener noreferrer">Open workflow <ExternalLink size={13} /></a>}</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
                     {record.status === "prepared" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "user-reported-submitted")}>I submitted this manually</button>}
-                    {record.status !== "backlink_verified" && record.candidateUrl && <button type="button" className={styles.export} onClick={() => { setCandidateUrl(record.candidateUrl); setVerifyResult(null); }}>Verify backlink</button>}
+                    {record.verificationStatus !== "found" && record.candidateUrl && <button type="button" className={styles.export} onClick={() => { setTargetUrl(record.targetUrl); setGeneratedUrl(record.targetUrl); setCandidateUrl(record.candidateUrl); setVerifyResult(null); }}>Verify backlink</button>}
                     {record.status !== "rejected" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "rejected")}>Record rejection</button>}
+                    {canReopenManualWorkflow(record.status) && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "prepared")}>Reopen manual workflow</button>}
                   </div>
                 </article>)}
               </div>
-              <div className={styles.notice} style={{ marginTop: 12 }}><ShieldCheck size={18} /><p>“I submitted this manually” is only your report that you attempted a submission; it is not proof of acceptance. Shopes changes a record to “Backlink verified” only when the checker finds the target link in the fetched HTML.</p></div>
+              <div className={styles.notice} style={{ marginTop: 12 }}><ShieldCheck size={18} /><p>Submission status and verification status are tracked separately. “I submitted this manually” is only your report, not proof of acceptance. A record is marked independently verified only when the checker finds the target link in fetched HTML; a successful verification does not rewrite the submission outcome.</p></div>
             </div>}
             {verifyResult && <div className={styles.notice} role="status" style={{ marginTop: 16, borderColor: verifyResult.status === "found" ? "#2c7569" : "#6c5960" }}><ShieldCheck size={18} /><div><p><strong>{verifyResult.status === "found" ? "Link found in fetched HTML" : verifyResult.status === "not-found" ? "Link not found" : verifyResult.status === "redirect" ? "Page redirected" : "Could not verify"}</strong><br />{verifyResult.message}{verifyResult.httpStatus ? ` (HTTP ${verifyResult.httpStatus})` : ""}{verifyResult.checkedAt ? ` Checked at ${new Date(verifyResult.checkedAt).toLocaleString()}.` : ""}{verifyResult.note ? ` ${verifyResult.note}` : ""}</p>{verifyResult.redirectUrl && <p><a href={verifyResult.redirectUrl} target="_blank" rel="noopener noreferrer">Review redirect destination: {verifyResult.redirectUrl} <ExternalLink size={12} /></a></p>}{verifyResult.evidence && <div style={{ marginTop: 10 }}><p><strong>Anchor text:</strong> {verifyResult.evidence.anchorText || "(empty anchor)"}</p><p><strong>Matched href:</strong> {verifyResult.evidence.href}</p><p><strong>Resolved URL:</strong> {verifyResult.evidence.resolvedUrl}</p><p><strong>rel:</strong> {verifyResult.evidence.rel.join(" ") || "none"} · <strong>nofollow/sponsored/ugc:</strong> {verifyResult.evidence.isNofollow ? "yes" : "not detected"}</p>{verifyResult.canonicalUrl && <p><strong>Canonical URL:</strong> {verifyResult.canonicalUrl}</p>}</div>}</div></div>}
           </section>

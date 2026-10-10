@@ -16,7 +16,9 @@
     "backlink:audit": "node --experimental-strip-types scripts/backlink-catalog-audit.mjs",
     "test:backlink-submission-analysis": "node --experimental-strip-types --test tests/backlink-submission-analysis.test.mjs",
     "test:backlink": "npm run test:backlink-verification && npm run test:backlink-submission-analysis && npm run test:public-url",
-    "test:public-url": "node --experimental-strip-types --test tests/public-url.test.mjs"
+    "test:public-url": "node --experimental-strip-types --test tests/public-url.test.mjs",
+    "test:backlink-tracker": "node --test tests/backlink-tracker.test.mjs",
+    "test:backlink-audit-summary": "node --test tests/backlink-audit-summary.test.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
