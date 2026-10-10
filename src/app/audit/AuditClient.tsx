@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft, ArrowRight, CheckCircle2, CircleAlert, Clock3, ExternalLink,
-  FileSearch, LoaderCircle, ShieldCheck, TriangleAlert, XCircle,
+  Download, FileSearch, LoaderCircle, ShieldCheck, TriangleAlert, XCircle,
 } from "lucide-react";
 import styles from "./page.module.css";
 
@@ -33,6 +33,49 @@ export default function AuditClient() {
   const [result, setResult] = useState<AuditResult | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<"all" | Finding["status"]>("all");
+
+  const visibleFindings = result?.findings.filter((finding) => statusFilter === "all" || finding.status === statusFilter) ?? [];
+
+  function severity(finding: Finding): string {
+    if (finding.status === "error") return "High";
+    if (finding.id === "robots" && /noindex/i.test(finding.detail)) return "Critical";
+    if (finding.status === "warning" && ["title", "http-status", "canonical", "structured-data"].includes(finding.id)) return "High";
+    if (finding.status === "warning") return "Medium";
+    return "Informational";
+  }
+
+  function recommendation(finding: Finding): string {
+    const guidance: Record<string, string> = {
+      "http-status": "Confirm the intended page returns a successful response and redirects to the preferred URL.",
+      title: "Write a unique, descriptive title that accurately summarizes the page.",
+      description: "Add a unique, useful meta description that describes the page to potential visitors.",
+      canonical: "Choose the preferred absolute URL and add one canonical link when appropriate.",
+      "canonical-count": "Keep at most one consistent canonical link pointing to the preferred URL.",
+      h1: "Use a clear primary heading and review the surrounding heading structure.",
+      "heading-content": "Ensure the H1 contains meaningful visible text.",
+      "images-alt": "Add contextual alt text to informative images; use empty alt text for decorative images.",
+      links: "Add descriptive internal links where they help visitors discover related pages.",
+      robots: "Review meta robots and response headers to ensure the page can be indexed when intended.",
+      viewport: "Add a responsive viewport meta tag and test the layout on mobile screen sizes.",
+      "open-graph": "Add accurate og:title, og:description, and og:image values for social previews.",
+      "structured-data": "Validate JSON-LD syntax and separately verify schema properties.",
+    };
+    return guidance[finding.id] || "Review the evidence and confirm whether this applies to the page's intended behavior.";
+  }
+
+  function exportReport() {
+    if (!result) return;
+    const payload = { ...result, findings: result.findings.map((finding) => ({ ...finding, severity: severity(finding), recommendation: recommendation(finding) })), reportType: "single-page HTML audit; not a full-site crawl" };
+    const blobUrl = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
+    const anchor = document.createElement("a");
+    anchor.href = blobUrl;
+    anchor.download = "shopes-audit-report.json";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(blobUrl);
+  }
 
   async function runAudit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -97,12 +140,18 @@ export default function AuditClient() {
               <div className={styles.summaryCard}><span>Errors</span><strong>{result.summary.errors}</strong></div>
             </div>
 
+            <div className={styles.findingsToolbar}>
+              <label>Filter findings <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}>
+                <option value="all">All results</option><option value="error">Errors</option><option value="warning">Warnings</option><option value="pass">Passed checks</option>
+              </select></label>
+              <button type="button" className={styles.secondaryButton} onClick={exportReport}><Download size={15} /> Export JSON report</button>
+            </div>
             <div className={styles.findings}>
-              {result.findings.map((finding) => {
+              {visibleFindings.map((finding) => {
                 const Icon = finding.status === "pass" ? CheckCircle2 : finding.status === "error" ? XCircle : TriangleAlert;
                 return <article className={styles.finding} key={finding.id}>
                   <span className={styles.findingIcon + " " + styles[finding.status]}><Icon size={17} /></span>
-                  <div className={styles.findingCopy}><h3>{finding.title}</h3><p>{finding.detail}</p></div>
+                  <div className={styles.findingCopy}><h3>{finding.title} <span className={styles.severityLabel}>{severity(finding)} priority</span></h3><p>{finding.detail}</p><p className={styles.recommendation}><strong>Recommended next step:</strong> {recommendation(finding)}</p></div>
                   <span className={styles.statusLabel + " " + styles[finding.status]}>{finding.status === "pass" ? "Passed" : finding.status === "error" ? "Issue" : "Review"}</span>
                 </article>;
               })}
