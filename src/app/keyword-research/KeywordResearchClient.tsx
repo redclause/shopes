@@ -14,7 +14,7 @@ import { useShopesTranslation } from "../../lib/i18n/useShopesTranslation";
 
 const PAGE_SIZE = 10;
 const LOCALE_TO_KEYWORD_LANGUAGE: Record<string, KeywordLanguage> = {
-  en: "English", ka: "Georgian", es: "Spanish", fr: "French", de: "German", pt: "Portuguese",
+  en: "English", es: "Spanish", fr: "French", de: "German", pt: "Portuguese",
   it: "Italian", nl: "Dutch", ru: "Russian", uk: "Ukrainian", tr: "Turkish", ar: "Arabic",
   hi: "Hindi", zh: "Chinese", "zh-TW": "Chinese", ja: "Japanese", ko: "Korean", id: "Indonesian", vi: "Vietnamese",
   pl: "Polish", sv: "Swedish",
