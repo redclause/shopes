@@ -17,3 +17,55 @@
 .methodology summary{font-size:12px;font-weight:800;color:#2c4735;cursor:pointer}
 .methodology p{font-size:11px;line-height:1.75;margin:12px 0 0}
 @media(max-width:640px){.methodology{padding:15px}.importButton{width:100%;justify-content:center}}
+
+
+/* Readability pass: larger type, darker muted text, and clearer table hierarchy. */
+.shell{color:#17231f;font-size:14px}
+.back{font-size:14px;color:#3f5045}
+.free{font-size:11px;color:#205f3d}
+.eyebrow{font-size:11px;color:#2e6b48}
+.intro h1{font-size:clamp(32px,4.2vw,48px);line-height:1.14}
+.intro>p{font-size:16px;line-height:1.75;color:#4e5e53}
+.seedLabel{font-size:14px}
+.searchRow input{font-size:15px}
+.searchRow button{font-size:14px}
+.fieldHelp{font-size:12px;color:#536258}
+.selectRow label,.filterSelect{font-size:13px;color:#46564b}
+.selectRow select,.filterSelect select{font-size:13px;color:#24342a}
+.resultsHead h2{font-size:21px}
+.resultsHead p{font-size:13px;color:#536258;line-height:1.55}
+.export,.sort{font-size:13px;color:#26392d}
+.sourceNote strong{font-size:14px;color:#233e2c}
+.sourceNote p{font-size:13px;line-height:1.7;color:#45574a}
+.filterSearch input{font-size:14px}
+.tableWrap th{font-size:11px;color:#4c5d51;letter-spacing:.06em}
+.tableWrap th,.tableWrap td{padding:14px 11px}
+.tableWrap td{font-size:13px;color:#39483d;line-height:1.5}
+.keyword{font-size:14px;color:#1f3326}
+.longTail{font-size:10px;color:#3c5b2d}
+.intent{font-size:12px;color:#34553c}
+.unavailable{font-size:12px;color:#5e6b61}
+.score{font-size:14px;min-width:32px;height:32px}
+.scoreLabel{font-size:11px;color:#536258}
+.cpcEstimate{display:inline-block;color:#234c31;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
+.tableFooter{font-size:13px;color:#4f5f53}
+.tableFooter button{font-size:13px;color:#2e4335}
+.empty h3{font-size:18px}
+.empty p{font-size:14px;line-height:1.75;color:#4f6054}
+.footer{font-size:13px;color:#4f5f53}
+.errorMessage{font-size:13px}
+.importButton{font-size:14px;color:#263d2e}
+.importSummary>div:first-child strong{font-size:15px}
+.importSummary>div:first-child p{font-size:13px;color:#4e5e53;line-height:1.7}
+.importSummary h3{font-size:16px}
+.clearButton{font-size:13px;color:#3d5043}
+.methodology{color:#3f5145}
+.methodology summary{font-size:14px;color:#263f2e}
+.methodology p{font-size:13px;line-height:1.8;color:#3f5145}
+@media(max-width:640px){
+  .intro h1{font-size:clamp(30px,8vw,38px)}
+  .intro>p{font-size:15px}
+  .resultsHead h2{font-size:19px}
+  .tableWrap th{font-size:10px}
+  .tableWrap td{font-size:13px}
+}
