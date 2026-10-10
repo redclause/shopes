@@ -6,11 +6,19 @@ import type { ChangeEvent, FormEvent } from "react";
 import { ArrowDownUp, ArrowLeft, Download, FileUp, Search, Sparkles, Target, Upload, X } from "lucide-react";
 import {
   exportKeywordCsv, generateKeywordIdeas, parseImportedSerpData, summarizeDomainOverlap,
-  type ImportedSerpRecord, type KeywordIdea, type KeywordLanguage, type SearchIntent,
+  type ImportedSerpRecord, type KeywordIdea, type SearchIntent,
 } from "./engine";
 import styles from "./page.module.css";
+import { LOCALE_STORAGE_KEY } from "../../lib/i18n/languages";
+import { SUPPORTED_KEYWORD_LANGUAGES, type KeywordLanguage } from "./engine";
 
 const PAGE_SIZE = 10;
+const LOCALE_TO_KEYWORD_LANGUAGE: Record<string, KeywordLanguage> = {
+  en: "English", ka: "Georgian", es: "Spanish", fr: "French", de: "German", pt: "Portuguese",
+  it: "Italian", nl: "Dutch", ru: "Russian", uk: "Ukrainian", tr: "Turkish", ar: "Arabic",
+  hi: "Hindi", zh: "Chinese", ja: "Japanese", ko: "Korean", id: "Indonesian", vi: "Vietnamese",
+  pl: "Polish", sv: "Swedish",
+};
 const INTENTS: Array<"All" | SearchIntent> = ["All", "Informational", "Commercial", "Transactional", "Navigational", "Local", "Unclassified"];
 
 export default function KeywordResearchClient() {
@@ -18,6 +26,28 @@ export default function KeywordResearchClient() {
   const [submittedSeed, setSubmittedSeed] = useState("");
   const [country, setCountry] = useState("US");
   const [language, setLanguage] = useState<KeywordLanguage>("English");
+  const [languageNotice, setLanguageNotice] = useState("");
+  useEffect(() => {
+    const syncLocale = (code: string) => {
+      const selected = LOCALE_TO_KEYWORD_LANGUAGE[code];
+      if (selected && SUPPORTED_KEYWORD_LANGUAGES.includes(selected)) {
+        setLanguage(selected);
+        setLanguageNotice("");
+        setPage(1);
+        setSelected([]);
+      } else {
+        setLanguageNotice("Keyword generation rules are not yet available for this interface language. Choose one of the 20 supported research languages below.");
+      }
+    };
+    try { syncLocale(window.localStorage.getItem(LOCALE_STORAGE_KEY) || "en"); }
+    catch { syncLocale("en"); }
+    const onLocaleChange = (event: Event) => {
+      const custom = event as CustomEvent<{ locale?: string }>;
+      if (custom.detail?.locale) syncLocale(custom.detail.locale);
+    };
+    window.addEventListener("shopes:locale-change", onLocaleChange);
+    return () => window.removeEventListener("shopes:locale-change", onLocaleChange);
+  }, []);
   const [query, setQuery] = useState("");
   const [intent, setIntent] = useState<"All" | SearchIntent>("All");
   const [cluster, setCluster] = useState("All");
@@ -134,8 +164,10 @@ export default function KeywordResearchClient() {
       <p id="seed-help" className={styles.fieldHelp}>Maximum 120 characters. Results are generated locally from language rules.</p>
       <div className={styles.selectRow}>
         <label>Target market<select value={country} onChange={(event) => setCountry(event.target.value)}><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option><option value="AU">Australia</option><option value="GE">Georgia</option><option value="GLOBAL">Global</option></select></label>
-        <label>Language<select value={language} onChange={(event) => { setLanguage(event.target.value as KeywordLanguage); setPage(1); setSelected([]); }}><option value="English">English</option><option value="Georgian">Georgian</option></select></label>
+        <label>Keyword language<select value={language} onChange={(event) => { setLanguage(event.target.value as KeywordLanguage); setLanguageNotice(""); setPage(1); setSelected([]); }}>{SUPPORTED_KEYWORD_LANGUAGES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
       </div>
+      {languageNotice && <p className={styles.fieldHelp} role="status">{languageNotice}</p>}
+      <p className={styles.fieldHelp}>Language rules are local heuristics with limited linguistic coverage; review generated phrases before using them.</p>
       {error && <p className={styles.errorMessage} role="alert">{error}</p>}
     </form>
 
