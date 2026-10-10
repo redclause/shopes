@@ -796,11 +796,11 @@ const TEXT: Record<string, TextMap> = {
 
 export function translateUiText(locale: Locale | string, text: string): string {
   const code = typeof locale === "string" ? locale : locale.code;
-  const normalized = text.replace(/\\s+/g, " ").trim();
+  const normalized = text.replace(/\s+/g, " ").trim();
   return TEXT[code]?.[normalized] ?? text;
 }
 
 export function hasUiTextTranslation(locale: string, text: string): boolean {
-  const normalized = text.replace(/\\s+/g, " ").trim();
+  const normalized = text.replace(/\s+/g, " ").trim();
   return locale === "en" || Object.prototype.hasOwnProperty.call(TEXT[locale] ?? {}, normalized);
 }
