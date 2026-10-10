@@ -163,7 +163,7 @@ export const KEYWORD_LANGUAGE_RULES: Record<KeywordLanguage, LanguageRules> = {
   ]),
 };
 
-export const SUPPORTED_KEYWORD_LANGUAGES = Object.keys(KEYWORD_LANGUAGE_RULES) as KeywordLanguage[];
+export const SUPPORTED_KEYWORD_LANGUAGES = Object.keys(KEYWORD_LANGUAGE_RULES).filter((language) => language !== "Georgian") as KeywordLanguage[];
 export function normalizeKeyword(value: string): string {
   return value.normalize("NFKC").toLocaleLowerCase().replace(/[\u200B-\u200D\uFEFF]/g, "").replace(/[“”„]/g, '"').replace(/[’‘]/g, "'").replace(/\s+/g, " ").trim();
 }
