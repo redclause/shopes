@@ -31,7 +31,7 @@ test("extracts canonical URL relative to the checked page", () => {
 });
 
 test("does not mistake script or comment text for a published anchor", () => {
-  const html = '<script>const fake = \'<a href="https://target.example/">fake</a>\';</script><!-- <a href="https://target.example/">comment</a> -->';
+  const html = `<script>const fake = '<a href="https://target.example/">fake</a>';</script><!-- <a href="https://target.example/">comment</a> -->`;
   assert.equal(extractBacklinkEvidence(html, "https://source.example/", "https://target.example/"), null);
 });
 
