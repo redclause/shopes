@@ -237,7 +237,20 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "The audit could not be completed.": "No se pudo completar la auditoría.",
     "pass": "Correcto",
     "warning": "Advertencia",
-    "error": "Error"
+    "error": "Error",
+    "HTTP response": "Respuesta HTTP",
+    "Meta description": "Meta descripción",
+    "Canonical URL": "URL canónica",
+    "H1 heading": "Encabezado H1",
+    "Image alternative text": "Texto alternativo de imagen",
+    "HTML links": "Enlaces HTML",
+    "Robots directive": "Directiva robots",
+    "No meta description was found.": "No se encontró ninguna meta descripción.",
+    "No rel=canonical link was found.": "No se encontró ningún enlace rel=canonical.",
+    "No HTML images were found.": "No se encontraron imágenes HTML.",
+    "No meta robots directive was found; HTTP headers were not inspected.": "No se encontró una directiva meta robots; no se inspeccionaron las cabeceras HTTP.",
+    "Title found (": "Título encontrado (",
+    "Description found (": "Descripción encontrada ("
   },
   "fr": {
     "WORKSPACE": "ESPACE DE TRAVAIL",
@@ -477,7 +490,20 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "The audit could not be completed.": "L’audit n’a pas pu être terminé.",
     "pass": "Réussi",
     "warning": "Avertissement",
-    "error": "Erreur"
+    "error": "Erreur",
+    "HTTP response": "Réponse HTTP",
+    "Meta description": "Méta-description",
+    "Canonical URL": "URL canonique",
+    "H1 heading": "Titre H1",
+    "Image alternative text": "Texte alternatif des images",
+    "HTML links": "Liens HTML",
+    "Robots directive": "Directive robots",
+    "No meta description was found.": "Aucune méta-description n’a été trouvée.",
+    "No rel=canonical link was found.": "Aucun lien rel=canonical n’a été trouvé.",
+    "No HTML images were found.": "Aucune image HTML n’a été trouvée.",
+    "No meta robots directive was found; HTTP headers were not inspected.": "Aucune directive meta robots n’a été trouvée ; les en-têtes HTTP n’ont pas été examinés.",
+    "Title found (": "Titre trouvé (",
+    "Description found (": "Description trouvée ("
   },
   "de": {
     "WORKSPACE": "ARBEITSBEREICH",
@@ -717,6 +743,19 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "The audit could not be completed.": "Das Audit konnte nicht abgeschlossen werden.",
     "pass": "Bestanden",
     "warning": "Warnung",
-    "error": "Fehler"
+    "error": "Fehler",
+    "HTTP response": "HTTP-Antwort",
+    "Meta description": "Meta-Beschreibung",
+    "Canonical URL": "Kanonische URL",
+    "H1 heading": "H1-Überschrift",
+    "Image alternative text": "Alternativtext für Bilder",
+    "HTML links": "HTML-Links",
+    "Robots directive": "Robots-Direktive",
+    "No meta description was found.": "Es wurde keine Meta-Beschreibung gefunden.",
+    "No rel=canonical link was found.": "Es wurde kein rel=canonical-Link gefunden.",
+    "No HTML images were found.": "Es wurden keine HTML-Bilder gefunden.",
+    "No meta robots directive was found; HTTP headers were not inspected.": "Es wurde keine Meta-Robots-Direktive gefunden; HTTP-Header wurden nicht geprüft.",
+    "Title found (": "Titel gefunden (",
+    "Description found (": "Beschreibung gefunden ("
   }
 };
