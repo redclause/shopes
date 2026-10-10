@@ -125,9 +125,6 @@ export default function AuditClient({ userName, userEmail, userImage, signOutAct
       <header className={styles.header}>
         <Link href="/dashboard" className={styles.brand}><span className={styles.brandMark}><FileSearch size={18} /></span><span>shopes<span className={styles.brandDot}>.</span></span></Link>
         <div className={styles.headerActions}>
-          <nav className={styles.backLink} aria-label="Main navigation">
-            <Link href="/dashboard">Dashboard</Link><Link href="/audit" aria-current="page">Site Audit</Link><Link href="/keyword-research">Keyword Research</Link><Link href="/product-intelligence">Product Analysis</Link><Link href="/">Home</Link>
-          </nav>
           <UserMenu name={userName} email={userEmail} image={userImage} signOutAction={signOutAction} />
         </div>
       </header>
