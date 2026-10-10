@@ -1,6 +1,7 @@
 "use client";
 
-import { Children, cloneElement, isValidElement, type ReactElement, type ReactNode } from "react";
+import { Children, cloneElement, isValidElement, useEffect, useState, type ReactElement, type ReactNode } from "react";
+import { LOCALE_STORAGE_KEY, getLocale } from "./languages";
 import { translateUiText } from "./ui-text";
 
 type Props = { locale: string; children: ReactNode };
@@ -23,6 +24,21 @@ function localizeNode(node: ReactNode, locale: string): ReactNode {
   return cloneElement(element, nextProps);
 }
 
-export default function LocalizedTree({ locale, children }: Props) {
+export default function LocalizedTree({ locale: initialLocale, children }: Props) {
+  const [locale, setLocale] = useState(initialLocale);
+  useEffect(() => {
+    try {
+      setLocale(getLocale(window.localStorage.getItem(LOCALE_STORAGE_KEY) || initialLocale).code);
+    } catch {
+      setLocale(getLocale(initialLocale).code);
+    }
+    const onLocaleChange = (event: Event) => {
+      const custom = event as CustomEvent<{ locale?: string }>;
+      if (custom.detail?.locale) setLocale(getLocale(custom.detail.locale).code);
+    };
+    window.addEventListener("shopes:locale-change", onLocaleChange);
+    return () => window.removeEventListener("shopes:locale-change", onLocaleChange);
+  }, [initialLocale]);
+
   return <>{localizeNode(children, locale)}</>;
 }
