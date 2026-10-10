@@ -511,6 +511,17 @@ export function translateUiText(locale: Locale | string, text: string): string {
     : code === "fr"
       ? `${missingAlt[1]} image(s) sur ${missingAlt[2]} ont un texte alternatif manquant ou vide.`
       : `${missingAlt[1]} von ${missingAlt[2]} Bildern fehlt ein Alternativtext oder er ist leer.`;
+  const links = normalized.match(/^(\d+) internal, (\d+) external link\(s\)(?:; (\d+) anchor\(s\) without href)?\.$/);
+  if (links) {
+    const suffix = links[3]
+      ? code === "es" ? `; ${links[3]} anclaje(s) sin href` : code === "fr" ? `; ${links[3]} ancre(s) sans href` : `; ${links[3]} Anker ohne href`
+      : "";
+    return code === "es"
+      ? `${links[1]} enlace(s) interno(s), ${links[2]} enlace(s) externo(s)${suffix}.`
+      : code === "fr"
+        ? `${links[1]} lien(s) interne(s), ${links[2]} lien(s) externe(s)${suffix}.`
+        : `${links[1]} interne(r) Link(s), ${links[2]} externe(r) Link(s)${suffix}.`;
+  }
   return text;
 }
 
