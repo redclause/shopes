@@ -1,0 +1,27 @@
+.root{position:relative;z-index:40;flex-shrink:0;color:#eaf5fb;font-family:var(--font-body,"DM Sans",Arial,sans-serif)}
+.trigger{display:flex;align-items:center;gap:9px;min-height:42px;padding:4px 9px 4px 5px;border:1px solid #28404d;border-radius:12px;background:rgba(17,29,38,.88);color:#eaf5fb;text-align:left;cursor:pointer;transition:border-color .16s,background .16s}
+.trigger:hover,.trigger[aria-expanded="true"]{border-color:#49DDF5;background:#142b35}
+.avatar,.identityAvatar{display:grid;place-items:center;flex:0 0 31px;width:31px;height:31px;overflow:hidden;border:1px solid #2b5865;border-radius:10px;background:#16333d;color:#65e5f4;font-size:11px;font-weight:800}
+.avatar img,.identityAvatar img{width:100%;height:100%;object-fit:cover}
+.triggerCopy{display:flex;min-width:0;flex-direction:column;gap:3px}
+.triggerCopy strong{max-width:125px;overflow:hidden;color:#f4f8fb;font-size:11px;font-weight:750;text-overflow:ellipsis;white-space:nowrap}
+.triggerCopy small{color:#9eb5c4;font-size:10px}
+.chevron,.chevronOpen{color:#49DDF5;transition:transform .16s}.chevronOpen{transform:rotate(180deg)}
+.menu{position:absolute;top:calc(100% + 10px);right:0;width:min(320px,calc(100vw - 28px));padding:10px;border:1px solid #294553;border-radius:16px;background:rgba(11,18,25,.98);box-shadow:0 20px 55px #0007;backdrop-filter:blur(18px);color:#eaf5fb}
+.identity{display:flex;align-items:flex-start;gap:11px;padding:10px 8px 12px}
+.identityAvatar{width:38px;height:38px;flex-basis:38px;border-radius:12px}
+.identityCopy{display:flex;min-width:0;flex-direction:column;gap:4px;padding-top:1px}
+.identityCopy strong{color:#f5f9fc;font-size:12px;font-weight:800;overflow-wrap:anywhere}
+.identityCopy small{color:#b2c3d0;font-size:10px;line-height:1.5;overflow-wrap:anywhere}
+.identityCopy em{margin-top:2px;color:#49DDF5;font-size:10px;font-style:normal;font-weight:700}
+.divider{height:1px;margin:6px 2px;background:#233541}
+.sectionLabel{display:block;padding:8px 9px 6px;color:#6fcfe0;font-size:9px;font-weight:850;letter-spacing:.15em}
+.menuLink,.signOut,.accountDetail{display:flex;align-items:center;gap:10px;width:100%;min-height:39px;padding:0 10px;border:0;border-radius:9px;background:transparent;color:#d6e6ef;text-align:left;text-decoration:none;font-size:12px;font-weight:650}
+.menuLink svg,.signOut svg,.accountDetail svg{flex-shrink:0;color:#49DDF5}
+.menuLink:hover,.menuLink:focus-visible{outline:none;background:#132c37;color:#72edfa}
+.accountDetail{color:#9eb5c4;font-size:10px;font-weight:500;overflow-wrap:anywhere}
+.accountDetail span{overflow-wrap:anywhere}
+.signOut{margin-top:4px;border:1px solid #34434d;color:#ffbdc1;cursor:pointer}
+.signOut svg{color:#ff9da5}
+.signOut:hover{border-color:#8a444b;background:#2a171d}
+@media(max-width:520px){.trigger{gap:6px;padding-right:6px}.triggerCopy strong{max-width:78px}.triggerCopy small{display:none}.menu{right:-2px}}
