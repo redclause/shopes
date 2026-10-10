@@ -156,16 +156,16 @@ export default function KeywordResearchClient() {
     </section>
 
     <form className={styles.searchForm} onSubmit={generate}>
-      <label className={styles.seedLabel} htmlFor="seed">Seed keyword or topic</label>
+      <label className={styles.seedLabel} htmlFor="seed">{t("seedKeyword")}</label>
       <div className={styles.searchRow}>
         <Search size={19} />
         <input id="seed" value={seed} onChange={(event) => setSeed(event.target.value)} placeholder={language === "Georgian" ? "მაგ. ონლაინ მაღაზია" : "e.g. organic dog food"} required maxLength={120} aria-describedby="seed-help" />
-        <button type="submit"><Sparkles size={16} /> {t("search")}</button>
+        <button type="submit"><Sparkles size={16} /> {t("generateIdeas")}</button>
       </div>
       <p id="seed-help" className={styles.fieldHelp}>Maximum 120 characters. Results are generated locally from language rules.</p>
       <div className={styles.selectRow}>
-        <label>Target market<select value={country} onChange={(event) => setCountry(event.target.value)}><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option><option value="AU">Australia</option><option value="GE">Georgia</option><option value="GLOBAL">Global</option></select></label>
-        <label>Keyword language<select value={language} onChange={(event) => { setLanguage(event.target.value as KeywordLanguage); setLanguageNotice(""); setPage(1); setSelected([]); }}>{SUPPORTED_KEYWORD_LANGUAGES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+        <label>{t("targetMarket")}<select value={country} onChange={(event) => setCountry(event.target.value)}><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option><option value="AU">Australia</option><option value="GE">Georgia</option><option value="GLOBAL">Global</option></select></label>
+        <label>{t("keywordLanguage")}<select value={language} onChange={(event) => { setLanguage(event.target.value as KeywordLanguage); setLanguageNotice(""); setPage(1); setSelected([]); }}>{SUPPORTED_KEYWORD_LANGUAGES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
       </div>
       {languageNotice && <p className={styles.fieldHelp} role="status">{languageNotice}</p>}
       <p className={styles.fieldHelp}>Language rules are local heuristics with limited linguistic coverage; review generated phrases before using them.</p>
@@ -175,7 +175,7 @@ export default function KeywordResearchClient() {
     <section className={styles.results} aria-live="polite">
       <div className={styles.resultsHead}>
         <div><h2>{t("keywordResearch")}</h2><p>{generated ? (filtered.length + " suggestions · " + country + " · " + language) : "Start with a seed keyword to generate related ideas."}</p></div>
-        <button className={styles.export} onClick={exportCsv} disabled={!generated}><Download size={15} /> Export CSV</button>
+        <button className={styles.export} onClick={exportCsv} disabled={!generated}><Download size={15} /> {t("exportCsv")}</button>
       </div>
       <div className={styles.sourceNote}><Target size={17} /><div><strong>Source: Shopes local algorithms</strong><p>Opportunity and relevance are transparent heuristics. Modelled CPC is a broad, low-confidence range based on estimated intent—not Google Ads bids or measured keyword data. Verified search volume, competition metrics, and live SERP data are unavailable unless you import a dataset.</p></div></div>
 
