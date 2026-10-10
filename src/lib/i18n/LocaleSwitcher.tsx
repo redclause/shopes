@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { LOCALES } from "./languages";
 import { applyLocaleToDocument, persistLocale, readStoredLocale } from "./locale-state";
 import { TRANSLATED_CORE_LOCALES } from "./messages";
-import { SUPPORTED_KEYWORD_LANGUAGES } from "../../app/keyword-research/engine";
 import styles from "./locale-switcher.module.css";
+
+const KEYWORD_RULE_LOCALES = new Set(["en", "ka", "es", "fr", "de", "pt", "it", "nl", "ru", "uk", "tr", "ar", "hi", "zh", "ja", "ko", "id", "vi", "pl", "sv"]);
 
 export default function LocaleSwitcher() {
   const [locale, setLocale] = useState("en");
@@ -30,8 +31,7 @@ export default function LocaleSwitcher() {
       <select aria-label="Interface language" value={locale} onChange={(event) => changeLocale(event.target.value)}>
         {LOCALES.map((item) => {
           const coreStatus = TRANSLATED_CORE_LOCALES.includes(item.code) ? "core UI translated" : "English UI fallback";
-          const keywordLanguage = ({ en: "English", ka: "Georgian", es: "Spanish", fr: "French", de: "German", pt: "Portuguese", it: "Italian", nl: "Dutch", ru: "Russian", uk: "Ukrainian", tr: "Turkish", ar: "Arabic", hi: "Hindi", zh: "Chinese", ja: "Japanese", ko: "Korean", id: "Indonesian", vi: "Vietnamese", pl: "Polish", sv: "Swedish" } as Record<string, string>)[item.code];
-          const keywordStatus = keywordLanguage && (SUPPORTED_KEYWORD_LANGUAGES as readonly string[]).includes(keywordLanguage) ? "keyword rules available" : "no keyword rules";
+          const keywordStatus = KEYWORD_RULE_LOCALES.has(item.code) ? "keyword rules available" : "no keyword rules";
           return <option key={item.code} value={item.code}>{item.nativeName} — {item.englishName} · {coreStatus} · {keywordStatus}</option>;
         })}
       </select>
