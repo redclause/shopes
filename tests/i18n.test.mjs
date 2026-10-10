@@ -95,6 +95,7 @@ test("static JSX copy on primary routes has translations for every offered UI lo
           text &&
           /[A-Za-zÀ-ž]/.test(text) &&
           !/^shopes$/i.test(text) &&
+          !/^\d+(\.\d+)?k$/i.test(text) &&
           !/^[A-Z]{1,3}$/.test(text) &&
           !/^https?:\/\//i.test(text) &&
           !/^[a-z0-9-]+\.[a-z]{2,}$/i.test(text) &&
