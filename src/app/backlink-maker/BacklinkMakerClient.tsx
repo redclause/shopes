@@ -39,6 +39,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   const [recordsLoaded, setRecordsLoaded] = useState(false);
   const [catalogSearch, setCatalogSearch] = useState("");
   const [catalogCategory, setCatalogCategory] = useState("All");
+  const [catalogPage, setCatalogPage] = useState(1);
   const [policyResults, setPolicyResults] = useState<Record<string, { status: string; message: string; evidence?: { path: string; kind: string; httpStatus: number; matchedKeywords?: string[]; excerpt?: string; summary?: { appliesToAll: boolean; directives: string[] } }[]; note?: string }>>({});
   const [checkingPolicySite, setCheckingPolicySite] = useState("");
 
