@@ -20,6 +20,7 @@ export default function KeywordResearchClient() {
   const [language, setLanguage] = useState<KeywordLanguage>("English");
   const [query, setQuery] = useState("");
   const [intent, setIntent] = useState<"All" | SearchIntent>("All");
+  const [cluster, setCluster] = useState("All");
   const [sort, setSort] = useState<"opportunity" | "phrase" | "intent">("opportunity");
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<string[]>([]);
@@ -38,12 +39,13 @@ export default function KeywordResearchClient() {
   const filtered = useMemo(() => allIdeas
     .filter((item) => item.phrase.toLocaleLowerCase().includes(query.toLocaleLowerCase()))
     .filter((item) => intent === "All" || item.intent === intent)
+    .filter((item) => cluster === "All" || item.cluster === cluster)
     .sort((a, b) => sort === "intent"
       ? a.intent.localeCompare(b.intent) || a.phrase.localeCompare(b.phrase)
       : sort === "phrase"
         ? a.phrase.localeCompare(b.phrase)
         : b.opportunityScore - a.opportunityScore || b.relevanceScore - a.relevanceScore || a.phrase.localeCompare(b.phrase)),
-  [allIdeas, query, intent, sort]);
+  [allIdeas, query, intent, cluster, sort]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const visible = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -100,8 +102,8 @@ export default function KeywordResearchClient() {
 
   function exportDataset() {
     if (!dataset.length) return;
-    const headers = ["keyword", "url", "domain", "title", "description", "rank", "source", "imported_at"];
-    const rows = dataset.map((item) => [item.keyword, item.url, item.domain, item.title, item.description, item.rank ?? "", item.source, item.importedAt]);
+    const headers = ["keyword", "url", "domain", "title", "description", "rank", "source", "source_date", "imported_at"];
+    const rows = dataset.map((item) => [item.keyword, item.url, item.domain, item.title, item.description, item.rank ?? "", item.source, item.sourceDate ?? "", item.importedAt]);
     const csv = [headers, ...rows].map((row) => row.map((value) => {
       const cell = String(value ?? "");
       const safe = /^[\s]*[=+@\-\t\r]/.test(cell) ? "'" + cell : cell;
@@ -147,6 +149,7 @@ export default function KeywordResearchClient() {
       {generated && <div className={styles.filters}>
         <label className={styles.filterSearch}><Search size={15} /><input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Filter keyword ideas" /></label>
         <label className={styles.filterSelect}>Intent<select value={intent} onChange={(event) => { setIntent(event.target.value as "All" | SearchIntent); setPage(1); }}>{INTENTS.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label className={styles.filterSelect}>Topic<select value={cluster} onChange={(event) => { setCluster(event.target.value); setPage(1); }}><option value="All">All topics</option>{Array.from(new Set(allIdeas.map((item) => item.cluster))).sort().map((item) => <option key={item}>{item}</option>)}</select></label>
         <button type="button" className={styles.sort} onClick={() => setSort(sort === "opportunity" ? "phrase" : sort === "phrase" ? "intent" : "opportunity")}><ArrowDownUp size={15} /> Sort: {sort === "opportunity" ? "Opportunity" : sort === "phrase" ? "Keyword" : "Intent"}</button>
       </div>}
 
@@ -171,7 +174,7 @@ export default function KeywordResearchClient() {
       <label className={styles.importButton}><Upload size={16} /> Choose CSV or JSON file<input type="file" accept=".csv,.json,text/csv,application/json" onChange={importDataset} /></label>
       {datasetError && <p className={styles.errorMessage} role="alert">{datasetError}</p>}
       {dataset.length > 0 && <div className={styles.importSummary}>
-        <div><strong>{importedCount.toLocaleString()} rows imported</strong><p>File: {datasetName}. Source and import time are attached to each record. These records are not independently verified as live search results.</p></div>
+        <div><strong>{importedCount.toLocaleString()} rows imported</strong><p>File: {datasetName}. Source filename and import time are attached to each record; source dates are retained when present in the file. These records are not independently verified as live search results.</p></div>
         <button type="button" className={styles.clearButton} onClick={() => { setDataset([]); setDatasetName(""); setImportedCount(0); setDatasetError(""); }}><X size={15} /> Clear</button>
         <h3>Domains appearing most often across imported results</h3>
         <div className={styles.tableWrap}><table><thead><tr><th>Domain</th><th>Occurrences</th><th>Keyword overlap</th><th>Average rank</th></tr></thead><tbody>{domainOverlap.slice(0, 20).map((item) => <tr key={item.domain}><td className={styles.keyword}>{item.domain}</td><td>{item.occurrences}</td><td>{item.keywords.length}</td><td>{item.averageRank ?? "Not supplied"}</td></tr>)}</tbody></table></div>
