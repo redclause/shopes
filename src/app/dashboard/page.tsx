@@ -60,6 +60,7 @@ export default async function DashboardPage() {
           <a className={styles.navItemActive} href="#overview" aria-current="page"><LayoutDashboard size={17} /> Dashboard</a>
           <a className={styles.navItem} href="#projects"><Globe2 size={17} /> Projects <span className={styles.navCount}>0</span></a>
           <a className={styles.navItem} href="#audits"><FileSearch size={17} /> Site audits</a>
+          <Link className={styles.navItem} href="/settings"><Settings2 size={17} /> Account settings</Link>
           <span className={styles.navLabel}>SHOPES</span>
           <Link className={styles.navItem} href="/#platform"><Target size={17} /> Explore platform <ArrowUpRight size={14} /></Link>
           <Link className={styles.navItem} href="/#pricing"><Sparkles size={17} /> Free plan details <ArrowUpRight size={14} /></Link>
@@ -142,8 +143,8 @@ export default async function DashboardPage() {
 
           <section className={styles.accountPanel} aria-labelledby="account-title">
             <div className={styles.accountPanelIcon}><Settings2 size={18} /></div>
-            <div className={styles.accountPanelCopy}><h2 id="account-title">Your account</h2><p>{user.email || "Google account"} · Signed in with Google. Dedicated account settings are planned for the next phase.</p></div>
-            <form action={signOutAction}><button className={styles.secondaryButton} type="submit"><LogOut size={15} /> Sign out</button></form>
+            <div className={styles.accountPanelCopy}><h2 id="account-title">Your account</h2><p>{user.email || "Google account"} · Signed in with Google. View your account identity and sign-in details in settings.</p></div>
+            <Link className={styles.secondaryButton} href="/settings"><Settings2 size={15} /> Account settings</Link>
           </section>
 
           <footer className={styles.footer}><span>© {new Date().getFullYear()} Shopes</span><span>Permanent free plan · No credit card required</span></footer>
