@@ -1,6 +1,9 @@
 import { auth, signOut } from "../../../auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { getLocale, LOCALE_STORAGE_KEY } from "../../../lib/i18n/languages";
+import { translate } from "../../../lib/i18n/messages";
 import {
   Activity,
   ArrowRight,
@@ -20,6 +23,9 @@ import {
 import styles from "./page.module.css";
 
 export default async function DashboardPage() {
+  const cookieStore = await cookies();
+  const locale = getLocale(cookieStore.get(LOCALE_STORAGE_KEY)?.value);
+  const t = (key: Parameters<typeof translate>[1]) => translate(locale, key);
   const session = await auth();
 
   if (!session?.user) {
@@ -43,7 +49,7 @@ export default async function DashboardPage() {
   return (
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
-        <Link href="/" className={styles.brand} aria-label="Shopes home">
+        <Link href="/" className={styles.brand} aria-label={t("home")}>
           <span className={styles.brandMark}><ShoppingBag size={18} /></span>
           <span>shopes<span className={styles.brandDot}>.</span></span>
         </Link>
@@ -57,13 +63,13 @@ export default async function DashboardPage() {
 
         <nav className={styles.navigation} aria-label="Workspace navigation">
           <span className={styles.navLabel}>OVERVIEW</span>
-          <a className={styles.navItemActive} href="#overview" aria-current="page"><LayoutDashboard size={17} /> Dashboard</a>
+          <a className={styles.navItemActive} href="#overview" aria-current="page"><LayoutDashboard size={17} /> {t("dashboard")}</a>
           <a className={styles.navItem} href="#projects"><Globe2 size={17} /> Projects <span className={styles.navCount}>0</span></a>
           <a className={styles.navItem} href="/audit"><FileSearch size={17} /> Site audits</a>
-          <Link className={styles.navItem} href="/keyword-research"><Target size={17} /> Keyword research</Link>
+          <Link className={styles.navItem} href="/keyword-research"><Target size={17} /> {t("keywordResearch")}</Link>
           <span className={styles.navLabel}>SHOPES</span>
           <Link className={styles.navItem} href="/#platform"><Target size={17} /> Explore platform <ArrowUpRight size={14} /></Link>
-          <Link className={styles.navItem} href="/#platform"><Sparkles size={17} /> Explore Shopes <ArrowUpRight size={14} /></Link>
+          <Link className={styles.navItem} href="/#platform"><Sparkles size={17} /> {t("home")} <ArrowUpRight size={14} /></Link>
         </nav>
 
         <div className={styles.sidebarBottom}>
@@ -78,7 +84,7 @@ export default async function DashboardPage() {
             <span className={styles.avatar} aria-hidden="true">{initials}</span>
             <span className={styles.accountText}><strong>{displayName}</strong><small>{user.email || "Google account"}</small></span>
             <form action={signOutAction}>
-              <button className={styles.signOut} type="submit" aria-label="Sign out of Shopes" title="Sign out"><LogOut size={16} /></button>
+              <button className={styles.signOut} type="submit" aria-label={t("signOut") + " of Shopes"} title={t("signOut")}><LogOut size={16} /></button>
             </form>
           </div>
         </div>
@@ -86,7 +92,7 @@ export default async function DashboardPage() {
 
       <section className={styles.mainPanel} id="overview">
         <header className={styles.topbar}>
-          <div className={styles.breadcrumb}><span>Workspace</span><span aria-hidden="true">/</span><strong>Dashboard</strong></div>
+          <div className={styles.breadcrumb}><span>{t("dashboard")}</span><span aria-hidden="true">/</span><strong>{t("dashboard")}</strong></div>
           <div className={styles.topbarRight}>
             <span className={styles.sessionBadge}><span /> Signed in securely</span>
             <span className={styles.avatarSmall} aria-hidden="true">{initials}</span>
@@ -100,7 +106,7 @@ export default async function DashboardPage() {
               <h1>Welcome back{user.name ? `, ${user.name.trim().split(/\s+/)[0]}` : ""}.</h1>
               <p>Build a clearer picture of your store’s search visibility, one step at a time.</p>
             </div>
-            <div className={styles.welcomeActions}><Link className={styles.primaryButton} href="/audit"><ArrowRight size={16} /> Run an audit</Link><Link className={styles.secondaryButton} href="/keyword-research"><Target size={16} /> Keyword research</Link></div>
+            <div className={styles.welcomeActions}><Link className={styles.primaryButton} href="/audit"><ArrowRight size={16} /> Run an audit</Link><Link className={styles.secondaryButton} href="/keyword-research"><Target size={16} /> {t("keywordResearch")}</Link></div>
           </div>
 
           <div className={styles.notice} role="note">
