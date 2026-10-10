@@ -11,6 +11,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { backlinkSiteCatalog } from "../src/app/backlink-maker/site-catalog.ts";
+import { extractPageEvidence, classifySubmissionPage } from "../src/app/backlink-maker/submission-analysis.mjs";
 
 const args = process.argv.slice(2);
 function option(name, fallback) {
@@ -119,7 +120,7 @@ function candidateLinks(html, baseUrl) {
     const label = match[6].replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
     try {
       const candidate = new URL(raw, baseUrl);
-      if (!["http:", "https:"].includes(candidate.protocol) || candidate.username || candidate.password) continue;
+      if (!["http:", "https:"].includes(candidate.protocol) || candidate.username || candidate.password) continue;\n      if (candidate.origin !== new URL(baseUrl).origin) continue;
       if (!keywords.test(candidate.pathname + " " + label)) continue;
       if (!out.some((item) => item.url === candidate.href)) out.push({ url: candidate.href, label: label || candidate.pathname });
       if (out.length >= 20) break;
@@ -144,16 +145,55 @@ for (const [index, site] of pending.entries()) {
   try {
     const page = await fetchPublicPage(site.url);
     const candidates = page.html ? candidateLinks(page.html, page.finalUrl) : [];
+    const pageEvidence = [];
+    if (page.html) {
+      const homepageEvidence = extractPageEvidence(page.html, page.finalUrl);
+      pageEvidence.push({ ...homepageEvidence, ...classifySubmissionPage(homepageEvidence) });
+    }
+    // Inspect a small number of same-origin candidate pages; do not submit forms.
+    for (const candidate of candidates.slice(0, 3)) {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        const candidatePage = await fetchPublicPage(candidate.url);
+        if (candidatePage.html) {
+          const evidence = extractPageEvidence(candidatePage.html, candidatePage.finalUrl);
+          pageEvidence.push({
+            ...evidence,
+            ...classifySubmissionPage(evidence),
+            httpStatus: candidatePage.status,
+            discoveredFrom: page.finalUrl,
+            discoveryAnchorText: candidate.label,
+          });
+        } else {
+          pageEvidence.push({
+            pageUrl: candidate.url,
+            title: null,
+            httpStatus: candidatePage.status,
+            classification: "candidate_discovered",
+            automationEligible: false,
+            reason: "candidate_page_has_no_inspectable_html",
+          });
+        }
+      } catch (error) {
+        pageEvidence.push({
+          pageUrl: candidate.url,
+          classification: "inconclusive",
+          automationEligible: false,
+          reason: error?.name === "AbortError" ? "timeout" : "candidate_fetch_failed",
+        });
+      }
+    }
     previous.records[site.id] = {
       siteId: site.id, name: site.name, domain: site.domain, homepage: site.url,
       checkedAt, checkResult: page.status >= 200 && page.status < 300 ? "homepage_reachable" : "homepage_unavailable",
       httpStatus: page.status, finalUrl: page.finalUrl, contentType: page.contentType || null,
-      truncated: Boolean(page.truncated), submissionCandidates: candidates,
-      submissionEndpointVerified: false, automationVerified: false,
-      classification: "unverified",
-      note: "Homepage reachability and keyword-matched links do not prove submission permission, endpoint validity, or automated submission support.",
+      truncated: Boolean(page.truncated), submissionCandidates: candidates, pageEvidence,
+      submissionEndpointVerified: pageEvidence.some((item) => item.classification === "endpoint_evidence_found"),
+      automationVerified: false,
+      classification: pageEvidence.some((item) => item.classification === "endpoint_evidence_found") ? "endpoint_evidence_found" : "candidate_discovered",
+      note: "Endpoint evidence is based on an actual same-origin form plus page intent. This is not proof of permission to automate, successful publication, or a verified backlink. No forms were submitted.",
     };
-    console.log(`[${index + 1}/${pending.length}] ${site.id}: HTTP ${page.status}; candidates=${candidates.length}; remains unverified`);
+    console.log(`[${index + 1}/${pending.length}] ${site.id}: HTTP ${page.status}; candidates=${candidates.length}; form-evidence=${pageEvidence.filter((item) => item.classification === "endpoint_evidence_found").length}; automation remains unverified`);
   } catch (error) {
     previous.records[site.id] = {
       siteId: site.id, name: site.name, domain: site.domain, homepage: site.url,
