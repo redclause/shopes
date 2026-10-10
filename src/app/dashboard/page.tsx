@@ -2,8 +2,8 @@ import { auth, signOut } from "../../../auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { getLocale, LOCALE_STORAGE_KEY } from "../../../lib/i18n/languages";
-import { translate } from "../../../lib/i18n/messages";
+import { getLocale, LOCALE_STORAGE_KEY } from "../../lib/i18n/languages";
+import { translate } from "../../lib/i18n/messages";
 import {
   Activity,
   ArrowRight,
