@@ -1,7 +1,23 @@
-import { signOut, auth } from "../../../auth";
+import { auth, signOut } from "../../../auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, LogOut, ShoppingBag } from "lucide-react";
+import {
+  Activity,
+  ArrowRight,
+  ArrowUpRight,
+  CheckCircle2,
+  CircleHelp,
+  FileSearch,
+  Globe2,
+  LayoutDashboard,
+  LogOut,
+  Settings2,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkles,
+  Target,
+} from "lucide-react";
+import styles from "./page.module.css";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -10,27 +26,128 @@ export default async function DashboardPage() {
     redirect("/login?callbackUrl=%2Fdashboard");
   }
 
+  const user = session.user;
+  const displayName = user.name?.trim() || user.email?.split("@")[0] || "Shopes user";
+  const initials = displayName
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "S";
+
   async function signOutAction() {
     "use server";
     await signOut({ redirectTo: "/" });
   }
 
   return (
-    <main style={{ minHeight: "100vh", background: "#f7faf7", color: "#19251f", fontFamily: '"DM Sans", Arial, sans-serif', padding: 24 }}>
-      <header style={{ maxWidth: 960, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "16px 0", borderBottom: "1px solid #e3eae2" }}>
-        <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 9, fontWeight: 800, fontSize: 22, color: "inherit", textDecoration: "none" }}>
-          <span style={{ width: 32, height: 32, display: "grid", placeItems: "center", background: "#a6e9c7", borderRadius: 10, color: "#173c2b" }}><ShoppingBag size={17} /></span>
-          <span>shopes<span style={{ color: "#5db88b" }}>.</span></span>
+    <main className={styles.shell}>
+      <aside className={styles.sidebar}>
+        <Link href="/" className={styles.brand} aria-label="Shopes home">
+          <span className={styles.brandMark}><ShoppingBag size={18} /></span>
+          <span>shopes<span className={styles.brandDot}>.</span></span>
         </Link>
-        <form action={signOutAction}>
-          <button type="submit" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 14px", border: "1px solid #dce4dc", borderRadius: 10, background: "#fff", color: "#202923", fontWeight: 700, cursor: "pointer" }}><LogOut size={15} /> Sign out</button>
-        </form>
-      </header>
-      <section style={{ maxWidth: 960, margin: "64px auto 0", padding: 32, border: "1px solid #e3eae2", borderRadius: 20, background: "#fff" }}>
-        <p style={{ color: "#5e6b64", fontSize: 11, letterSpacing: ".14em", fontWeight: 800 }}>YOUR SHOPES WORKSPACE</p>
-        <h1 style={{ margin: "12px 0", fontSize: 36, letterSpacing: "-.04em" }}>Welcome{session.user.name ? `, ${session.user.name}` : ""}.</h1>
-        <p style={{ color: "#69766e", lineHeight: 1.8 }}>You are signed in with Google. Workspace persistence and live SEO tools are not yet connected.</p>
-        <Link href="/" style={{ marginTop: 20, display: "inline-flex", alignItems: "center", gap: 8, color: "#287d52", fontWeight: 700, textDecoration: "none" }}><ArrowLeft size={15} /> Back to Shopes</Link>
+
+        <div className={styles.workspaceLabel}>WORKSPACE</div>
+        <div className={styles.workspaceCard}>
+          <span className={styles.workspaceIcon}><Globe2 size={17} /></span>
+          <span className={styles.workspaceCopy}><strong>My workspace</strong><small>Personal workspace</small></span>
+          <span className={styles.freeBadge}>FREE</span>
+        </div>
+
+        <nav className={styles.navigation} aria-label="Workspace navigation">
+          <span className={styles.navLabel}>OVERVIEW</span>
+          <a className={styles.navItemActive} href="#overview" aria-current="page"><LayoutDashboard size={17} /> Dashboard</a>
+          <a className={styles.navItem} href="#projects"><Globe2 size={17} /> Projects <span className={styles.navCount}>0</span></a>
+          <a className={styles.navItem} href="#audits"><FileSearch size={17} /> Site audits</a>
+          <span className={styles.navLabel}>SHOPES</span>
+          <Link className={styles.navItem} href="/#platform"><Target size={17} /> Explore platform <ArrowUpRight size={14} /></Link>
+          <Link className={styles.navItem} href="/#pricing"><Sparkles size={17} /> Free plan details <ArrowUpRight size={14} /></Link>
+        </nav>
+
+        <div className={styles.sidebarBottom}>
+          <div className={styles.helpCard}>
+            <span className={styles.helpIcon}><CircleHelp size={17} /></span>
+            <strong>Getting started</strong>
+            <p>Explore what Shopes can do while project storage and live audits are being built.</p>
+            <Link href="/#features">Explore features <ArrowRight size={14} /></Link>
+          </div>
+
+          <div className={styles.account}>
+            <span className={styles.avatar} aria-hidden="true">{initials}</span>
+            <span className={styles.accountText}><strong>{displayName}</strong><small>{user.email || "Google account"}</small></span>
+            <form action={signOutAction}>
+              <button className={styles.signOut} type="submit" aria-label="Sign out of Shopes" title="Sign out"><LogOut size={16} /></button>
+            </form>
+          </div>
+        </div>
+      </aside>
+
+      <section className={styles.mainPanel} id="overview">
+        <header className={styles.topbar}>
+          <div className={styles.breadcrumb}><span>Workspace</span><span aria-hidden="true">/</span><strong>Dashboard</strong></div>
+          <div className={styles.topbarRight}>
+            <span className={styles.sessionBadge}><span /> Signed in securely</span>
+            <span className={styles.avatarSmall} aria-hidden="true">{initials}</span>
+          </div>
+        </header>
+
+        <div className={styles.content}>
+          <div className={styles.welcome}>
+            <div>
+              <div className={styles.eyebrow}><Sparkles size={14} /> YOUR SHOPES WORKSPACE</div>
+              <h1>Welcome back{user.name ? `, ${user.name.trim().split(/\s+/)[0]}` : ""}.</h1>
+              <p>Build a clearer picture of your store’s search visibility, one step at a time.</p>
+            </div>
+            <Link className={styles.primaryButton} href="/#get-started"><ArrowRight size={16} /> Explore Shopes</Link>
+          </div>
+
+          <div className={styles.notice} role="note">
+            <span className={styles.noticeIcon}><ShieldCheck size={18} /></span>
+            <div><strong>Your workspace is ready</strong><p>Google sign-in is connected. Website projects and live SEO data are not available yet, so this dashboard shows no fabricated metrics.</p></div>
+            <span className={styles.noticeStatus}><CheckCircle2 size={14} /> Account connected</span>
+          </div>
+
+          <section className={styles.section} id="projects" aria-labelledby="projects-title">
+            <div className={styles.sectionHeading}>
+              <div><h2 id="projects-title">Your projects</h2><p>Websites you choose to monitor will appear here.</p></div>
+              <span className={styles.countBadge}>0 projects</span>
+            </div>
+            <div className={styles.emptyState}>
+              <div className={styles.emptyArtwork} aria-hidden="true">
+                <span className={styles.orbit} />
+                <span className={styles.globeCard}><Globe2 size={28} /></span>
+                <span className={styles.sparkleCard}><Sparkles size={16} /></span>
+              </div>
+              <div className={styles.emptyCopy}>
+                <span className={styles.kicker}>A CLEAR PLACE TO BEGIN</span>
+                <h3>Your first project is the next step.</h3>
+                <p>Project saving is not connected yet. When it is available, you’ll be able to add a store and keep its audit history in one place.</p>
+                <Link className={styles.secondaryButton} href="/#get-started">Explore the store workflow <ArrowRight size={15} /></Link>
+              </div>
+            </div>
+          </section>
+
+          <section className={styles.section} id="audits" aria-labelledby="activity-title">
+            <div className={styles.sectionHeading}>
+              <div><h2 id="activity-title">Workspace overview</h2><p>Live results will appear after the required services are connected.</p></div>
+              <span className={styles.countBadge}>No audit data</span>
+            </div>
+            <div className={styles.metricGrid}>
+              <article className={styles.metricCard}><span className={styles.metricIcon}><Activity size={18} /></span><span className={styles.metricLabel}>AUDITS COMPLETED</span><strong>—</strong><p>No audits have run yet.</p></article>
+              <article className={styles.metricCard}><span className={styles.metricIcon}><Target size={18} /></span><span className={styles.metricLabel}>SEO OPPORTUNITIES</span><strong>—</strong><p>Insights require real audit data.</p></article>
+              <article className={styles.metricCard}><span className={styles.metricIcon}><FileSearch size={18} /></span><span className={styles.metricLabel}>ISSUES TO REVIEW</span><strong>—</strong><p>Website crawling is not connected.</p></article>
+            </div>
+          </section>
+
+          <section className={styles.accountPanel} aria-labelledby="account-title">
+            <div className={styles.accountPanelIcon}><Settings2 size={18} /></div>
+            <div className={styles.accountPanelCopy}><h2 id="account-title">Your account</h2><p>{user.email || "Google account"} · Signed in with Google. Dedicated account settings are planned for the next phase.</p></div>
+            <form action={signOutAction}><button className={styles.secondaryButton} type="submit"><LogOut size={15} /> Sign out</button></form>
+          </section>
+
+          <footer className={styles.footer}><span>© {new Date().getFullYear()} Shopes</span><span>Permanent free plan · No credit card required</span></footer>
+        </div>
       </section>
     </main>
   );
