@@ -9,8 +9,8 @@ const PAGE_COUNT = Math.ceil(ARTICLE_COUNT / PAGE_SIZE);
 export const metadata: Metadata = {
   title: "Shopes Blog — Online Shopping",
   description: "Practical long-form guides for researching products, comparing online stores, understanding offers, and making informed shopping decisions.",
-  alternates: { canonical: "/blog" },
-  openGraph: { title: "Shopes Blog — Online Shopping", description: "Practical online shopping guides and product research.", type: "website" }
+  alternates: { canonical: "https://shopes.online/blog" },
+  openGraph: { title: "Shopes Blog — Online Shopping", description: "Practical online shopping guides and product research.", type: "website", url: "https://shopes.online/blog" }
 };
 
 export default function BlogIndexPage() {
