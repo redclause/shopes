@@ -91,7 +91,6 @@ export async function POST(request: Request) {
       await reader.cancel().catch(() => undefined);
     }
     const html = new TextDecoder().decode(Buffer.concat(chunks));
-    const html = new TextDecoder().decode(Buffer.concat(chunks));
     const evidence = extractBacklinkEvidence(html, candidateUrl.toString(), targetUrl.toString());
     const canonicalUrl = extractCanonicalUrl(html, candidateUrl.toString());
 
