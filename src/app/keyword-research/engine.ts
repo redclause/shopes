@@ -111,6 +111,18 @@ function words(value: string): string[] {
   return value.split(/[\s\p{P}\p{S}]+/u).filter(Boolean);
 }
 
+function clusterFor(kind: string, intent: SearchIntent, language: KeywordLanguage): string {
+  const value = kind.toLocaleLowerCase();
+  if (/question|კითხვით/.test(value)) return language === "Georgian" ? "კითხვები და სწავლა" : "Questions & learning";
+  if (/comparison|review|შედარებ|მიმოხილვ/.test(value)) return language === "Georgian" ? "შედარება და ალტერნატივები" : "Comparison & alternatives";
+  if (/purchase|price|buying|შეძენის|ფასის|ფასის/.test(value)) return language === "Georgian" ? "ყიდვა და ფასი" : "Buying & pricing";
+  if (/local|ლოკალურ/.test(value) || intent === "Local") return language === "Georgian" ? "ლოკალური ძიება" : "Local intent";
+  if (/synonym|სინონიმ/.test(value)) return language === "Georgian" ? "სინონიმები" : "Synonyms";
+  if (/audience|content|topic|თემატურ|აუდიტორიის/.test(value)) return language === "Georgian" ? "თემები და აუდიტორია" : "Topics & audience";
+  if (/shorter|short-tail|მოკლე/.test(value)) return language === "Georgian" ? "ფრაზის ვარიანტები" : "Phrase variations";
+  return language === "Georgian" ? "ძირითადი თემა" : "Core topic";
+}
+
 function scorePhrase(phrase: string, seed: string, intent: SearchIntent): Pick<KeywordIdea, "wordCount" | "longTail" | "specificityScore" | "relevanceScore" | "opportunityScore"> {
   const wordCount = words(phrase).length;
   const seedTokens = new Set(words(normalizeKeyword(seed)));
@@ -154,7 +166,7 @@ export function generateKeywordIdeas(seedInput: string, language: KeywordLanguag
     const intent = candidate.intent || classifyIntent(phrase, language);
     unique.set(normalized, {
       phrase, normalized, kind: candidate.kind, intent, intentConfidence: "heuristic",
-      cluster: seed, ...scorePhrase(phrase, seed, intent),
+      cluster: clusterFor(candidate.kind, intent, language), ...scorePhrase(phrase, seed, intent),
       provenance: "locally-generated", metricsStatus: "unavailable",
     });
     if (unique.size >= Math.min(Math.max(1, maxResults), 250)) break;
@@ -170,6 +182,7 @@ export type ImportedSerpRecord = {
   description: string;
   rank?: number;
   source: string;
+  sourceDate?: string;
   importedAt: string;
 };
 
