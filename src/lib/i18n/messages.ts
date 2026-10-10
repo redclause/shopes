@@ -38,7 +38,8 @@ export function translate(locale: Locale | string, key: MessageKey): string {
 }
 
 export function hasFullCoreTranslation(code: string): boolean {
+  if (code === "en") return true;
   return Object.keys(CATALOG[code] ?? {}).length === Object.keys(EN).length;
 }
 
-export const TRANSLATED_CORE_LOCALES = Object.keys(CATALOG);
+export const TRANSLATED_CORE_LOCALES = ["en", ...Object.keys(CATALOG)];
