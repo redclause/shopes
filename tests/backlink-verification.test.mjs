@@ -7,7 +7,7 @@ test("matches absolute and relative links after normalizing trailing slash and f
   const result = extractBacklinkEvidence(html, "https://directory.example.org/guides/page", "https://directory.example.org/resource?ref=docs");
   assert.ok(result);
   assert.equal(result.anchorText, "Useful resource");
-  assert.equal(result.resolvedUrl, "https://directory.example.org/resource/?ref=docs");
+  assert.equal(result.resolvedUrl, "https://directory.example.org/resource?ref=docs");
   assert.deepEqual(result.rel, []);
   assert.equal(result.isNofollow, false);
 });
