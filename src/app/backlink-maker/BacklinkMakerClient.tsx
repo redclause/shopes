@@ -234,8 +234,8 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
             </div>
             <section aria-labelledby="site-catalog-title" style={{ marginTop: 24 }}>
               <div className={styles.cardHeading}><span className={styles.iconTile}><Link2 size={19} /></span><div><h2 id="site-catalog-title">Website opportunity catalog</h2><p>{backlinkSiteCatalog.length.toLocaleString()} website candidates across communities, publishing, directories, reviews, startups, software marketplaces and social platforms. Each entry requires current policy review; catalog inclusion does not mean backlink placement is permitted.</p></div></div>
-              <label className={styles.field}><span>Search catalog</span><input value={catalogSearch} onChange={(event) => setCatalogSearch(event.target.value)} placeholder="Search site name, domain, category or submission method" /></label>
-              <label className={styles.field}><span>Category</span><select value={catalogCategory} onChange={(event) => setCatalogCategory(event.target.value)} style={{ width: "100%", minHeight: 46, padding: "10px 12px", border: "1px solid #334352", borderRadius: 10, background: "#0b1118", color: "#f3f8fc", font: "inherit", fontSize: 14 }}>
+              <label className={styles.field}><span>Search catalog</span><input value={catalogSearch} onChange={(event) => { setCatalogSearch(event.target.value); setCatalogPage(1); }} placeholder="Search site name, domain, category or submission method" /></label>
+              <label className={styles.field}><span>Category</span><select value={catalogCategory} onChange={(event) => { setCatalogCategory(event.target.value); setCatalogPage(1); }} style={{ width: "100%", minHeight: 46, padding: "10px 12px", border: "1px solid #334352", borderRadius: 10, background: "#0b1118", color: "#f3f8fc", font: "inherit", fontSize: 14 }}>
                 {backlinkSiteCategories.map((category) => <option key={category} value={category}>{category}</option>)}
               </select></label>
               <div className={styles.snippetList}>
@@ -261,6 +261,14 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
                 </article>)}
                 {filteredCatalog.length === 0 && <p style={{ color: "#aabac8", fontSize: 13 }}>No catalog entries match this search.</p>}
               </div>
+              {filteredCatalog.length > 0 && <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", margin: "14px 0" }}>
+                <p style={{ color: "#aabac8", fontSize: 13, margin: 0 }}>Showing {(catalogPage - 1) * catalogPageSize + 1}–{Math.min(catalogPage * catalogPageSize, filteredCatalog.length)} of {filteredCatalog.length.toLocaleString()} candidates</p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button type="button" className={styles.export} disabled={catalogPage <= 1} onClick={() => setCatalogPage((page) => Math.max(1, page - 1))}>Previous</button>
+                  <span style={{ color: "#aabac8", fontSize: 13, alignSelf: "center" }}>Page {catalogPage} / {catalogPageCount}</span>
+                  <button type="button" className={styles.export} disabled={catalogPage >= catalogPageCount} onClick={() => setCatalogPage((page) => Math.min(catalogPageCount, page + 1))}>Next</button>
+                </div>
+              </div>}
               <div className={styles.notice}><ShieldCheck size={18} /><p><strong>Important:</strong> Catalog entries are candidate websites, not verified backlink placements. Check each site’s current official rules and relevance before submitting anything; only explicitly approved site-specific integrations may automate submission.</p></div>
             </section>
             <div className={styles.notice} style={{ marginTop: 16 }}><ShieldCheck size={18} /><p><strong>Honest status reporting:</strong> Search links open public search results in your browser; Shopes does not claim that a backlink has been submitted or published. Direct automated scraping of search engines is intentionally not used.</p></div>
