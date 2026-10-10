@@ -71,6 +71,7 @@ test("static UI text translations work and missing copy remains explicitly detec
   assert.equal(translateUiText("es", "The page returned HTTP 404."), "La página devolvió HTTP 404.");
   assert.equal(translateUiText("fr", "Title found (32 characters): A useful title"), "Titre trouvé (32 caractères): A useful title");
   assert.equal(translateUiText("de", "The website request timed out."), "Die Website-Anfrage hat das Zeitlimit überschritten.");
+  assert.equal(translateUiText("es", "2 internal, 3 external link(s); 1 anchor(s) without href."), "2 enlace(s) interno(s), 3 enlace(s) externo(s); 1 anclaje(s) sin href.");
 });
 
 test("static JSX copy on primary routes has translations for every offered UI locale", () => {
