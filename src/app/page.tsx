@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import GoogleOneTapButton from "./components/GoogleOneTapButton";
 import { useShopesTranslation } from "../lib/i18n/useShopesTranslation";
@@ -13,6 +14,7 @@ const issues = [
 ];
 
 export default function Home() {
+  const router = useRouter();
   const { t } = useShopesTranslation();
   const [siteUrl, setSiteUrl] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,7 +27,7 @@ export default function Home() {
       const hasProtocol = value.startsWith("https://") || value.startsWith("http://");
       const parsed = new URL(hasProtocol ? value : "https://" + value);
       if (!parsed.hostname.includes(".")) throw new Error("Invalid host");
-      setMessage("Ready to set up an audit for " + parsed.hostname + ". Sign in with Google to continue.");
+      router.push("/audit?url=" + encodeURIComponent(parsed.toString()));
     } catch {
       setMessage(value ? "Enter a valid store domain, such as yourstore.com." : "Enter your store URL to begin.");
     }
