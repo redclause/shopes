@@ -5,13 +5,12 @@ import { useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { ArrowDownUp, ArrowLeft, Download, FileUp, Search, Sparkles, Target, Upload, X } from "lucide-react";
 import {
-  exportKeywordCsv, generateKeywordIdeas, parseImportedSerpData, summarizeDomainOverlap,
-  type ImportedSerpRecord, type KeywordIdea, type SearchIntent,
+  exportKeywordCsv, generateKeywordIdeas, parseImportedSerpData, summarizeDomainOverlap, SUPPORTED_KEYWORD_LANGUAGES,
+  type ImportedSerpRecord, type KeywordIdea, type KeywordLanguage, type SearchIntent,
 } from "./engine";
 import styles from "./page.module.css";
 import { LOCALE_STORAGE_KEY } from "../../lib/i18n/languages";
 import { useShopesTranslation } from "../../lib/i18n/useShopesTranslation";
-import { SUPPORTED_KEYWORD_LANGUAGES, type KeywordLanguage } from "./engine";
 
 const PAGE_SIZE = 10;
 const LOCALE_TO_KEYWORD_LANGUAGE: Record<string, KeywordLanguage> = {
