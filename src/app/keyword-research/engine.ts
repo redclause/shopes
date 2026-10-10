@@ -170,7 +170,7 @@ export function normalizeKeyword(value: string): string {
 
 export function classifyIntent(phrase: string, language: KeywordLanguage): SearchIntent {
   const value = normalizeKeyword(phrase);
-  const rules = KEYWORD_LANGUAGE_KEYWORD_LANGUAGE_RULES[language];
+  const rules = KEYWORD_LANGUAGE_RULES[language];
   for (const item of rules.modifiers) {
     const modifier = normalizeKeyword(item.phrase);
     if (modifier && (value === modifier || value.startsWith(modifier + " ") || value.endsWith(" " + modifier) || value.includes(" " + modifier + " "))) return item.intent;
