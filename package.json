@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:keyword-engine": "node --experimental-strip-types --test tests/keyword-engine.test.mjs",
+    "test:product-intelligence": "node --experimental-strip-types --test tests/product-intelligence.test.mjs",
     "test:i18n": "node --experimental-strip-types --test tests/i18n.test.mjs",
     "test:blog": "node --experimental-strip-types --test tests/blog.test.mjs"
   },
