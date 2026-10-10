@@ -1,30 +1,26 @@
-export type LocalSubmissionStatus = "prepared" | "user-reported-submitted" | "backlink_verified" | "rejected";
+/** @typedef {"prepared" | "user-reported-submitted" | "backlink_verified" | "rejected"} LocalSubmissionStatus */
+/** @typedef {{ targetUrl: string, siteId?: string, status: string, verification?: { resolvedUrl?: string } }} LocalSubmissionRecord */
 
-export type LocalSubmissionRecord = {
-  targetUrl: string;
-  siteId?: string;
-  status: LocalSubmissionStatus | string;
-  verification?: { resolvedUrl?: string };
-};
-
-/** Normalize legacy browser records without treating a user report as proof. */
-export function normalizeStoredStatus(record: Partial<LocalSubmissionRecord>): LocalSubmissionStatus {
+/** @param {Partial<LocalSubmissionRecord>} record @returns {LocalSubmissionStatus} */
+export function normalizeStoredStatus(record) {
   if (record.status === "backlink_verified" && record.verification?.resolvedUrl) return "backlink_verified";
   if (record.status === "submitted" || record.status === "user-reported-submitted") return "user-reported-submitted";
   if (record.status === "rejected") return "rejected";
   return "prepared";
 }
 
-/** Prevent repeat local tracking entries for the same target/site until rejected. */
-export function hasActiveDuplicate<T extends LocalSubmissionRecord>(records: T[], targetUrl: string, siteId: string): boolean {
+/** @param {LocalSubmissionRecord[]} records @param {string} targetUrl @param {string} siteId */
+export function hasActiveDuplicate(records, targetUrl, siteId) {
   return records.some((record) => record.targetUrl === targetUrl && record.siteId === siteId && record.status !== "rejected");
 }
 
-export function canReopenManualWorkflow(status: string): boolean {
+/** @param {string} status */
+export function canReopenManualWorkflow(status) {
   return status === "rejected";
 }
 
-export function submissionStatusLabel(status: string): string {
+/** @param {string} status */
+export function submissionStatusLabel(status) {
   switch (status) {
     case "prepared": return "Prepared — not submitted";
     case "user-reported-submitted": return "User-reported submission — unverified";
