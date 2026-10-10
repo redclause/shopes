@@ -47,6 +47,7 @@ export default function GoogleOneTapButton({
 }: GoogleOneTapButtonProps) {
   const router = useRouter();
   const initialized = useRef(false);
+  const initializing = useRef(false);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -80,7 +81,8 @@ export default function GoogleOneTapButton({
   }, [busy, redirectTo, router]);
 
   const initialize = useCallback(async () => {
-    if (initialized.current || !window.google?.accounts?.id) return;
+    if (initialized.current || initializing.current || !window.google?.accounts?.id) return;
+    initializing.current = true;
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     if (!clientId) {
       setMessage("Google sign-in is not configured for this deployment.");
@@ -116,6 +118,8 @@ export default function GoogleOneTapButton({
       }
     } catch {
       setMessage("Google One Tap could not start. Please try again.");
+    } finally {
+      initializing.current = false;
     }
   }, [autoPrompt, onCredential]);
 
@@ -144,7 +148,7 @@ export default function GoogleOneTapButton({
         type="button"
         className={className}
         onClick={openOneTap}
-        disabled={busy}
+        disabled={busy || !ready}
         aria-busy={busy}
       >
         {busy ? <LoaderCircle size={15} className="google-one-tap-spinner" aria-hidden="true" /> : null}
