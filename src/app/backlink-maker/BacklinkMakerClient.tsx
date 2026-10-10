@@ -50,7 +50,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
       const saved = window.localStorage.getItem("shopes-backlink-submissions-v1");
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setSubmissionRecords(parsed.filter((item) => item && typeof item.id === "string" && typeof item.targetUrl === "string" && typeof item.candidateUrl === "string").map((item) => ({ ...item, status: item.status === "submitted" || item.status === "user-reported-submitted" ? "user-reported-submitted" : item.status === "rejected" ? "rejected" : "prepared" })));
+        if (Array.isArray(parsed)) setSubmissionRecords(parsed.filter((item) => item && typeof item.id === "string" && typeof item.targetUrl === "string" && typeof item.candidateUrl === "string").map((item) => ({ ...item, status: item.status === "backlink_verified" && item.verification?.resolvedUrl ? "backlink_verified" : item.status === "submitted" || item.status === "user-reported-submitted" ? "user-reported-submitted" : item.status === "rejected" ? "rejected" : "prepared" })));
       }
     } catch { /* Ignore malformed local history and keep the tool usable. */ }
     setRecordsLoaded(true);
