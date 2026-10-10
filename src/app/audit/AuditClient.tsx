@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft, ArrowRight, CheckCircle2, CircleAlert, Clock3, ExternalLink,
@@ -37,6 +37,11 @@ export default function AuditClient() {
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"all" | Finding["status"]>("all");
   const [saveMessage, setSaveMessage] = useState("");
+
+  useEffect(() => {
+    const requestedUrl = new URLSearchParams(window.location.search).get("url");
+    if (requestedUrl) setUrl(requestedUrl);
+  }, []);
 
   const visibleFindings = result?.findings.filter((finding) => statusFilter === "all" || finding.status === statusFilter) ?? [];
 
