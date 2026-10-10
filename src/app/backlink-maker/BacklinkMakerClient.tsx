@@ -11,7 +11,7 @@ import { backlinkSiteCatalog, backlinkSiteCategories } from "./site-catalog";
 type Props = { userName: string; userEmail: string; userImage?: string | null; signOutAction: () => Promise<void> };
 type Snippet = { id: string; title: string; description: string; value: string };
 type VerificationEvidence = { anchorText: string; href: string; resolvedUrl: string; rel: string[]; isNofollow: boolean };
-type SubmissionRecord = { id: string; targetUrl: string; candidateUrl: string; status: "prepared" | "user-reported-submitted" | "backlink_verified" | "rejected"; createdAt: string; updatedAt: string; note?: string; siteId?: string; siteName?: string; siteDomain?: string; submissionUrl?: string; verification?: VerificationEvidence; canonicalUrl?: string; httpStatus?: number };
+type SubmissionRecord = { id: string; targetUrl: string; candidateUrl: string; status: "prepared" | "user-reported-submitted" | "backlink_verified" | "rejected"; createdAt: string; updatedAt: string; note?: string; title?: string; description?: string; submissionMethod?: string; siteId?: string; siteName?: string; siteDomain?: string; submissionUrl?: string; verification?: VerificationEvidence; canonicalUrl?: string; httpStatus?: number };
 
 function normalizeUrl(value: string) {
   const input = value.trim();
@@ -50,7 +50,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
       const saved = window.localStorage.getItem("shopes-backlink-submissions-v1");
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setSubmissionRecords(parsed.filter((item) => item && typeof item.id === "string" && typeof item.targetUrl === "string" && typeof item.candidateUrl === "string"));
+        if (Array.isArray(parsed)) setSubmissionRecords(parsed.filter((item) => item && typeof item.id === "string" && typeof item.targetUrl === "string" && typeof item.candidateUrl === "string").map((item) => ({ ...item, status: item.status === "submitted" || item.status === "user-reported-submitted" ? "user-reported-submitted" : item.status === "rejected" ? "rejected" : "prepared" })));
       }
     } catch { /* Ignore malformed local history and keep the tool usable. */ }
     setRecordsLoaded(true);
@@ -130,7 +130,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
     const now = new Date().toISOString();
     const candidateHost = candidateUrl.trim() ? (() => { try { return new URL(candidateUrl.trim()).hostname.toLowerCase(); } catch { return ""; } })() : "";
     const candidateBelongsToSite = candidateHost === site.domain || candidateHost.endsWith("." + site.domain);
-    const record: SubmissionRecord = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, targetUrl: generatedUrl, candidateUrl: candidateBelongsToSite ? candidateUrl.trim() : "", siteId: site.id, siteName: site.name, siteDomain: site.domain, submissionUrl: site.submissionUrl || site.url, status: "prepared", createdAt: now, updatedAt: now, note: submissionNote.trim() || undefined };
+    const record: SubmissionRecord = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, targetUrl: generatedUrl, candidateUrl: candidateBelongsToSite ? candidateUrl.trim() : "", siteId: site.id, siteName: site.name, siteDomain: site.domain, submissionUrl: site.submissionUrl || site.url, submissionMethod: site.submissionMethod, title: pageTitle.trim() || undefined, description: description.trim() || undefined, status: "prepared", createdAt: now, updatedAt: now, note: submissionNote.trim() || undefined };
     setSubmissionRecords((current) => [record, ...current].slice(0, 100));
     setSubmissionNote("");
     setPublisherPermission(false);
@@ -301,7 +301,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
               <div className={styles.cardHeading}><span className={styles.iconTile}><Check size={19} /></span><div><h2>Submission history</h2><p>Stored in this browser only; up to 100 records.</p></div></div>
               <div className={styles.snippetList}>
                 {submissionRecords.map((record) => <article className={styles.snippet} key={record.id}>
-                  <div className={styles.snippetHead}><div><h3>{record.status === "prepared" ? "Prepared — not submitted" : record.status === "user-reported-submitted" ? "User-reported submission — unverified" : record.status === "backlink_verified" ? "Backlink verified in page HTML" : "User-reported rejection"}</h3><p>{record.siteName || record.siteDomain || "Unspecified site"}</p><p>Target: {record.targetUrl}</p>{record.candidateUrl && <p>Verified/candidate page: {record.candidateUrl}</p>}<p>Updated {new Date(record.updatedAt).toLocaleString()}</p>{record.verification && <p>Anchor: {record.verification.anchorText || "(empty anchor)"} · rel: {record.verification.rel.join(" ") || "none"} · {record.verification.isNofollow ? "nofollow/sponsored/ugc" : "not marked nofollow/sponsored/ugc"}{record.httpStatus ? ` · HTTP ${record.httpStatus}` : ""}</p>}{record.canonicalUrl && <p>Canonical: {record.canonicalUrl}</p>}</div>{record.submissionUrl && <a className={styles.export} href={record.submissionUrl} target="_blank" rel="noopener noreferrer">Open workflow <ExternalLink size={13} /></a>}</div>
+                  <div className={styles.snippetHead}><div><h3>{record.status === "prepared" ? "Prepared — not submitted" : record.status === "user-reported-submitted" ? "User-reported submission — unverified" : record.status === "backlink_verified" ? "Backlink verified in page HTML" : "User-reported rejection"}</h3><p>{record.siteName || record.siteDomain || "Unspecified site"}{record.submissionMethod ? ` · ${record.submissionMethod}` : ""}</p>{record.title && <p>Title: {record.title}</p>}{record.description && <p>Description: {record.description}</p>}<p>Target: {record.targetUrl}</p>{record.candidateUrl && <p>Verified/candidate page: {record.candidateUrl}</p>}<p>Updated {new Date(record.updatedAt).toLocaleString()}</p>{record.verification && <p>Anchor: {record.verification.anchorText || "(empty anchor)"} · rel: {record.verification.rel.join(" ") || "none"} · {record.verification.isNofollow ? "nofollow/sponsored/ugc" : "not marked nofollow/sponsored/ugc"}{record.httpStatus ? ` · HTTP ${record.httpStatus}` : ""}</p>}{record.canonicalUrl && <p>Canonical: {record.canonicalUrl}</p>}</div>{record.submissionUrl && <a className={styles.export} href={record.submissionUrl} target="_blank" rel="noopener noreferrer">Open workflow <ExternalLink size={13} /></a>}</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
                     {record.status === "prepared" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "user-reported-submitted")}>I submitted this manually</button>}
                     {record.status !== "backlink_verified" && record.candidateUrl && <button type="button" className={styles.export} onClick={() => { setCandidateUrl(record.candidateUrl); setVerifyResult(null); }}>Verify backlink</button>}
