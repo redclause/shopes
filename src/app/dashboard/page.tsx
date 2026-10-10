@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import styles from "./page.module.css";
 import WorkspaceProjects from "./WorkspaceProjects";
+import UserMenu from "../../components/UserMenu";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -98,7 +99,7 @@ export default async function DashboardPage() {
           <div className={styles.breadcrumb}><span>{t("dashboard")}</span><span aria-hidden="true">/</span><strong>{t("dashboard")}</strong></div>
           <div className={styles.topbarRight}>
             <span className={styles.sessionBadge}><span /> Signed in securely</span>
-            <span className={styles.avatarSmall} aria-hidden="true">{initials}</span>
+            <UserMenu name={displayName} email={user.email || ""} image={user.image} signOutAction={signOutAction} />
           </div>
         </header>
 

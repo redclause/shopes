@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { ArrowDownUp, ArrowLeft, Download, FileUp, Save, Search, Sparkles, Target, Upload, X } from "lucide-react";
+import { ArrowDownUp, Download, FileUp, Save, Search, Sparkles, Target, Upload, X } from "lucide-react";
 import {
   exportKeywordCsv, generateKeywordIdeas, parseImportedSerpData, summarizeDomainOverlap, SUPPORTED_KEYWORD_LANGUAGES,
   type ImportedSerpRecord, type KeywordIdea, type KeywordLanguage, type SearchIntent,
 } from "./engine";
 import styles from "./page.module.css";
+import UserMenu from "../../components/UserMenu";
 import { LOCALE_STORAGE_KEY } from "../../lib/i18n/languages";
 import { useShopesTranslation } from "../../lib/i18n/useShopesTranslation";
 
@@ -21,7 +22,7 @@ const LOCALE_TO_KEYWORD_LANGUAGE: Record<string, KeywordLanguage> = {
 };
 const INTENTS: Array<"All" | SearchIntent> = ["All", "Informational", "Commercial", "Transactional", "Navigational", "Local", "Unclassified"];
 
-export default function KeywordResearchClient() {
+export default function KeywordResearchClient({ userName, userEmail, userImage, signOutAction }: { userName: string; userEmail: string; userImage?: string | null; signOutAction: () => Promise<void> }) {
   const { t } = useShopesTranslation();
   const [seed, setSeed] = useState("");
   const [submittedSeed, setSubmittedSeed] = useState("");
@@ -162,9 +163,12 @@ export default function KeywordResearchClient() {
   return <main className={styles.shell}>
     <header className={styles.header}>
       <nav className={styles.back} aria-label="Main navigation">
-        <Link href="/dashboard">{t("dashboard")}</Link><Link href="/audit">Site audit</Link><Link href="/keyword-research" aria-current="page">Keyword research</Link><Link href="/product-intelligence">Product analysis</Link><Link href="/">Home</Link>
+        <Link href="/dashboard">{t("dashboard")}</Link><Link href="/audit">Site Audit</Link><Link href="/keyword-research" aria-current="page">Keyword Research</Link><Link href="/product-intelligence">Product Analysis</Link><Link href="/">Home</Link>
       </nav>
-      <span className={styles.free}>{t("freeForever").toUpperCase()}</span>
+      <div className={styles.headerActions}>
+        <span className={styles.free}>{t("freeForever").toUpperCase()}</span>
+        <UserMenu name={userName} email={userEmail} image={userImage} signOutAction={signOutAction} />
+      </div>
     </header>
 
     <section className={styles.intro}>

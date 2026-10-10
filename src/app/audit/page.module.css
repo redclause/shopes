@@ -60,3 +60,14 @@
 .header .backLink a{font-size:12px;font-weight:700;color:#52645a;white-space:nowrap}
 .header .backLink a:hover{color:#287d52}
 @media(max-width:640px){.header{height:auto;min-height:72px;gap:12px;align-items:flex-start;padding-top:12px;padding-bottom:12px}.header .backLink{justify-content:flex-end;gap:8px;max-width:70%}.header .backLink a{font-size:11px}}
+
+
+/* High-contrast cyan navigation matching the Shopes SEO console. */
+.header{gap:18px}
+.headerActions{display:flex;align-items:center;justify-content:flex-end;gap:18px;min-width:0}
+.header .backLink{display:flex;align-items:center;justify-content:flex-end;gap:clamp(10px,1.6vw,20px);flex-wrap:wrap}
+.header .backLink a{color:#49DDF5!important;font-size:12px;font-weight:800;white-space:nowrap;text-shadow:0 0 12px #49DDF51a}
+.header .backLink a:hover,.header .backLink a[aria-current="page"]{color:#a0f3ff!important}
+.header .backLink a[aria-current="page"]{text-decoration:underline;text-decoration-color:#49DDF5;text-underline-offset:7px}
+@media(max-width:920px){.header{height:auto;min-height:72px;flex-wrap:wrap;padding-top:12px;padding-bottom:12px}.headerActions{flex:1;gap:10px}.header .backLink{gap:10px;justify-content:flex-start;flex:1}}
+@media(max-width:640px){.headerActions{align-items:flex-start;flex-wrap:wrap;justify-content:space-between}.header .backLink{max-width:none;gap:9px}.header .backLink a{font-size:11px}}

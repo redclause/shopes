@@ -1,4 +1,4 @@
-import { auth } from "../../../auth";
+import { auth, signOut } from "../../../auth";
 import { redirect } from "next/navigation";
 import AuditClient from "./AuditClient";
 
@@ -18,5 +18,11 @@ export default async function AuditPage({ searchParams }: AuditPageProps) {
     redirect("/login?callbackUrl=" + encodeURIComponent(callbackUrl));
   }
 
-  return <AuditClient />;
+  async function signOutAction() {
+    "use server";
+    await signOut({ redirectTo: "/" });
+  }
+
+  const user = session.user;
+  return <AuditClient userName={user.name?.trim() || user.email?.split("@")[0] || "Shopes user"} userEmail={user.email || ""} userImage={user.image} signOutAction={signOutAction} />;
 }
