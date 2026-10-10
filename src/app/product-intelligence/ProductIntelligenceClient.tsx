@@ -11,6 +11,7 @@ import {
   type ProductData, type ProductRecommendation
 } from "../../lib/product-intelligence";
 import styles from "./page.module.css";
+import UserMenu from "../../components/UserMenu";
 
 type AnalysisResponse = {
   product: ProductData;
@@ -92,7 +93,7 @@ function priorityClass(priority: ProductRecommendation["priority"]): string {
   return priority === "Critical" ? styles.critical : priority === "Recommended" ? styles.recommended : styles.optional;
 }
 
-export default function ProductIntelligenceClient() {
+export default function ProductIntelligenceClient({ userName, userEmail, userImage, signOutAction }: { userName: string; userEmail: string; userImage?: string | null; signOutAction: () => Promise<void> }) {
   const [url, setUrl] = useState("");
   const [competitorUrls, setCompetitorUrls] = useState(["", ""]);
   const [result, setResult] = useState<AnalysisResponse | null>(null);
@@ -198,8 +199,13 @@ export default function ProductIntelligenceClient() {
 
       <section className={styles.main}>
         <header className={styles.topbar}>
-          <Link href="/dashboard" className={styles.backLink}><ArrowLeft size={15} /> Workspace</Link>
-          <span className={styles.topbarBadge}><ShieldCheck size={14} /> Evidence-first analysis</span>
+          <nav className={styles.mainNav} aria-label="Main navigation">
+            <Link href="/dashboard">Dashboard</Link><Link href="/keyword-research">Keyword Research</Link><Link href="/audit">Site Audit</Link><Link href="/product-intelligence" aria-current="page">Product Analysis</Link>
+          </nav>
+          <div className={styles.topbarActions}>
+            <span className={styles.topbarBadge}><ShieldCheck size={14} /> Evidence-first analysis</span>
+            <UserMenu name={userName} email={userEmail} image={userImage} signOutAction={signOutAction} />
+          </div>
         </header>
 
         <div className={styles.pageHeading}>
