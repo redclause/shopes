@@ -477,6 +477,40 @@ export function translateUiText(locale: Locale | string, text: string): string {
     const suffix = EXTRA_TEXT[code]?.["Create a free account to continue."] ?? "Create a free account to continue.";
     return `${prefix} ${auditReady[1]}. ${suffix}`;
   }
+  const titleFound = normalized.match(/^Title found \((\d+) characters\): (.*)$/);
+  if (titleFound) {
+    const prefix = code === "es" ? "Título encontrado" : code === "fr" ? "Titre trouvé" : "Titel gefunden";
+    const unit = code === "es" ? "caracteres" : code === "fr" ? "caractères" : "Zeichen";
+    return `${prefix} (${titleFound[1]} ${unit}): ${titleFound[2]}`;
+  }
+  const descriptionFound = normalized.match(/^Description found \((\d+) characters\): (.*)$/);
+  if (descriptionFound) {
+    const prefix = code === "es" ? "Descripción encontrada" : code === "fr" ? "Description trouvée" : "Beschreibung gefunden";
+    const unit = code === "es" ? "caracteres" : code === "fr" ? "caractères" : "Zeichen";
+    return `${prefix} (${descriptionFound[1]} ${unit}): ${descriptionFound[2]}`;
+  }
+  const httpStatus = normalized.match(/^The page returned HTTP (\d+)\.$/);
+  if (httpStatus) {
+    const prefix = code === "es" ? "La página devolvió HTTP" : code === "fr" ? "La page a renvoyé HTTP" : "Die Seite gab HTTP zurück";
+    return `${prefix} ${httpStatus[1]}.`;
+  }
+  const canonical = normalized.match(/^Canonical link found: (.+)$/);
+  if (canonical) return `${code === "es" ? "Enlace canónico encontrado:" : code === "fr" ? "Lien canonique trouvé :" : "Kanonischer Link gefunden:"} ${canonical[1]}`;
+  const robots = normalized.match(/^Meta robots: (.+)\.$/);
+  if (robots) return `${code === "es" ? "Meta robots:" : code === "fr" ? "Meta robots :" : "Meta-Robots:"} ${robots[1]}.`;
+  const headings = normalized.match(/^Found (\d+) H1 heading\(s\) and (\d+) H2 heading\(s\)\.$/);
+  if (headings) {
+    const found = code === "es" ? "Encontrados" : code === "fr" ? "Trouvé" : "Gefunden";
+    const h1 = code === "es" ? "encabezado(s) H1" : code === "fr" ? "titre(s) H1" : "H1-Überschrift(en)";
+    const h2 = code === "es" ? "encabezado(s) H2" : code === "fr" ? "titre(s) H2" : "H2-Überschrift(en)";
+    return `${found} ${headings[1]} ${h1} y ${headings[2]} ${h2}.`.replace(" y ", code === "fr" ? " et " : code === "de" ? " und " : " y ");
+  }
+  const missingAlt = normalized.match(/^(\d+) of (\d+) image\(s\) have missing or empty alt text\.$/);
+  if (missingAlt) return code === "es"
+    ? `${missingAlt[1]} de ${missingAlt[2]} imágenes no tienen texto alternativo o lo tienen vacío.`
+    : code === "fr"
+      ? `${missingAlt[1]} image(s) sur ${missingAlt[2]} ont un texte alternatif manquant ou vide.`
+      : `${missingAlt[1]} von ${missingAlt[2]} Bildern fehlt ein Alternativtext oder er ist leer.`;
   return text;
 }
 
