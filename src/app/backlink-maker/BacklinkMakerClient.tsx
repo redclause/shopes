@@ -242,7 +242,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
                 {visibleCatalog.map((site) => <article className={styles.snippet} key={site.id}>
                   <div className={styles.snippetHead}><div><h3>{site.name} <span style={{ color: "#8da2b3", fontWeight: 500 }}>· {site.category}</span></h3><p>{site.domain} · {site.submissionMethod}</p><p>{site.notes}</p><p style={{ color: "#f0c879", marginTop: 6 }}>Policy status: needs manual review</p>{site.sourceUrl && <p style={{ marginTop: 6 }}><a href={site.sourceUrl} target="_blank" rel="noopener noreferrer">Source list <ExternalLink size={12} /></a></p>}</div><a className={styles.export} href={site.url} target="_blank" rel="noopener noreferrer">Review site <ExternalLink size={13} /></a></div>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
-                    <button type="button" className={styles.export} onClick={() => { setCandidateUrl(site.url); setVerifyResult(null); }}>Use as candidate page</button>
+                    {site.submissionUrl && <a className={styles.export} href={site.submissionUrl} target="_blank" rel="noopener noreferrer">Open submission page <ExternalLink size={13} /></a>}
                     <button type="button" className={styles.export} disabled={checkingPolicySite === site.id} onClick={() => checkSitePolicy(site.id)}>{checkingPolicySite === site.id ? "Checking rules…" : "Inspect public rules"}</button>
                   </div>
                   {policyResults[site.id] && <div className={styles.notice} role="status" style={{ marginTop: 12 }}>
