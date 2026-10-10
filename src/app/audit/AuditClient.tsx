@@ -162,7 +162,7 @@ export default function AuditClient() {
               </select></label>
               <div className={styles.reportActions}>
                 <button type="button" className={styles.secondaryButton} onClick={saveReportLocally}>{t("saveInBrowser")}</button>
-                <button type="button" className={styles.secondaryButton} onClick={exportReport}><Download size={15} /> Export JSON report</button>
+                <button type="button" className={styles.secondaryButton} onClick={exportReport}><Download size={15} /> {t("exportJsonReport")}</button>
               </div>
             </div>
             {saveMessage && <p className={styles.saveMessage} role="status">{saveMessage}</p>}
