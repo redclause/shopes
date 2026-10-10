@@ -37,7 +37,7 @@ export default function KeywordResearchClient() {
         setPage(1);
         setSelected([]);
       } else {
-        setLanguageNotice("Keyword generation rules are not yet available for this interface language. Choose one of the 20 supported research languages below.");
+        setLanguageNotice("Keyword generation rules are not yet available for this interface language. Choose one of the 19 supported research languages below.");
       }
     };
     try { syncLocale(window.localStorage.getItem(LOCALE_STORAGE_KEY) || "en"); }
