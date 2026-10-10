@@ -145,6 +145,10 @@ export default function GoogleOneTapButton({
 
   useEffect(() => {
     if (!ready || rendered.current || !buttonContainerRef.current || !window.google?.accounts?.id) return;
+    const availableWidth = buttonContainerRef.current.parentElement?.clientWidth || 320;
+    const buttonWidth = className.includes("google-cta")
+      ? 200
+      : Math.min(360, Math.max(200, availableWidth));
     window.google.accounts.id.renderButton(buttonContainerRef.current, {
       type: "standard",
       theme: "outline",
@@ -152,11 +156,11 @@ export default function GoogleOneTapButton({
       text: "continue_with",
       shape: "rectangular",
       logo_alignment: "left",
-      width: Math.min(360, Math.max(240, buttonContainerRef.current.clientWidth || 320)),
+      width: buttonWidth,
       locale: "en",
     });
     rendered.current = true;
-  }, [ready]);
+  }, [className, ready]);
 
   useEffect(() => {
     if (window.google?.accounts?.id) void initialize();
