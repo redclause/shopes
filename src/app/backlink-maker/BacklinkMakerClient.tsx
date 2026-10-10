@@ -239,7 +239,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
                 {backlinkSiteCategories.map((category) => <option key={category} value={category}>{category}</option>)}
               </select></label>
               <div className={styles.snippetList}>
-                {backlinkSiteCatalog.filter((site) => (catalogCategory === "All" || site.category === catalogCategory) && [site.name, site.domain, site.category, site.submissionMethod, site.notes].some((value) => value.toLowerCase().includes(catalogSearch.trim().toLowerCase()))).map((site) => <article className={styles.snippet} key={site.id}>
+                {visibleCatalog.map((site) => <article className={styles.snippet} key={site.id}>
                   <div className={styles.snippetHead}><div><h3>{site.name} <span style={{ color: "#8da2b3", fontWeight: 500 }}>· {site.category}</span></h3><p>{site.domain} · {site.submissionMethod}</p><p>{site.notes}</p><p style={{ color: "#f0c879", marginTop: 6 }}>Policy status: needs manual review</p>{site.sourceUrl && <p style={{ marginTop: 6 }}><a href={site.sourceUrl} target="_blank" rel="noopener noreferrer">Source list <ExternalLink size={12} /></a></p>}</div><a className={styles.export} href={site.url} target="_blank" rel="noopener noreferrer">Review site <ExternalLink size={13} /></a></div>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
                     <button type="button" className={styles.export} onClick={() => { setCandidateUrl(site.url); setVerifyResult(null); }}>Use as candidate page</button>
@@ -259,7 +259,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
                     </div>
                   </div>}
                 </article>)}
-                {backlinkSiteCatalog.filter((site) => (catalogCategory === "All" || site.category === catalogCategory) && [site.name, site.domain, site.category, site.submissionMethod, site.notes].some((value) => value.toLowerCase().includes(catalogSearch.trim().toLowerCase()))).length === 0 && <p style={{ color: "#aabac8", fontSize: 13 }}>No catalog entries match this search.</p>}
+                {filteredCatalog.length === 0 && <p style={{ color: "#aabac8", fontSize: 13 }}>No catalog entries match this search.</p>}
               </div>
               <div className={styles.notice}><ShieldCheck size={18} /><p><strong>Important:</strong> Catalog entries are candidate websites, not verified backlink placements. Check each site’s current official rules and relevance before submitting anything; only explicitly approved site-specific integrations may automate submission.</p></div>
             </section>
