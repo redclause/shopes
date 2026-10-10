@@ -170,7 +170,7 @@ img,svg,video,canvas{max-width:100%}
 
 
 /* Google One Tap control: keep sign-in on the current page and expose status accessibly. */
-.google-one-tap-control{position:relative;display:inline-flex;align-items:center;min-width:0}
+.google-one-tap-control{position:relative;display:inline-flex;align-items:center;min-width:0}.google-cta{border:0}
 .google-one-tap-status{position:absolute;z-index:30;top:calc(100% + 8px);right:0;width:max-content;max-width:min(320px,85vw);padding:9px 11px;border:1px solid #354353;border-radius:9px;background:#111820;color:#edf5fb;font-size:12px;font-weight:500;line-height:1.5;box-shadow:0 12px 30px #0003}
 .google-one-tap-spinner{animation:shopes-one-tap-spin .9s linear infinite}
 @keyframes shopes-one-tap-spin{to{transform:rotate(360deg)}}
