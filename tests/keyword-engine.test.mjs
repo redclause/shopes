@@ -66,7 +66,8 @@ test("imports valid CSV and summarizes domain overlap", () => {
   assert.equal(records[0].domain, "example.com");
   const summary = summarizeDomainOverlap(records);
   assert.equal(summary[0].domain, "example.com");
-  assert.equal(summary[0].keywords.length, 2);
+  assert.equal(summary[0].occurrences, 2);
+  assert.equal(summary[0].keywords.length, 1);
   assert.equal(summary[0].averageRank, 3);
 });
 
