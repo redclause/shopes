@@ -91,3 +91,24 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .footer-brand .brand,.footer-column b{color:#F4F7FB}.footer-brand p,.footer-column a,.footer-bottom{color:#B2BDCC}
 .footer-column a:hover,.footer-bottom svg{color:#49DDF5}
 @media(max-width:640px){.hero{background:radial-gradient(ellipse at 80% 10%,#142632 0,transparent 50%),#0B0D12}.feature-card,.integration-panel,.workflow-grid article,.price-card{background:#11151C}}
+
+
+/* Readability pass: increase default and component typography across Shopes. */
+body{font-size:17px;line-height:1.65}
+.announcement{font-size:13px;min-height:40px;height:auto;padding:8px 16px}
+.site-header{min-height:82px;height:auto}
+.nav-links{font-size:15px;gap:28px}
+.header-actions{font-size:15px;gap:22px}
+.brand{font-size:29px}
+.hero h1{font-size:clamp(3.25rem,6vw,5.7rem);line-height:1.02}
+.hero-description,.section-intro>p,.integration-copy>p,.final-cta>p{font-size:18px;line-height:1.75}
+.eyebrow,.feature-kicker,.tiny-label,.step-number{font-size:13px;letter-spacing:.08em}
+.feature-card h3,.workflow-grid h3{font-size:25px;line-height:1.25}
+.feature-card>p,.workflow-grid p,.integration-item-copy small,.footer-brand p{font-size:16px;line-height:1.7}
+.feature-card>a,.hero-links,.hero-proof,.integration-copy small,.site-footer,.footer-column{font-size:15px}
+.button,.url-form button,.url-form input{font-size:16px;min-height:50px}
+.metric-card>span,.metric-foot,.chart-period,.audit-row small,.audit-list-head,.mini-audit-head,.mini-audit-foot{font-size:13px}
+.metric-number{font-size:30px}
+.dash-heading h3,.chart-head strong,.integration-panel-head h3{font-size:20px}
+.footer-column b{font-size:16px}
+@media(max-width:640px){body{font-size:16px}.site-header{padding:0 20px}.nav-links{font-size:16px}.header-actions{font-size:15px}.hero h1{font-size:clamp(3rem,12vw,4.3rem)}.hero-description,.section-intro>p,.integration-copy>p{font-size:17px}.feature-card h3,.workflow-grid h3{font-size:23px}}
