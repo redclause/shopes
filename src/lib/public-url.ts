@@ -40,7 +40,7 @@ export function parsePublicHttpUrl(value: unknown): URL {
   try { url = new URL(value); } catch { throw new Error("Enter a valid public URL."); }
   if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error("Only HTTP and HTTPS URLs are supported.");
   if (url.username || url.password) throw new Error("URLs containing credentials are not supported.");
-  const hostname = url.hostname.toLowerCase().replace(/^\\[|\\]$/g, "");
+  const hostname = url.hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (!hostname || hostname === "localhost" || hostname.endsWith(".localhost") || hostname.endsWith(".local") || hostname.endsWith(".internal") || hostname === "metadata.google.internal") {
     throw new Error("Private or local addresses cannot be checked.");
   }
@@ -50,7 +50,7 @@ export function parsePublicHttpUrl(value: unknown): URL {
 
 export async function assertPublicHttpUrl(value: unknown): Promise<URL> {
   const url = parsePublicHttpUrl(value);
-  const hostname = url.hostname.replace(/^\\[|\\]$/g, "");
+  const hostname = url.hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (!isIP(hostname)) {
     const addresses = await lookup(hostname, { all: true, verbatim: true });
     if (!addresses.length || addresses.some(({ address }) => !isPublicIpAddress(address))) {
