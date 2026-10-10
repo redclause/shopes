@@ -10,7 +10,8 @@ import { backlinkSiteCatalog, backlinkSiteCategories } from "./site-catalog";
 
 type Props = { userName: string; userEmail: string; userImage?: string | null; signOutAction: () => Promise<void> };
 type Snippet = { id: string; title: string; description: string; value: string };
-type SubmissionRecord = { id: string; targetUrl: string; candidateUrl: string; status: "review" | "submitted" | "published" | "rejected"; createdAt: string; updatedAt: string; note?: string };
+type VerificationEvidence = { anchorText: string; href: string; resolvedUrl: string; rel: string[]; isNofollow: boolean };
+type SubmissionRecord = { id: string; targetUrl: string; candidateUrl: string; status: "prepared" | "user-reported-submitted" | "backlink_verified" | "rejected"; createdAt: string; updatedAt: string; note?: string; verification?: VerificationEvidence; canonicalUrl?: string; httpStatus?: number };
 
 function normalizeUrl(value: string) {
   const input = value.trim();
@@ -31,7 +32,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   const [copiedId, setCopiedId] = useState("");
   const [topic, setTopic] = useState("");
   const [candidateUrl, setCandidateUrl] = useState("");
-  const [verifyResult, setVerifyResult] = useState<{status:string; message:string; checkedUrl?:string; targetUrl?:string; checkedAt?:string; note?:string; httpStatus?:number} | null>(null);
+  const [verifyResult, setVerifyResult] = useState<{status:string; message:string; checkedUrl?:string; targetUrl?:string; checkedAt?:string; note?:string; httpStatus?:number; canonicalUrl?:string | null; redirectUrl?:string; evidence?:VerificationEvidence | null} | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [submissionRecords, setSubmissionRecords] = useState<SubmissionRecord[]>([]);
   const [submissionNote, setSubmissionNote] = useState("");
@@ -106,7 +107,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
       const result = await response.json();
       setVerifyResult(result);
       if (result.status === "found") {
-        setSubmissionRecords((current) => current.map((record) => record.targetUrl === generatedUrl && record.candidateUrl === candidateUrl.trim() ? { ...record, status: "published", updatedAt: new Date().toISOString() } : record));
+        setSubmissionRecords((current) => current.map((record) => record.targetUrl === generatedUrl && record.candidateUrl === candidateUrl.trim() ? { ...record, status: "backlink_verified", verification: result.evidence ?? undefined, canonicalUrl: result.canonicalUrl ?? undefined, httpStatus: result.httpStatus, updatedAt: new Date().toISOString() } : record));
       }
     } catch {
       setVerifyResult({ status: "error", message: "The verification request failed. Please try again." });
@@ -119,7 +120,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
     event.preventDefault();
     if (!generatedUrl || !candidateUrl.trim() || !publisherPermission) return;
     const now = new Date().toISOString();
-    const record: SubmissionRecord = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, targetUrl: generatedUrl, candidateUrl: candidateUrl.trim(), status: "review", createdAt: now, updatedAt: now, note: submissionNote.trim() || undefined };
+    const record: SubmissionRecord = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, targetUrl: generatedUrl, candidateUrl: candidateUrl.trim(), status: "prepared", createdAt: now, updatedAt: now, note: submissionNote.trim() || undefined };
     setSubmissionRecords((current) => [record, ...current].slice(0, 100));
     setSubmissionNote("");
     setPublisherPermission(false);
@@ -287,15 +288,15 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
               <div className={styles.cardHeading}><span className={styles.iconTile}><Check size={19} /></span><div><h2>Submission history</h2><p>Stored in this browser only; up to 100 records.</p></div></div>
               <div className={styles.snippetList}>
                 {submissionRecords.map((record) => <article className={styles.snippet} key={record.id}>
-                  <div className={styles.snippetHead}><div><h3>{record.status === "review" ? "Ready for review" : record.status === "submitted" ? "Submission sent" : record.status === "published" ? "Backlink verified" : "Not accepted"}</h3><p>{record.candidateUrl}</p><p>Target: {record.targetUrl}</p><p>Updated {new Date(record.updatedAt).toLocaleString()}</p></div><a className={styles.export} href={record.candidateUrl} target="_blank" rel="noreferrer">Open page <ExternalLink size={13} /></a></div>
+                  <div className={styles.snippetHead}><div><h3>{record.status === "prepared" ? "Prepared — not submitted" : record.status === "user-reported-submitted" ? "User-reported submission — unverified" : record.status === "backlink_verified" ? "Backlink verified in page HTML" : "User-reported rejection"}</h3><p>{record.candidateUrl}</p><p>Target: {record.targetUrl}</p><p>Updated {new Date(record.updatedAt).toLocaleString()}</p></div><a className={styles.export} href={record.candidateUrl} target="_blank" rel="noreferrer">Open page <ExternalLink size={13} /></a></div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
-                    {record.status !== "submitted" && record.status !== "published" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "submitted")}>Mark as submitted</button>}
-                    {record.status !== "published" && <button type="button" className={styles.export} onClick={() => { setCandidateUrl(record.candidateUrl); setVerifyResult(null); }}>Verify backlink</button>}
-                    {record.status !== "rejected" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "rejected")}>Mark not accepted</button>}
+                    {record.status === "prepared" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "user-reported-submitted")}>I submitted this manually</button>}
+                    {record.status !== "backlink_verified" && <button type="button" className={styles.export} onClick={() => { setCandidateUrl(record.candidateUrl); setVerifyResult(null); }}>Verify backlink</button>}
+                    {record.status !== "rejected" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "rejected")}>Record rejection</button>}
                   </div>
                 </article>)}
               </div>
-              <div className={styles.notice} style={{ marginTop: 12 }}><ShieldCheck size={18} /><p>Use “Mark published” only after the verification tool finds the target link on that page. Submission status is a user-confirmed record, not proof that the publisher accepted it.</p></div>
+              <div className={styles.notice} style={{ marginTop: 12 }}><ShieldCheck size={18} /><p>“I submitted this manually” is only your report that you attempted a submission; it is not proof of acceptance. Shopes changes a record to “Backlink verified” only when the checker finds the target link in the fetched HTML.</p></div>
             </div>}
             {verifyResult && <div className={styles.notice} role="status" style={{ marginTop: 16, borderColor: verifyResult.status === "found" ? "#2c7569" : "#6c5960" }}><ShieldCheck size={18} /><p><strong>{verifyResult.status === "found" ? "Link found" : verifyResult.status === "not-found" ? "Link not found" : verifyResult.status === "redirect" ? "Page redirected" : "Could not verify"}</strong><br />{verifyResult.message}{verifyResult.httpStatus ? ` (HTTP ${verifyResult.httpStatus})` : ""}{verifyResult.checkedAt ? ` Checked at ${new Date(verifyResult.checkedAt).toLocaleString()}.` : ""}{verifyResult.note ? ` ${verifyResult.note}` : ""}</p></div>}
           </section>
