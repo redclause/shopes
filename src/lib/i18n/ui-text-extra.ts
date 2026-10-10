@@ -207,7 +207,13 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "waterproof boots": "botas impermeables",
     "Run audit": "Ejecutar auditoría",
     "Toggle navigation": "Alternar navegación",
-    "Illustrative trend chart": "Gráfico de tendencia ilustrativo"
+    "Illustrative trend chart": "Gráfico de tendencia ilustrativo",
+    ". No paid plans or upgrade fees.": ". Sin planes de pago ni tarifas de actualización.",
+    "Explore opportunities": "Explorar oportunidades",
+    "Shopes. Built for better discovery.": "Shopes. Diseñado para mejorar el descubrimiento.",
+    "· Signed in with Google. Dedicated account settings are planned for the next phase.": "· Sesión iniciada con Google. La configuración específica de la cuenta está prevista para la siguiente fase.",
+    "File:": "Archivo:",
+    ". Source filename and import time are attached to each record; source dates are retained when present in the file. These records are not independently verified as live search results.": ". El nombre del archivo y la hora de importación se adjuntan a cada registro; las fechas de origen se conservan si están disponibles. Estos registros no se verifican de forma independiente como resultados de búsqueda en directo."
   },
   "fr": {
     "WORKSPACE": "ESPACE DE TRAVAIL",
@@ -417,7 +423,13 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "waterproof boots": "bottes imperméables",
     "Run audit": "Lancer l’audit",
     "Toggle navigation": "Afficher/masquer la navigation",
-    "Illustrative trend chart": "Graphique de tendance illustratif"
+    "Illustrative trend chart": "Graphique de tendance illustratif",
+    ". No paid plans or upgrade fees.": ". Aucune formule payante ni frais de mise à niveau.",
+    "Explore opportunities": "Découvrir les opportunités",
+    "Shopes. Built for better discovery.": "Shopes. Conçu pour mieux vous faire découvrir.",
+    "· Signed in with Google. Dedicated account settings are planned for the next phase.": "· Connecté avec Google. Les paramètres de compte dédiés sont prévus pour la prochaine phase.",
+    "File:": "Fichier :",
+    ". Source filename and import time are attached to each record; source dates are retained when present in the file. These records are not independently verified as live search results.": ". Le nom du fichier et l’heure d’import sont associés à chaque ligne ; les dates sources sont conservées lorsqu’elles existent. Ces données ne sont pas vérifiées indépendamment comme résultats de recherche en direct."
   },
   "de": {
     "WORKSPACE": "ARBEITSBEREICH",
@@ -627,6 +639,12 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "waterproof boots": "wasserdichte Stiefel",
     "Run audit": "Audit starten",
     "Toggle navigation": "Navigation umschalten",
-    "Illustrative trend chart": "Illustratives Trenddiagramm"
+    "Illustrative trend chart": "Illustratives Trenddiagramm",
+    ". No paid plans or upgrade fees.": ". Keine kostenpflichtigen Tarife oder Upgrade-Gebühren.",
+    "Explore opportunities": "Chancen entdecken",
+    "Shopes. Built for better discovery.": "Shopes. Für bessere Auffindbarkeit entwickelt.",
+    "· Signed in with Google. Dedicated account settings are planned for the next phase.": "· Mit Google angemeldet. Eigene Kontoeinstellungen sind für die nächste Phase geplant.",
+    "File:": "Datei:",
+    ". Source filename and import time are attached to each record; source dates are retained when present in the file. These records are not independently verified as live search results.": ". Dateiname und Importzeitpunkt werden jedem Datensatz zugeordnet; Quelldaten bleiben erhalten, wenn sie in der Datei vorhanden sind. Diese Datensätze sind nicht unabhängig als Live-Suchergebnisse verifiziert."
   }
 };
