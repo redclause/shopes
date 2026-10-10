@@ -1,6 +1,6 @@
 # Shopes Keyword Research Engine
 
-The initial engine is deterministic and local. It makes no external SEO/API requests and needs no database or API credentials.
+The engine is deterministic and local. It makes no external SEO/API requests and needs no database or API credentials. English is the primary interface language; Georgian rules are also available, and more languages can be added.
 
 ## Modules
 
@@ -18,6 +18,10 @@ The score is a local prioritization heuristic, not a search-demand estimate, ran
 
 This score ranks generated phrases for review only. It does **not** claim that a phrase has low competition, high traffic, or a high probability of ranking.
 
+## Modelled CPC estimate
+
+The UI and CSV export include a **modelled CPC range in USD**, marked low confidence. This is intentionally a rough rule-based placeholder based only on the local intent classification; it is not sourced from bids, ads auctions, or keyword-level observations, and it is not calibrated against real campaigns. Current broad ranges are: informational $0.05–$1.25; commercial $0.25–$2.75; transactional $0.35–$3.50; local $0.20–$2.50; navigational $0.05–$1.50; unclassified $0.05–$1.75. The estimate does not vary by market, niche, or competition and should not be used for budgeting or bidding decisions. The product keeps verified CPC unavailable as a separate concept.
+
 ## Intent classification
 
 Intent is heuristic and rule-based. Purchase/price terms map to transactional intent; best/review/comparison terms map to commercial intent; question and guide terms map to informational intent; explicit local modifiers map to local intent. Unmatched phrases remain unclassified. English and Georgian have separate modifier and question dictionaries. Classification should be treated as a suggestion, not a verified label.
@@ -25,7 +29,7 @@ Intent is heuristic and rule-based. Purchase/price terms map to transactional in
 ## Provenance and metrics
 
 - Generated phrases carry `provenance: locally-generated` and `metricsStatus: unavailable`.
-- The UI does not fabricate search volume, CPC, paid competition, organic difficulty, rankings, or trends.
+- The UI does not fabricate search volume, measured CPC, paid competition, organic difficulty, rankings, or trends. The separately labelled modelled CPC range is an uncalibrated heuristic, not observed data.
 - Market selection is descriptive metadata only; it does not mean the engine has market-specific query data.
 - Imported rows retain the filename/source label and import timestamp, and preserve an optional source date when a `source_date`, `date`, or `fetched_at` field is provided. The UI does not independently verify the dataset's source or claim it represents live Google results.
 
