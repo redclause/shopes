@@ -272,7 +272,18 @@ const TEXT: Record<string, TextMap> = {
     "The file exceeds the 2 MB import limit.": "El archivo supera el límite de importación de 2 MB.",
     "Choose a .csv or .json file.": "Elige un archivo .csv o .json.",
     "Could not import this dataset.": "No se pudo importar este conjunto de datos."
-  fr: {
+,
+    "core labels translated": "etiquetas principales traducidas",
+    "English UI fallback": "interfaz en inglés",
+    "keyword rules available": "reglas de palabras clave disponibles",
+    "no keyword rules": "sin reglas de palabras clave",
+    "Some specialized, dynamic, or not-yet-catalogued text may remain in English.": "Algunos textos especializados, dinámicos o aún no catalogados pueden seguir en inglés.",
+    "Interface language": "Idioma de la interfaz",
+    "Ready to set up an audit for": "Listo para configurar una auditoría de",
+    "Create a free account to continue.": "Crea una cuenta gratuita para continuar.",
+    "Enter a valid store domain, such as yourstore.com.": "Introduce un dominio de tienda válido, como mitienda.com.",
+    "Enter your store URL to get started.": "Introduce la URL de tu tienda para empezar.",
+    "Sign out": "Cerrar sesión"  fr: {
     "Built for the next generation of e-commerce":"Conçu pour la nouvelle génération du commerce en ligne","Platform":"Plateforme","Solutions":"Solutions","Integrations":"Intégrations","Get started":"Commencer",
     "E-COMMERCE SEARCH INTELLIGENCE":"INTELLIGENCE DE RECHERCHE E-COMMERCE","Your store deserves":"Votre boutique mérite","to be":"d’être","found.":"trouvée.",
     "The SEO and product discovery platform built to help online stores show up, stand out, and get discovered across the web.":"La plateforme SEO et de découverte de produits qui aide les boutiques en ligne à gagner en visibilité et à se démarquer sur le web.",
@@ -506,7 +517,8 @@ const TEXT: Record<string, TextMap> = {
     "Sort:": "Trier :",
     "Page": "Page",
     "of": "sur",
-    "suggestions": "suggestions",
+    "suggestions": "s,
+    "Your Google client secret stays on the server and is never exposed in the browser.": "Le secret client Google reste sur le serveur et n’est jamais exposé dans le navigateur."uggestions",
     "selected": "sélectionnés",
     "Showing": "Affichage",
     "rows imported": "lignes importées",
@@ -791,13 +803,54 @@ const TEXT: Record<string, TextMap> = {
     "Swedish": "Schwedisch",
     "The file exceeds the 2 MB import limit.": "Die Datei überschreitet das Importlimit von 2 MB.",
     "Choose a .csv or .json file.": "Wähle eine .csv- oder .json-Datei.",
-    "Could not import this dataset.": "Dieser Datensatz konnte nicht importiert werden."
+    "Could not import this dataset.": "Dieser Datensatz konnte nicht importiert werden.",
+    "core labels translated": "Kernbeschriftungen übersetzt",
+    "English UI fallback": "englische Benutzeroberfläche",
+    "keyword rules available": "Keyword-Regeln verfügbar",
+    "no keyword rules": "keine Keyword-Regeln",
+    "Some specialized, dynamic, or not-yet-catalogued text may remain in English.": "Einige spezielle, dynamische oder noch nicht katalogisierte Texte können auf Englisch bleiben.",
+    "Interface language": "Oberflächensprache",
+    "Create a free account to continue.": "Erstelle ein kostenloses Konto, um fortzufahren.",
+    "Enter a valid store domain, such as yourstore.com.": "Gib eine gültige Shop-Domain ein, z. B. meinshop.de.",
+    "Enter your store URL to get started.": "Gib zum Start die URL deines Shops ein.",
+    "Sign out": "Abmelden"
 };
 
 export function translateUiText(locale: Locale | string, text: string): string {
   const code = typeof locale === "string" ? locale : locale.code;
   const normalized = text.replace(/\s+/g, " ").trim();
-  return TEXT[code]?.[normalized] ?? text;
+  const exact = TEXT[code]?.[normalized];
+  if (exact !== undefined) return exact;
+  if (code === "en") return text;
+
+  const suggestions = normalized.match(/^(\d+) suggestions · ([A-Z]+) · (.+)$/);
+  if (suggestions) {
+    const markets: Record<string, Record<string, string>> = {
+      es: { US: "Estados Unidos", GB: "Reino Unido", CA: "Canadá", AU: "Australia", GE: "Georgia", GLOBAL: "Global" },
+      fr: { US: "États-Unis", GB: "Royaume-Uni", CA: "Canada", AU: "Australie", GE: "Géorgie", GLOBAL: "Mondial" },
+      de: { US: "Vereinigte Staaten", GB: "Vereinigtes Königreich", CA: "Kanada", AU: "Australien", GE: "Georgien", GLOBAL: "Global" }
+    };
+    const countLabel = code === "es" ? "sugerencias" : code === "fr" ? "suggestions" : "Vorschläge";
+    const language = TEXT[code]?.[suggestions[3]] ?? suggestions[3];
+    return `${suggestions[1]} ${countLabel} · ${markets[code]?.[suggestions[2]] ?? suggestions[2]} · ${language}`;
+  }
+  const selected = normalized.match(/^(\d+) selected ·$/);
+  if (selected) {
+    const word = code === "es" ? "seleccionadas" : code === "fr" ? "sélectionnés" : "ausgewählt";
+    return `${selected[1]} ${word} ·`;
+  }
+  const imported = normalized.match(/^(\d[\d,.]*) rows imported$/);
+  if (imported) {
+    const word = code === "es" ? "filas importadas" : code === "fr" ? "lignes importées" : "Zeilen importiert";
+    return `${imported[1]} ${word}`;
+  }
+  const auditReady = normalized.match(/^Ready to set up an audit for (.+)\. Create a free account to continue\.$/);
+  if (auditReady) {
+    const prefix = code === "es" ? "Listo para configurar una auditoría de" : code === "fr" ? "Prêt à configurer un audit pour" : "Bereit, ein Audit für";
+    const suffix = TEXT[code]?.["Create a free account to continue."] ?? "Create a free account to continue.";
+    return `${prefix} ${auditReady[1]}. ${suffix}`;
+  }
+  return text;
 }
 
 export function hasUiTextTranslation(locale: string, text: string): boolean {
