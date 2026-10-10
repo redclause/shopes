@@ -35,7 +35,7 @@ export default function LocaleSwitcher() {
           return <option key={item.code} value={item.code}>{item.nativeName} — {item.englishName} · {coreStatus} · {keywordStatus}</option>;
         })}
       </select>
-      <small className={styles.note}>Interface translations are incomplete; some or most page text may remain in English.</small>
+      <small className={styles.note}>Some specialized, dynamic, or not-yet-catalogued text may remain in English.</small>
     </label>
   );
 }
