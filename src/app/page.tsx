@@ -13,7 +13,6 @@ const issues = [
 ];
 
 export default function Home() {
-  const [annual, setAnnual] = useState(false);
   const [siteUrl, setSiteUrl] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -25,7 +24,7 @@ export default function Home() {
       const hasProtocol = value.startsWith("https://") || value.startsWith("http://");
       const parsed = new URL(hasProtocol ? value : "https://" + value);
       if (!parsed.hostname.includes(".")) throw new Error("Invalid host");
-      setMessage("Ready to set up an audit for " + parsed.hostname + ". Create a free account to continue.");
+      setMessage("The URL format looks valid for " + parsed.hostname + ". Live SEO audits are not connected yet, so no scan has been run.");
     } catch {
       setMessage(value ? "Enter a valid store domain, such as yourstore.com." : "Enter your store URL to get started.");
     }
@@ -45,7 +44,7 @@ export default function Home() {
         <div className="eyebrow"><span className="eyebrow-dot"/> E-COMMERCE SEARCH INTELLIGENCE</div>
         <h1>Your store deserves<br/>to be <span className="headline-accent">found.</span></h1>
         <p className="hero-description">The SEO and product discovery platform built to help online stores show up, stand out, and get discovered across the web.</p>
-        <form className="url-form" onSubmit={startAudit}><Globe2 size={18}/><input aria-label="Your store URL" placeholder="Enter your store URL" value={siteUrl} onChange={event => { setSiteUrl(event.target.value); setMessage(""); }}/><button type="submit">Analyze store <ArrowRight size={15}/></button></form>
+        <form className="url-form" onSubmit={startAudit}><Globe2 size={18}/><input aria-label="Your store URL" placeholder="Enter your store URL" value={siteUrl} onChange={event => { setSiteUrl(event.target.value); setMessage(""); }}/><button type="submit">Validate URL <ArrowRight size={15}/></button></form>
         {message && <p className="form-message" role="status">{message}</p>}
         <div className="hero-proof"><span className="proof-avatars"><i>S</i><i>M</i><i>A</i></span><span>Built for teams who care about being found.</span><span className="proof-separator">·</span><span><ShieldCheck size={13}/> Practical insights, not guesswork</span></div>
         <div className="hero-links"><a href="#features">Explore the platform <ArrowRight size={14}/></a><span>Free plan available. No credit card required.</span></div>
@@ -88,7 +87,6 @@ export default function Home() {
 
     <section className="final-cta section-wrap"><div className="cta-decoration"><span/><span/><span/></div><div className="eyebrow">YOUR NEXT GROWTH OPPORTUNITY STARTS HERE</div><h2>Make discoverability<br/>your <span>competitive edge.</span></h2><p>Bring your store&apos;s SEO and product discovery into focus.</p><a href="#get-started" className="button button-dark">Get started for free <ArrowRight size={16}/></a><small>No credit card. No paid plans. Free forever.</small></section>
 
-    <footer className="site-footer"><div className="section-wrap"><div className="footer-main"><div className="footer-brand"><a className="brand" href="#"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></a><p>SEO and product discovery intelligence for online stores.</p></div><div className="footer-column"><b>Platform</b><a href="#features">Site audits</a><a href="#features">Keyword research</a><a href="#integrations">Product discovery</a><a href="#pricing">Pricing</a></div><div className="footer-column"><b>Resources</b><a href="#platform">How it works</a><a href="#integrations">Integrations</a><a href="#pricing">Plans and limits</a><a href="mailto:hello@shopes.online">Contact</a></div><div className="footer-column"><b>Company</b><a href="mailto:hello@shopes.online">Support</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Shopes. Built for better discovery.</span><span><ShieldCheck size={14}/> Clear data. Practical decisions.</span></div></div></footer>
-    <div className="sr-only" id="privacy">Privacy policy will be published before production launch.</div><div className="sr-only" id="terms">Terms of service will be published before production launch.</div>
+    <footer className="site-footer"><div className="section-wrap"><div className="footer-main"><div className="footer-brand"><a className="brand" href="#"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></a><p>SEO and product discovery intelligence for online stores.</p></div><div className="footer-column"><b>Platform</b><a href="#features">Site audits</a><a href="#features">Keyword research</a><a href="#integrations">Product discovery</a><a href="#pricing">Pricing</a></div><div className="footer-column"><b>Resources</b><a href="#platform">How it works</a><a href="#integrations">Integrations</a><a href="#pricing">Plans and limits</a><a href="mailto:hello@shopes.online">Contact</a></div><div className="footer-column"><b>Company</b><a href="mailto:hello@shopes.online">Support</a><span>Privacy policy — coming before launch</span><span>Terms of service — coming before launch</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Shopes. Built for better discovery.</span><span><ShieldCheck size={14}/> Clear data. Practical decisions.</span></div></div></footer>
   </main>;
 }
