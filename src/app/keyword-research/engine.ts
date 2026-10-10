@@ -1,100 +1,169 @@
 export type SearchIntent = "Informational" | "Commercial" | "Transactional" | "Navigational" | "Local" | "Unclassified";
-export type KeywordLanguage = "English" | "Georgian";
+export type KeywordLanguage =
+  | "English" | "Georgian" | "Spanish" | "French" | "German" | "Portuguese" | "Italian"
+  | "Dutch" | "Russian" | "Ukrainian" | "Turkish" | "Arabic" | "Hindi" | "Chinese"
+  | "Japanese" | "Korean" | "Indonesian" | "Vietnamese" | "Polish" | "Swedish";
+
 export type KeywordIdea = {
-  phrase: string;
-  normalized: string;
-  kind: string;
-  intent: SearchIntent;
-  intentConfidence: "heuristic";
-  cluster: string;
-  wordCount: number;
-  longTail: boolean;
-  specificityScore: number;
-  relevanceScore: number;
-  opportunityScore: number;
-  estimatedCpcLowUsd: number;
-  estimatedCpcHighUsd: number;
-  cpcConfidence: "low";
-  provenance: "locally-generated";
-  metricsStatus: "unavailable";
+  phrase: string; normalized: string; kind: string; intent: SearchIntent;
+  intentConfidence: "heuristic"; cluster: string; wordCount: number; longTail: boolean;
+  specificityScore: number; relevanceScore: number; opportunityScore: number;
+  estimatedCpcLowUsd: number; estimatedCpcHighUsd: number; cpcConfidence: "low";
+  provenance: "locally-generated"; metricsStatus: "unavailable";
 };
 
 type LanguageRules = {
+  label: string;
   modifiers: Array<{ phrase: string; kind: string; intent: SearchIntent }>;
   questions: string[];
   suffixes: Array<{ phrase: string; kind: string; intent: SearchIntent }>;
   synonyms: Record<string, string[]>;
 };
 
-const RULES: Record<KeywordLanguage, LanguageRules> = {
-  English: {
-    modifiers: [
-      { phrase: "best", kind: "Commercial modifier", intent: "Commercial" },
-      { phrase: "top", kind: "Commercial modifier", intent: "Commercial" },
-      { phrase: "affordable", kind: "Commercial modifier", intent: "Commercial" },
-      { phrase: "reviews", kind: "Review modifier", intent: "Commercial" },
-      { phrase: "alternatives", kind: "Comparison modifier", intent: "Commercial" },
-      { phrase: "vs", kind: "Comparison modifier", intent: "Commercial" },
-      { phrase: "buy", kind: "Purchase modifier", intent: "Transactional" },
-      { phrase: "price", kind: "Price modifier", intent: "Transactional" },
-      { phrase: "online", kind: "Purchase modifier", intent: "Transactional" },
-      { phrase: "near me", kind: "Local modifier", intent: "Local" },
-      { phrase: "how to choose", kind: "Question modifier", intent: "Informational" },
-      { phrase: "how to use", kind: "Question modifier", intent: "Informational" },
-      { phrase: "for beginners", kind: "Audience modifier", intent: "Informational" },
-      { phrase: "checklist", kind: "Content modifier", intent: "Informational" },
-      { phrase: "ideas", kind: "Content modifier", intent: "Informational" },
-    ],
-    questions: ["what is", "how to", "why does", "when to choose", "where to find", "which", "is it worth"],
-    suffixes: [
-      { phrase: "guide", kind: "Topic variation", intent: "Informational" },
-      { phrase: "tips", kind: "Topic variation", intent: "Informational" },
-      { phrase: "examples", kind: "Topic variation", intent: "Informational" },
-      { phrase: "benefits", kind: "Topic variation", intent: "Informational" },
-      { phrase: "cost", kind: "Price modifier", intent: "Transactional" },
-      { phrase: "comparison", kind: "Comparison modifier", intent: "Commercial" },
-    ],
-    synonyms: {
-      "buy": ["purchase", "shop for"],
-      "cheap": ["affordable", "budget"],
-      "guide": ["tutorial", "how-to"],
-      "reviews": ["ratings", "customer feedback"],
-    },
-  },
-  Georgian: {
-    modifiers: [
-      { phrase: "საუკეთესო", kind: "კომერციული მოდიფიკატორი", intent: "Commercial" },
-      { phrase: "იაფი", kind: "ფასის მოდიფიკატორი", intent: "Commercial" },
-      { phrase: "ფასი", kind: "ფასის მოდიფიკატორი", intent: "Transactional" },
-      { phrase: "ყიდვა", kind: "შეძენის მოდიფიკატორი", intent: "Transactional" },
-      { phrase: "ონლაინ", kind: "შეძენის მოდიფიკატორი", intent: "Transactional" },
-      { phrase: "მიმოხილვა", kind: "მიმოხილვის მოდიფიკატორი", intent: "Commercial" },
-      { phrase: "შედარება", kind: "შედარების მოდიფიკატორი", intent: "Commercial" },
-      { phrase: "ალტერნატივები", kind: "შედარების მოდიფიკატორი", intent: "Commercial" },
-      { phrase: "როგორ გამოვიყენოთ", kind: "კითხვითი მოდიფიკატორი", intent: "Informational" },
-      { phrase: "როგორ ავირჩიოთ", kind: "კითხვითი მოდიფიკატორი", intent: "Informational" },
-      { phrase: "დამწყებთათვის", kind: "აუდიტორიის მოდიფიკატორი", intent: "Informational" },
-      { phrase: "იდეები", kind: "თემატური მოდიფიკატორი", intent: "Informational" },
-      { phrase: "რჩევები", kind: "თემატური მოდიფიკატორი", intent: "Informational" },
-      { phrase: "ახლო მდებარე", kind: "ლოკალური მოდიფიკატორი", intent: "Local" },
-    ],
-    questions: ["რა არის", "როგორ", "რატომ", "როდის", "სად ვიყიდოთ", "რომელი", "ღირს თუ არა"],
-    suffixes: [
-      { phrase: "გზამკვლევი", kind: "თემატური ვარიანტი", intent: "Informational" },
-      { phrase: "რჩევები", kind: "თემატური ვარიანტი", intent: "Informational" },
-      { phrase: "მაგალითები", kind: "თემატური ვარიანტი", intent: "Informational" },
-      { phrase: "უპირატესობები", kind: "თემატური ვარიანტი", intent: "Informational" },
-      { phrase: "ღირებულება", kind: "ფასის მოდიფიკატორი", intent: "Transactional" },
-      { phrase: "შედარება", kind: "შედარების მოდიფიკატორი", intent: "Commercial" },
-    ],
-    synonyms: {
-      "ყიდვა": ["შეძენა", "შეკვეთა"],
-      "იაფი": ["ხელმისაწვდომი", "ბიუჯეტური"],
-      "გზამკვლევი": ["ინსტრუქცია", "სახელმძღვანელო"],
-    },
-  },
+const makeRules = (
+  label: string,
+  modifiers: Array<[string, string, SearchIntent]>,
+  questions: string[],
+  suffixes: Array<[string, string, SearchIntent]>,
+  synonyms: Record<string, string[]> = {},
+): LanguageRules => ({
+  label,
+  modifiers: modifiers.map(([phrase, kind, intent]) => ({ phrase, kind, intent })),
+  questions,
+  suffixes: suffixes.map(([phrase, kind, intent]) => ({ phrase, kind, intent })),
+  synonyms,
+});
+
+export const KEYWORD_LANGUAGE_RULES: Record<KeywordLanguage, LanguageRules> = {
+  English: makeRules("English", [
+    ["best","Commercial modifier","Commercial"],["top","Commercial modifier","Commercial"],["affordable","Commercial modifier","Commercial"],
+    ["reviews","Review modifier","Commercial"],["alternatives","Comparison modifier","Commercial"],["vs","Comparison modifier","Commercial"],
+    ["buy","Purchase modifier","Transactional"],["price","Price modifier","Transactional"],["online","Purchase modifier","Transactional"],
+    ["near me","Local modifier","Local"],["for beginners","Audience modifier","Informational"],["checklist","Content modifier","Informational"],
+  ], ["what is","how to","why does","when to choose","where to find","which","is it worth"], [
+    ["guide","Topic variation","Informational"],["tips","Topic variation","Informational"],["examples","Topic variation","Informational"],
+    ["benefits","Topic variation","Informational"],["cost","Price modifier","Transactional"],["comparison","Comparison modifier","Commercial"],
+  ], { buy:["purchase","shop for"], cheap:["affordable","budget"], guide:["tutorial","how-to"], reviews:["ratings","customer feedback"] }),
+  Georgian: makeRules("ქართული", [
+    ["საუკეთესო","კომერციული მოდიფიკატორი","Commercial"],["იაფი","ფასის მოდიფიკატორი","Commercial"],["ფასი","ფასის მოდიფიკატორი","Transactional"],
+    ["ყიდვა","შეძენის მოდიფიკატორი","Transactional"],["ონლაინ","შეძენის მოდიფიკატორი","Transactional"],["მიმოხილვა","მიმოხილვის მოდიფიკატორი","Commercial"],
+    ["შედარება","შედარების მოდიფიკატორი","Commercial"],["ალტერნატივები","შედარების მოდიფიკატორი","Commercial"],["დამწყებთათვის","აუდიტორიის მოდიფიკატორი","Informational"],
+    ["ახლო მდებარე","ლოკალური მოდიფიკატორი","Local"],["რჩევები","თემატური მოდიფიკატორი","Informational"],
+  ], ["რა არის","როგორ","რატომ","როდის","სად ვიყიდოთ","რომელი","ღირს თუ არა"], [
+    ["გზამკვლევი","თემატური ვარიანტი","Informational"],["რჩევები","თემატური ვარიანტი","Informational"],["მაგალითები","თემატური ვარიანტი","Informational"],
+    ["უპირატესობები","თემატური ვარიანტი","Informational"],["ღირებულება","ფასის მოდიფიკატორი","Transactional"],["შედარება","შედარების მოდიფიკატორი","Commercial"],
+  ], { ყიდვა:["შეძენა","შეკვეთა"], იაფი:["ხელმისაწვდომი","ბიუჯეტური"], გზამკვლევი:["ინსტრუქცია","სახელმძღვანელო"] }),
+  Spanish: makeRules("Español", [
+    ["mejor","Modificador comercial","Commercial"],["barato","Modificador de precio","Commercial"],["reseñas","Modificador de reseñas","Commercial"],
+    ["alternativas","Comparación","Commercial"],["comprar","Compra","Transactional"],["precio","Precio","Transactional"],["en línea","Compra","Transactional"],["cerca de mí","Local","Local"],["para principiantes","Audiencia","Informational"],
+  ], ["qué es","cómo","por qué","cuándo","dónde comprar","cuál","vale la pena"], [
+    ["guía","Tema","Informational"],["consejos","Tema","Informational"],["ejemplos","Tema","Informational"],["beneficios","Tema","Informational"],["costo","Precio","Transactional"],["comparación","Comparación","Commercial"],
+  ], { comprar:["adquirir","pedir"], barato:["económico","asequible"], guía:["tutorial","manual"] }),
+  French: makeRules("Français", [
+    ["meilleur","Modificateur commercial","Commercial"],["pas cher","Prix","Commercial"],["avis","Avis","Commercial"],["alternatives","Comparaison","Commercial"],
+    ["acheter","Achat","Transactional"],["prix","Prix","Transactional"],["en ligne","Achat","Transactional"],["près de moi","Local","Local"],["pour débutants","Public","Informational"],
+  ], ["qu'est-ce que","comment","pourquoi","quand","où acheter","quel","est-ce que ça vaut"], [
+    ["guide","Sujet","Informational"],["conseils","Sujet","Informational"],["exemples","Sujet","Informational"],["avantages","Sujet","Informational"],["coût","Prix","Transactional"],["comparaison","Comparaison","Commercial"],
+  ], { acheter:["commander","acquérir"], pas:["abordable","économique"], guide:["tutoriel","manuel"] }),
+  German: makeRules("Deutsch", [
+    ["beste","Kommerziell","Commercial"],["günstig","Preis","Commercial"],["bewertungen","Bewertungen","Commercial"],["alternativen","Vergleich","Commercial"],
+    ["kaufen","Kauf","Transactional"],["preis","Preis","Transactional"],["online","Kauf","Transactional"],["in meiner nähe","Lokal","Local"],["für anfänger","Zielgruppe","Informational"],
+  ], ["was ist","wie","warum","wann","wo kaufen","welche","lohnt sich"], [
+    ["ratgeber","Thema","Informational"],["tipps","Thema","Informational"],["beispiele","Thema","Informational"],["vorteile","Thema","Informational"],["kosten","Preis","Transactional"],["vergleich","Vergleich","Commercial"],
+  ], { kaufen:["bestellen","erwerben"], günstig:["preiswert","erschwinglich"], ratgeber:["anleitung","leitfaden"] }),
+  Portuguese: makeRules("Português", [
+    ["melhor","Comercial","Commercial"],["barato","Preço","Commercial"],["avaliações","Avaliações","Commercial"],["alternativas","Comparação","Commercial"],
+    ["comprar","Compra","Transactional"],["preço","Preço","Transactional"],["online","Compra","Transactional"],["perto de mim","Local","Local"],["para iniciantes","Público","Informational"],
+  ], ["o que é","como","por que","quando","onde comprar","qual","vale a pena"], [
+    ["guia","Tema","Informational"],["dicas","Tema","Informational"],["exemplos","Tema","Informational"],["benefícios","Tema","Informational"],["custo","Preço","Transactional"],["comparação","Comparação","Commercial"],
+  ], { comprar:["adquirir","encomendar"], barato:["econômico","acessível"], guia:["tutorial","manual"] }),
+  Italian: makeRules("Italiano", [
+    ["migliore","Commerciale","Commercial"],["economico","Prezzo","Commercial"],["recensioni","Recensioni","Commercial"],["alternative","Confronto","Commercial"],
+    ["comprare","Acquisto","Transactional"],["prezzo","Prezzo","Transactional"],["online","Acquisto","Transactional"],["vicino a me","Locale","Local"],["per principianti","Pubblico","Informational"],
+  ], ["che cos'è","come","perché","quando","dove comprare","quale","ne vale la pena"], [
+    ["guida","Argomento","Informational"],["consigli","Argomento","Informational"],["esempi","Argomento","Informational"],["vantaggi","Argomento","Informational"],["costo","Prezzo","Transactional"],["confronto","Confronto","Commercial"],
+  ]),
+  Dutch: makeRules("Nederlands", [
+    ["beste","Commercieel","Commercial"],["goedkoop","Prijs","Commercial"],["reviews","Reviews","Commercial"],["alternatieven","Vergelijking","Commercial"],
+    ["kopen","Aankoop","Transactional"],["prijs","Prijs","Transactional"],["online","Aankoop","Transactional"],["bij mij in de buurt","Lokaal","Local"],["voor beginners","Doelgroep","Informational"],
+  ], ["wat is","hoe","waarom","wanneer","waar kopen","welke","is het de moeite waard"], [
+    ["gids","Onderwerp","Informational"],["tips","Onderwerp","Informational"],["voorbeelden","Onderwerp","Informational"],["voordelen","Onderwerp","Informational"],["kosten","Prijs","Transactional"],["vergelijking","Vergelijking","Commercial"],
+  ]),
+  Russian: makeRules("Русский", [
+    ["лучший","Коммерческий","Commercial"],["недорогой","Цена","Commercial"],["отзывы","Отзывы","Commercial"],["альтернативы","Сравнение","Commercial"],
+    ["купить","Покупка","Transactional"],["цена","Цена","Transactional"],["онлайн","Покупка","Transactional"],["рядом со мной","Местный","Local"],["для начинающих","Аудитория","Informational"],
+  ], ["что такое","как","почему","когда","где купить","какой","стоит ли"], [
+    ["руководство","Тема","Informational"],["советы","Тема","Informational"],["примеры","Тема","Informational"],["преимущества","Тема","Informational"],["стоимость","Цена","Transactional"],["сравнение","Сравнение","Commercial"],
+  ]),
+  Ukrainian: makeRules("Українська", [
+    ["найкращий","Комерційний","Commercial"],["недорогий","Ціна","Commercial"],["відгуки","Відгуки","Commercial"],["альтернативи","Порівняння","Commercial"],
+    ["купити","Покупка","Transactional"],["ціна","Ціна","Transactional"],["онлайн","Покупка","Transactional"],["поруч зі мною","Місцевий","Local"],["для початківців","Аудиторія","Informational"],
+  ], ["що таке","як","чому","коли","де купити","який","чи варто"], [
+    ["посібник","Тема","Informational"],["поради","Тема","Informational"],["приклади","Тема","Informational"],["переваги","Тема","Informational"],["вартість","Ціна","Transactional"],["порівняння","Порівняння","Commercial"],
+  ]),
+  Turkish: makeRules("Türkçe", [
+    ["en iyi","Ticari","Commercial"],["ucuz","Fiyat","Commercial"],["yorumlar","Yorumlar","Commercial"],["alternatifler","Karşılaştırma","Commercial"],
+    ["satın al","Satın alma","Transactional"],["fiyat","Fiyat","Transactional"],["online","Satın alma","Transactional"],["yakınımda","Yerel","Local"],["yeni başlayanlar için","Kitle","Informational"],
+  ], ["nedir","nasıl","neden","ne zaman","nereden alınır","hangi","değer mi"], [
+    ["rehber","Konu","Informational"],["ipuçları","Konu","Informational"],["örnekler","Konu","Informational"],["faydalar","Konu","Informational"],["maliyet","Fiyat","Transactional"],["karşılaştırma","Karşılaştırma","Commercial"],
+  ]),
+  Arabic: makeRules("العربية", [
+    ["أفضل","تجاري","Commercial"],["رخيص","السعر","Commercial"],["مراجعات","مراجعات","Commercial"],["بدائل","مقارنة","Commercial"],
+    ["شراء","شراء","Transactional"],["سعر","السعر","Transactional"],["عبر الإنترنت","شراء","Transactional"],["بالقرب مني","محلي","Local"],["للمبتدئين","جمهور","Informational"],
+  ], ["ما هو","كيف","لماذا","متى","أين أشتري","أي","هل يستحق"], [
+    ["دليل","موضوع","Informational"],["نصائح","موضوع","Informational"],["أمثلة","موضوع","Informational"],["فوائد","موضوع","Informational"],["تكلفة","السعر","Transactional"],["مقارنة","مقارنة","Commercial"],
+  ]),
+  Hindi: makeRules("हिन्दी", [
+    ["सबसे अच्छा","व्यावसायिक","Commercial"],["सस्ता","कीमत","Commercial"],["समीक्षा","समीक्षा","Commercial"],["विकल्प","तुलना","Commercial"],
+    ["खरीदें","खरीद","Transactional"],["कीमत","कीमत","Transactional"],["ऑनलाइन","खरीद","Transactional"],["मेरे पास","स्थानीय","Local"],["शुरुआती लोगों के लिए","दर्शक","Informational"],
+  ], ["क्या है","कैसे","क्यों","कब","कहाँ खरीदें","कौन सा","क्या यह उपयोगी है"], [
+    ["गाइड","विषय","Informational"],["सुझाव","विषय","Informational"],["उदाहरण","विषय","Informational"],["लाभ","विषय","Informational"],["लागत","कीमत","Transactional"],["तुलना","तुलना","Commercial"],
+  ]),
+  Chinese: makeRules("简体中文", [
+    ["最佳","商业修饰词","Commercial"],["便宜","价格","Commercial"],["评价","评价","Commercial"],["替代品","比较","Commercial"],
+    ["购买","购买","Transactional"],["价格","价格","Transactional"],["在线","购买","Transactional"],["附近","本地","Local"],["适合初学者","受众","Informational"],
+  ], ["什么是","如何","为什么","何时","哪里购买","哪个","值得吗"], [
+    ["指南","主题","Informational"],["技巧","主题","Informational"],["示例","主题","Informational"],["优点","主题","Informational"],["费用","价格","Transactional"],["比较","比较","Commercial"],
+  ]),
+  Japanese: makeRules("日本語", [
+    ["おすすめ","商用修飾語","Commercial"],["安い","価格","Commercial"],["レビュー","レビュー","Commercial"],["代替","比較","Commercial"],
+    ["購入","購入","Transactional"],["価格","価格","Transactional"],["オンライン","購入","Transactional"],["近く","ローカル","Local"],["初心者向け","対象","Informational"],
+  ], ["とは","方法","なぜ","いつ","どこで買う","どれ","価値がある"], [
+    ["ガイド","トピック","Informational"],["ヒント","トピック","Informational"],["例","トピック","Informational"],["メリット","トピック","Informational"],["費用","価格","Transactional"],["比較","比較","Commercial"],
+  ]),
+  Korean: makeRules("한국어", [
+    ["최고의","상업","Commercial"],["저렴한","가격","Commercial"],["리뷰","리뷰","Commercial"],["대안","비교","Commercial"],
+    ["구매","구매","Transactional"],["가격","가격","Transactional"],["온라인","구매","Transactional"],["내 주변","지역","Local"],["초보자를 위한","대상","Informational"],
+  ], ["무엇인가","방법","왜","언제","어디서 구매","어떤","가치가 있나"], [
+    ["가이드","주제","Informational"],["팁","주제","Informational"],["예시","주제","Informational"],["장점","주제","Informational"],["비용","가격","Transactional"],["비교","비교","Commercial"],
+  ]),
+  Indonesian: makeRules("Bahasa Indonesia", [
+    ["terbaik","Komersial","Commercial"],["murah","Harga","Commercial"],["ulasan","Ulasan","Commercial"],["alternatif","Perbandingan","Commercial"],
+    ["beli","Pembelian","Transactional"],["harga","Harga","Transactional"],["online","Pembelian","Transactional"],["dekat saya","Lokal","Local"],["untuk pemula","Audiens","Informational"],
+  ], ["apa itu","cara","mengapa","kapan","tempat membeli","mana","apakah layak"], [
+    ["panduan","Topik","Informational"],["tips","Topik","Informational"],["contoh","Topik","Informational"],["manfaat","Topik","Informational"],["biaya","Harga","Transactional"],["perbandingan","Perbandingan","Commercial"],
+  ]),
+  Vietnamese: makeRules("Tiếng Việt", [
+    ["tốt nhất","Thương mại","Commercial"],["giá rẻ","Giá","Commercial"],["đánh giá","Đánh giá","Commercial"],["lựa chọn thay thế","So sánh","Commercial"],
+    ["mua","Mua hàng","Transactional"],["giá","Giá","Transactional"],["trực tuyến","Mua hàng","Transactional"],["gần tôi","Địa phương","Local"],["cho người mới bắt đầu","Đối tượng","Informational"],
+  ], ["là gì","cách","tại sao","khi nào","mua ở đâu","nào","có đáng không"], [
+    ["hướng dẫn","Chủ đề","Informational"],["mẹo","Chủ đề","Informational"],["ví dụ","Chủ đề","Informational"],["lợi ích","Chủ đề","Informational"],["chi phí","Giá","Transactional"],["so sánh","So sánh","Commercial"],
+  ]),
+  Polish: makeRules("Polski", [
+    ["najlepszy","Komercyjny","Commercial"],["tani","Cena","Commercial"],["opinie","Opinie","Commercial"],["alternatywy","Porównanie","Commercial"],
+    ["kup","Zakup","Transactional"],["cena","Cena","Transactional"],["online","Zakup","Transactional"],["w pobliżu","Lokalny","Local"],["dla początkujących","Odbiorcy","Informational"],
+  ], ["co to jest","jak","dlaczego","kiedy","gdzie kupić","który","czy warto"], [
+    ["poradnik","Temat","Informational"],["wskazówki","Temat","Informational"],["przykłady","Temat","Informational"],["korzyści","Temat","Informational"],["koszt","Cena","Transactional"],["porównanie","Porównanie","Commercial"],
+  ]),
+  Swedish: makeRules("Svenska", [
+    ["bästa","Kommersiell","Commercial"],["billig","Pris","Commercial"],["recensioner","Recensioner","Commercial"],["alternativ","Jämförelse","Commercial"],
+    ["köp","Köp","Transactional"],["pris","Pris","Transactional"],["online","Köp","Transactional"],["nära mig","Lokal","Local"],["för nybörjare","Målgrupp","Informational"],
+  ], ["vad är","hur","varför","när","var kan man köpa","vilken","är det värt"], [
+    ["guide","Ämne","Informational"],["tips","Ämne","Informational"],["exempel","Ämne","Informational"],["fördelar","Ämne","Informational"],["kostnad","Pris","Transactional"],["jämförelse","Jämförelse","Commercial"],
+  ]),
 };
 
+export const SUPPORTED_KEYWORD_LANGUAGES = Object.keys(KEYWORD_LANGUAGE_RULES) as KeywordLanguage[];
 export function normalizeKeyword(value: string): string {
   return value.normalize("NFKC").toLocaleLowerCase().replace(/[\u200B-\u200D\uFEFF]/g, "").replace(/[“”„]/g, '"').replace(/[’‘]/g, "'").replace(/\s+/g, " ").trim();
 }
