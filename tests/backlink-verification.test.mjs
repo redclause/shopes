@@ -4,7 +4,7 @@ import { comparableUrl, extractBacklinkEvidence, extractCanonicalUrl } from "../
 
 test("matches absolute and relative links after normalizing trailing slash and fragment", () => {
   const html = '<a href="../resource/?ref=docs#section">Useful <strong>resource</strong></a>';
-  const result = extractBacklinkEvidence(html, "https://directory.example.org/guides/page", "https://directory.example.org/resource/?ref=docs");
+  const result = extractBacklinkEvidence(html, "https://directory.example.org/guides/page", "https://directory.example.org/resource?ref=docs");
   assert.ok(result);
   assert.equal(result.anchorText, "Useful resource");
   assert.equal(result.resolvedUrl, "https://directory.example.org/resource/?ref=docs");
