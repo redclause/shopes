@@ -21,6 +21,7 @@ import {
   Target,
 } from "lucide-react";
 import styles from "./page.module.css";
+import WorkspaceProjects from "./WorkspaceProjects";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -118,22 +119,9 @@ export default async function DashboardPage() {
 
           <section className={styles.section} id="projects" aria-labelledby="projects-title">
             <div className={styles.sectionHeading}>
-              <div><h2 id="projects-title">Your projects</h2><p>Websites you choose to monitor will appear here.</p></div>
-              <span className={styles.countBadge}>0 projects</span>
+              <div><h2 id="projects-title">Your workspace projects</h2><p>Organize target websites and review audit snapshots saved in this browser.</p></div>
             </div>
-            <div className={styles.emptyState}>
-              <div className={styles.emptyArtwork} aria-hidden="true">
-                <span className={styles.orbit} />
-                <span className={styles.globeCard}><Globe2 size={28} /></span>
-                <span className={styles.sparkleCard}><Sparkles size={16} /></span>
-              </div>
-              <div className={styles.emptyCopy}>
-                <span className={styles.kicker}>A CLEAR PLACE TO BEGIN</span>
-                <h3>Your first project is the next step.</h3>
-                <p>Project saving is not connected yet. When it is available, you’ll be able to add a store and keep its audit history in one place.</p>
-                <Link className={styles.secondaryButton} href="/#get-started">Explore the store workflow <ArrowRight size={15} /></Link>
-              </div>
-            </div>
+            <WorkspaceProjects />
           </section>
 
           <section className={styles.section} id="audits" aria-labelledby="activity-title">
