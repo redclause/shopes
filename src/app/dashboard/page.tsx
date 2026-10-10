@@ -50,9 +50,6 @@ export default function DashboardPage() {
       setFeedback("Enter a valid website address, such as yourstore.com.");
     }
   }
-k("Enter a valid website address, such as yourstore.com.");
-    }
-  }
 
   return (
     <main className={styles.app}>
