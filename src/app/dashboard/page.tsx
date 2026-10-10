@@ -51,10 +51,10 @@ export default function DashboardPage() {
         </button>
         <nav className={styles.navigation} aria-label="Main navigation">
           <span className={styles.navSection}>OVERVIEW</span>
-          <Link className={`${styles.navItem} ${styles.navActive}`} href="#overview" aria-current="page"><LayoutDashboard size={17}/> Dashboard</a>
+          <Link className={`${styles.navItem} ${styles.navActive}`} href="#overview" aria-current="page"><LayoutDashboard size={17}/> Dashboard</Link>
           <Link className={styles.navItem} href="#projects"><Globe2 size={17}/> Projects <span className={styles.navCount}>0</span></Link>
-          <Link className={styles.navItem} href="#audits"><FileSearch size={17}/> Site audits</a>
-          <Link className={styles.navItem} href="/#platform"><TrendingUp size={17}/> SEO insights <ExternalLink size={12} className={styles.external}/></a>
+          <Link className={styles.navItem} href="#audits"><FileSearch size={17}/> Site audits</Link>
+          <Link className={styles.navItem} href="/#platform"><TrendingUp size={17}/> SEO insights <ExternalLink size={12} className={styles.external}/></Link>
           <span className={styles.navSection}>WORKSPACE</span>
           <Link className={styles.navItem} href="/#integrations"><Zap size={17}/> Integrations <ExternalLink size={12} className={styles.external}/></a>
           <Link className={styles.navItem} href="/#pricing"><Sparkles size={17}/> Plans & pricing <ExternalLink size={12} className={styles.external}/></a>
