@@ -59,7 +59,8 @@ export default async function DashboardPage() {
           <span className={styles.navLabel}>OVERVIEW</span>
           <a className={styles.navItemActive} href="#overview" aria-current="page"><LayoutDashboard size={17} /> Dashboard</a>
           <a className={styles.navItem} href="#projects"><Globe2 size={17} /> Projects <span className={styles.navCount}>0</span></a>
-          <a className={styles.navItem} href="#audits"><FileSearch size={17} /> Site audits</a>
+          <a className={styles.navItem} href="/audit"><FileSearch size={17} /> Site audits</a>
+          <Link className={styles.navItem} href="/keyword-research"><Target size={17} /> Keyword research</Link>
           <span className={styles.navLabel}>SHOPES</span>
           <Link className={styles.navItem} href="/#platform"><Target size={17} /> Explore platform <ArrowUpRight size={14} /></Link>
           <Link className={styles.navItem} href="/#pricing"><Sparkles size={17} /> Free plan details <ArrowUpRight size={14} /></Link>
@@ -99,7 +100,7 @@ export default async function DashboardPage() {
               <h1>Welcome back{user.name ? `, ${user.name.trim().split(/\s+/)[0]}` : ""}.</h1>
               <p>Build a clearer picture of your store’s search visibility, one step at a time.</p>
             </div>
-            <Link className={styles.primaryButton} href="/#get-started"><ArrowRight size={16} /> Explore Shopes</Link>
+            <div className={styles.welcomeActions}><Link className={styles.primaryButton} href="/audit"><ArrowRight size={16} /> Run an audit</Link><Link className={styles.secondaryButton} href="/keyword-research"><Target size={16} /> Keyword research</Link></div>
           </div>
 
           <div className={styles.notice} role="note">
@@ -131,7 +132,8 @@ export default async function DashboardPage() {
           <section className={styles.section} id="audits" aria-labelledby="activity-title">
             <div className={styles.sectionHeading}>
               <div><h2 id="activity-title">Workspace overview</h2><p>Live results will appear after the required services are connected.</p></div>
-              <span className={styles.countBadge}>No audit data</span>
+              <span className={styles.countBadge}>No saved history</span>
+              <Link className={styles.secondaryButton} href="/audit"><FileSearch size={15} /> Run a technical audit <ArrowRight size={15} /></Link>
             </div>
             <div className={styles.metricGrid}>
               <article className={styles.metricCard}><span className={styles.metricIcon}><Activity size={18} /></span><span className={styles.metricLabel}>AUDITS COMPLETED</span><strong>—</strong><p>No audits have run yet.</p></article>
