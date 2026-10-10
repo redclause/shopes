@@ -90,7 +90,6 @@ export async function POST(request: Request) {
       await reader.cancel().catch(() => undefined);
     }
     const html = new TextDecoder().decode(Buffer.concat(chunks));
-    const decodedTarget = targetUrl.toString().replace(/&/g, "&amp;");
     const hrefPattern = /href\s*=\s*(['"])(.*?)\1/gi;
     let match: RegExpExecArray | null;
     let found = false;
