@@ -36,7 +36,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <h1 className="login-title" style={{ margin: "0 0 12px", fontSize: 40, lineHeight: 1.15, letterSpacing: "-.055em" }}>{t("signIn")}.</h1>
         <p className="login-description" style={{ margin: "0 0 26px", color: "#B2BDCC", fontSize: 17, lineHeight: 1.8 }}>{t("signIn")} securely with your Google account to access your workspace.</p>
         <form action={signInWithGoogle}>
-          <button className="google-signin-button" type="submit" style={{ width: "100%", minHeight: 56, display: "flex", alignItems: "center", justifyContent: "center", gap: 11, border: "1px solid #49DDF5", borderRadius: 10, background: "#49DDF5", color: "#07131a", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+          <button className="google-signin-button" type="submit" style={{ width: "100%", minHeight: 56, display: "flex", alignItems: "center", justifyContent: "center", gap: 11, border: "1px solid #dadce0", borderRadius: 6, background: "#fff", color: "#3c4043", fontSize: 16, fontWeight: 600, cursor: "pointer" }}>
             <GoogleMark /> Continue with Google
           </button>
         </form>
