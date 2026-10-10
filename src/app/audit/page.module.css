@@ -20,3 +20,38 @@
 
 .findingsToolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:22px 0 12px}.findingsToolbar label{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700}.findingsToolbar select{min-height:40px;padding:0 12px;border:1px solid #dfe6df;border-radius:9px;background:#fff;color:#203229;font:inherit}.severityLabel{display:inline-flex;vertical-align:middle;align-items:center;margin-left:7px;padding:4px 7px;border-radius:6px;background:#f1f5f1;color:#46574b;font-size:10px;font-weight:800;letter-spacing:.02em}.recommendation{margin-top:8px!important;color:#344b3d!important;font-size:13px!important;line-height:1.65!important}.recommendation strong{font-weight:800}.findingsToolbar .secondaryButton{background:#fff;color:#244c35;border:1px solid #cbded0;min-height:40px;font-size:13px}.findingsToolbar .secondaryButton:hover{background:#f0faf3}
 .reportActions{display:flex;gap:8px;flex-wrap:wrap}.saveMessage{margin:10px 0 0;color:#315b40;font-size:13px;line-height:1.6}.findingsToolbar{align-items:flex-end}
+/* Futuristic technical audit console */
+.page{background:radial-gradient(ellipse at 85% 0%,#142833 0,transparent 38%),#0B0D12;color:#F4F7FB}
+.header{border-color:#293342;background:rgba(11,13,18,.88)}
+.brand{color:#F4F7FB}.brandMark{background:#49DDF5;color:#07131a}.brandDot{color:#49DDF5}
+.backLink{color:#B2BDCC!important}.backLink:hover{color:#49DDF5!important}
+.content>h1{color:#F4F7FB;font-size:clamp(36px,5vw,52px)}
+.eyebrow{color:#49DDF5}
+.intro{color:#B2BDCC}
+.formCard,.results{background:#11151C;border-color:#293342;box-shadow:0 18px 48px #0004}
+.cardHeading h2,.resultsHeader h2{color:#F4F7FB;font-size:20px}
+.cardHeading p,.help{color:#B2BDCC}
+.iconBox{background:#172d38;color:#49DDF5}
+.form label{color:#F4F7FB;font-size:15px}
+.inputRow input{background:#0B0D12;border-color:#354353;color:#F4F7FB;font-size:16px}
+.inputRow input::placeholder{color:#8997AA}
+.inputRow input:focus{border-color:#49DDF5;box-shadow:0 0 0 3px #49DDF522}
+.inputRow button,.secondaryButton{background:#49DDF5;border-color:#49DDF5;color:#07131a;font-size:14px}
+.inputRow button:hover:not(:disabled){background:#7be8f8;border-color:#7be8f8}
+.loading{background:#132a34;color:#B2BDCC;font-size:15px}
+.errorBox{background:#2a171a;border-color:#62343a;color:#FF9BA2}
+.resultsHeader h2{font-size:24px}
+.auditedUrl{color:#49DDF5!important;font-size:13px}
+.timestamp{color:#B2BDCC;font-size:12px}
+.summaryCard{background:#141A23;border-color:#293342}
+.summaryCard span{color:#B2BDCC;font-size:14px}
+.summaryCard strong{color:#F4F7FB;font-size:30px}
+.findings{border-color:#293342}.finding{border-color:#293342}
+.findingCopy h3{color:#F4F7FB;font-size:15px}
+.findingCopy p{color:#B2BDCC;font-size:15px}
+.findingIcon.pass{background:#1c2a20;color:#B8F36B}.findingIcon.warning{background:#302719;color:#F2BE63}.findingIcon.error{background:#301a1e;color:#FF6B75}
+.statusLabel.pass{background:#1c2a20;color:#B8F36B}.statusLabel.warning{background:#302719;color:#F2BE63}.statusLabel.error{background:#301a1e;color:#FF6B75}
+.limits{background:#141A23}.limits strong{color:#F4F7FB;font-size:14px}.limits ul{color:#B2BDCC;font-size:14px}
+.securityNote{background:#141A23;border-color:#293342;color:#B2BDCC}
+.securityNote strong{color:#49DDF5}.securityNote p{font-size:14px}
+@media(max-width:600px){.formCard,.results{background:#11151C}.content>h1{font-size:clamp(32px,8vw,42px)}.findingCopy p{font-size:14px}}
