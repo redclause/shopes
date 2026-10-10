@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:keyword-engine": "node --experimental-strip-types --test tests/keyword-engine.test.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
