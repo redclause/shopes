@@ -7,13 +7,6 @@ export type LocalSubmissionRecord = {
   verification?: { resolvedUrl?: string };
 };
 
-const VALID_STATUSES = new Set<LocalSubmissionStatus>([
-  "prepared",
-  "user-reported-submitted",
-  "backlink_verified",
-  "rejected",
-]);
-
 /** Normalize legacy browser records without treating a user report as proof. */
 export function normalizeStoredStatus(record: Partial<LocalSubmissionRecord>): LocalSubmissionStatus {
   if (record.status === "backlink_verified" && record.verification?.resolvedUrl) return "backlink_verified";
