@@ -121,7 +121,7 @@ export default function KeywordResearchClient() {
     <section className={styles.intro}>
       <div className={styles.eyebrow}><Sparkles size={14} /> INDEPENDENT KEYWORD ENGINE</div>
       <h1>Find your next <span>keyword opportunity.</span></h1>
-      <p>Discover related phrases with a deterministic local engine. Shopes does not call external SEO APIs, and it never invents search volume, CPC, keyword difficulty, or live rankings.</p>
+      <p>Discover related phrases with a deterministic local engine. Shopes does not call external SEO APIs, and it never invents verified search volume, keyword difficulty, or live rankings. CPC is shown only as a low-confidence, rule-based estimate—not observed advertising data.</p>
     </section>
 
     <form className={styles.searchForm} onSubmit={generate}>
@@ -144,7 +144,7 @@ export default function KeywordResearchClient() {
         <div><h2>Keyword ideas</h2><p>{generated ? (filtered.length + " suggestions · " + country + " · " + language) : "Start with a seed keyword to generate related ideas."}</p></div>
         <button className={styles.export} onClick={exportCsv} disabled={!generated}><Download size={15} /> Export CSV</button>
       </div>
-      <div className={styles.sourceNote}><Target size={17} /><div><strong>Source: Shopes local algorithms</strong><p>Opportunity and relevance scores are transparent heuristics—not search demand or SEO difficulty. Search volume, CPC, competition metrics, and live SERP data are unavailable unless you import a dataset.</p></div></div>
+      <div className={styles.sourceNote}><Target size={17} /><div><strong>Source: Shopes local algorithms</strong><p>Opportunity and relevance are transparent heuristics. Modelled CPC is a broad, low-confidence range based on estimated intent—not Google Ads bids or measured keyword data. Verified search volume, competition metrics, and live SERP data are unavailable unless you import a dataset.</p></div></div>
 
       {generated && <div className={styles.filters}>
         <label className={styles.filterSearch}><Search size={15} /><input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Filter keyword ideas" /></label>
@@ -156,7 +156,7 @@ export default function KeywordResearchClient() {
       {!generated ? <div className={styles.empty}><div><Search size={24} /></div><h3>Your keyword list starts here</h3><p>Enter a seed phrase above. Shopes will generate deterministic keyword ideas in your browser without external API calls.</p></div> : filtered.length === 0 ? <div className={styles.empty}><h3>No matching ideas</h3><p>Try another filter or seed keyword.</p></div> : <>
         <div className={styles.tableWrap}><table><thead><tr>
           <th><input aria-label="Select all visible keywords" type="checkbox" checked={visible.length > 0 && visible.every((item) => selected.includes(item.normalized))} onChange={(event) => setSelected(event.target.checked ? Array.from(new Set([...selected, ...visible.map((item) => item.normalized)])) : selected.filter((phrase) => !visible.some((item) => item.normalized === phrase)))} /></th>
-          <th>Keyword</th><th>Type</th><th>Intent</th><th>Words</th><th>Opportunity</th><th>Verified metrics</th>
+          <th>Keyword</th><th>Type</th><th>Intent</th><th>Words</th><th>Opportunity</th><th>Modelled CPC (USD)</th><th>Verified metrics</th>
         </tr></thead><tbody>{visible.map((item: KeywordIdea) => <tr key={item.normalized}>
           <td><input type="checkbox" aria-label={"Select " + item.phrase} checked={selected.includes(item.normalized)} onChange={(event) => setSelected(event.target.checked ? [...selected, item.normalized] : selected.filter((phrase) => phrase !== item.normalized))} /></td>
           <td className={styles.keyword}>{item.phrase}{item.longTail && <span className={styles.longTail}>LONG-TAIL</span>}</td>
@@ -187,7 +187,7 @@ export default function KeywordResearchClient() {
       <p><strong>Relevance (0–100):</strong> based on overlap between seed tokens and candidate phrase tokens, with a bonus when the normalized phrase contains the seed.</p>
       <p><strong>Shopes Opportunity Score (0–100):</strong> round(0.45 × specificity + 0.40 × relevance + intent bonus). Intent bonuses are informational 8, commercial 12, transactional 10, local 7, navigational 0, unclassified 3; capped at 100. This is a prioritization heuristic, not a ranking probability or Keyword Difficulty score.</p>
       <p><strong>Data provenance:</strong> generated phrases are labelled locally generated; imported rows retain their file label and import timestamp. Importing a dataset does not verify its origin or make it live Google data.</p>
-      <p><strong>Unavailable without verified sources:</strong> monthly search volume, CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.</p>
+      <p><strong>Modelled CPC (USD):</strong> broad intent-based ranges (informational $0.05–$1.25; commercial $0.25–$2.75; transactional $0.35–$3.50; local $0.20–$2.50; navigational $0.05–$1.50; unclassified $0.05–$1.75). These ranges are uncalibrated, low-confidence placeholders—not market observations or predictions. They do not vary by country or niche. <strong>Unavailable without verified sources:</strong> monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.</p>
     </details>
 
     <footer className={styles.footer}>Shopes is free to use. No external keyword API, database, paid provider, or automatic search-engine scraping is used.</footer>
