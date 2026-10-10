@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useShopesTranslation } from "../lib/i18n/useShopesTranslation";
-import { ArrowRight, BarChart3, Check, ChevronDown, Compass, Globe2, Layers3, Menu, Search, ShieldCheck, ShoppingBag, Sparkles, Target, TrendingUp, X, Zap } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BarChart3, Check, ChevronDown, Compass, Globe2, Layers3, Menu, Search, ShieldCheck, ShoppingBag, Sparkles, Target, TrendingUp, X, Zap } from "lucide-react";
 
 const issues = [
   ["Product pages missing meta descriptions", "128 URLs", "orange"],
