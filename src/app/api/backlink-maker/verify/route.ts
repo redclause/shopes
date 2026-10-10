@@ -58,7 +58,15 @@ export async function POST(request: Request) {
     }
 
     if (response.status >= 300 && response.status < 400) {
-      return NextResponse.json({ status: "redirect", message: "The page redirected. Review the destination and verify that URL instead.", httpStatus: response.status, redirectUrl: response.headers.get("location") ? new URL(response.headers.get("location")!, candidateUrl).toString() : undefined });
+      const location = response.headers.get("location");
+      let redirectUrl: string | undefined;
+      if (location) {
+        try {
+          const destination = new URL(location, candidateUrl);
+          if (destination.protocol === "http:" || destination.protocol === "https:") redirectUrl = destination.toString();
+        } catch { /* Ignore malformed redirect destinations. */ }
+      }
+      return NextResponse.json({ status: "redirect", message: "The page redirected. Review the destination and verify that URL instead.", httpStatus: response.status, redirectUrl });
     }
     if (!response.ok) {
       return NextResponse.json({ status: "unavailable", message: "The candidate page could not be checked successfully.", httpStatus: response.status });
