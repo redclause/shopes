@@ -42,6 +42,9 @@ test("scores are bounded and never masquerade as verified metrics", () => {
     assert.ok(idea.opportunityScore >= 0 && idea.opportunityScore <= 100);
     assert.ok(idea.relevanceScore >= 0 && idea.relevanceScore <= 100);
     assert.equal(idea.metricsStatus, "unavailable");
+    assert.ok(idea.estimatedCpcLowUsd >= 0);
+    assert.ok(idea.estimatedCpcHighUsd > idea.estimatedCpcLowUsd);
+    assert.equal(idea.cpcConfidence, "low");
     assert.equal(idea.provenance, "locally-generated");
   }
 });
@@ -51,6 +54,8 @@ test("CSV escaping quotes values and neutralizes spreadsheet formulas", () => {
   assert.equal(csvEscape("=1+1"), '"\'=1+1"');
   const csv = exportKeywordCsv(generateKeywordIdeas("shop", "English"), "US", "English");
   assert.match(csv, /Shopes Opportunity Score/);
+  assert.match(csv, /Modelled CPC low \(USD\)/);
+  assert.match(csv, /Low — uncalibrated heuristic/);
   assert.match(csv, /Unavailable/);
 });
 
