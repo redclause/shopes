@@ -12,6 +12,9 @@ export type KeywordIdea = {
   specificityScore: number;
   relevanceScore: number;
   opportunityScore: number;
+  estimatedCpcLowUsd: number;
+  estimatedCpcHighUsd: number;
+  cpcConfidence: "low";
   provenance: "locally-generated";
   metricsStatus: "unavailable";
 };
@@ -123,6 +126,20 @@ function clusterFor(kind: string, intent: SearchIntent, language: KeywordLanguag
   return language === "Georgian" ? "ძირითადი თემა" : "Core topic";
 }
 
+function estimateCpc(intent: SearchIntent): Pick<KeywordIdea, "estimatedCpcLowUsd" | "estimatedCpcHighUsd" | "cpcConfidence"> {
+  // Deliberately broad, uncalibrated ranges based only on heuristic intent—not observed bids or keyword data.
+  const ranges: Record<SearchIntent, [number, number]> = {
+    Informational: [0.05, 1.25],
+    Commercial: [0.25, 2.75],
+    Transactional: [0.35, 3.5],
+    Navigational: [0.05, 1.5],
+    Local: [0.2, 2.5],
+    Unclassified: [0.05, 1.75],
+  };
+  const [estimatedCpcLowUsd, estimatedCpcHighUsd] = ranges[intent];
+  return { estimatedCpcLowUsd, estimatedCpcHighUsd, cpcConfidence: "low" };
+}
+
 function scorePhrase(phrase: string, seed: string, intent: SearchIntent): Pick<KeywordIdea, "wordCount" | "longTail" | "specificityScore" | "relevanceScore" | "opportunityScore"> {
   const wordCount = words(phrase).length;
   const seedTokens = new Set(words(normalizeKeyword(seed)));
@@ -167,7 +184,7 @@ export function generateKeywordIdeas(seedInput: string, language: KeywordLanguag
     unique.set(normalized, {
       phrase, normalized, kind: candidate.kind, intent, intentConfidence: "heuristic",
       cluster: clusterFor(candidate.kind, intent, language), ...scorePhrase(phrase, seed, intent),
-      provenance: "locally-generated", metricsStatus: "unavailable",
+      ...estimateCpc(intent), provenance: "locally-generated", metricsStatus: "unavailable",
     });
     if (unique.size >= Math.min(Math.max(1, maxResults), 250)) break;
   }
@@ -264,7 +281,7 @@ export function csvEscape(value: unknown): string {
 }
 
 export function exportKeywordCsv(ideas: KeywordIdea[], country: string, language: string): string {
-  const headers = ["Keyword", "Type", "Intent (heuristic)", "Cluster", "Word count", "Long-tail", "Specificity score", "Relevance score", "Shopes Opportunity Score", "Provenance", "Verified metrics", "Market", "Language"];
-  return [headers, ...ideas.map((item) => [item.phrase, item.kind, item.intent, item.cluster, item.wordCount, item.longTail ? "Yes" : "No", item.specificityScore, item.relevanceScore, item.opportunityScore, item.provenance, "Unavailable", country, language])]
+  const headers = ["Keyword", "Type", "Intent (heuristic)", "Cluster", "Word count", "Long-tail", "Specificity score", "Relevance score", "Shopes Opportunity Score", "Modelled CPC low (USD)", "Modelled CPC high (USD)", "CPC confidence", "Provenance", "Verified metrics", "Market", "Language"];
+  return [headers, ...ideas.map((item) => [item.phrase, item.kind, item.intent, item.cluster, item.wordCount, item.longTail ? "Yes" : "No", item.specificityScore, item.relevanceScore, item.opportunityScore, item.estimatedCpcLowUsd, item.estimatedCpcHighUsd, "Low — uncalibrated heuristic", item.provenance, "Unavailable", country, language])]
     .map((row) => row.map(csvEscape).join(",")).join("\r\n");
 }
