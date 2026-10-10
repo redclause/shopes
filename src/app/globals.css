@@ -180,3 +180,4 @@ img,svg,video,canvas{max-width:100%}
 .standard-google-fallback button{width:100%;min-height:44px;border:1px solid #354353;border-radius:8px;background:transparent;color:#c5d0dc;font-size:14px;font-weight:600;cursor:pointer}
 @media(max-width:720px){.google-one-tap-status{right:auto;left:0}.mobile-google-cta{width:100%;justify-content:center}.nav-links .google-one-tap-control{width:100%}}
 \n.login-card .google-one-tap-control{display:flex;width:100%}\n
+.google-one-tap-fallback{display:block;margin-top:6px;color:#72e5ef;font-size:11px;font-weight:750;text-decoration:underline;text-underline-offset:2px}
