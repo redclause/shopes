@@ -162,6 +162,7 @@ export default function KeywordResearchClient() {
           <td className={styles.keyword}>{item.phrase}{item.longTail && <span className={styles.longTail}>LONG-TAIL</span>}</td>
           <td>{item.kind}</td><td><span className={styles.intent}>{item.intent}</span></td><td>{item.wordCount}</td>
           <td><span className={styles.score}>{item.opportunityScore}</span><small className={styles.scoreLabel}>heuristic / 100</small></td>
+          <td><span className={styles.cpcEstimate}>${item.estimatedCpcLowUsd.toFixed(2)}–${item.estimatedCpcHighUsd.toFixed(2)}</span><small className={styles.scoreLabel}>low confidence</small></td>
           <td><span className={styles.unavailable}>Not available</span></td>
         </tr>)}</tbody></table></div>
         <div className={styles.tableFooter}><span>{selected.length ? (selected.length + " selected · ") : ""}Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}</span><div><button disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</button><span>Page {page} of {pageCount}</span><button disabled={page >= pageCount} onClick={() => setPage(page + 1)}>Next</button></div></div>
