@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${article.title} — Shopes Blog`,
     description: article.description,
-    alternates: { canonical: `/blog/${article.slug}` },
-    openGraph: { type: "article", title: article.title, description: article.description, url: `/blog/${article.slug}`, siteName: "Shopes Blog" },
+    alternates: { canonical: `https://shopes.online/blog/${article.slug}` },
+    openGraph: { type: "article", title: article.title, description: article.description, url: `https://shopes.online/blog/${article.slug}`, siteName: "Shopes Blog" },
     twitter: { card: "summary", title: article.title, description: article.description }
   };
 }
