@@ -24,6 +24,8 @@ jobs:
         run: npm run test:i18n
       - name: Blog generator tests
         run: npm run test:blog
+      - name: Backlink verification tests
+        run: npm run test:backlink-verification
       - name: Type-check
         run: npm run typecheck
       - name: Lint
