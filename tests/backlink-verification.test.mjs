@@ -30,6 +30,11 @@ test("extracts canonical URL relative to the checked page", () => {
   assert.equal(extractCanonicalUrl(html, "https://source.example/category/page"), "https://source.example/article");
 });
 
+test("does not mistake script or comment text for a published anchor", () => {
+  const html = '<script>const fake = \'<a href="https://target.example/">fake</a>\';</script><!-- <a href="https://target.example/">comment</a> -->';
+  assert.equal(extractBacklinkEvidence(html, "https://source.example/", "https://target.example/"), null);
+});
+
 test("rejects non-http URL schemes", () => {
   assert.equal(comparableUrl("javascript:alert(1)"), null);
   assert.equal(extractBacklinkEvidence('<a href="javascript:alert(1)">x</a>', "https://source.example/", "https://target.example/"), null);
