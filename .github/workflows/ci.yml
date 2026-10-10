@@ -16,6 +16,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Keyword engine tests
+        run: npm run test:keyword-engine
       - name: Type-check
         run: npm run typecheck
       - name: Lint
