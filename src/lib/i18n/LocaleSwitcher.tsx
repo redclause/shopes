@@ -6,7 +6,7 @@ import { applyLocaleToDocument, persistLocale, readStoredLocale } from "./locale
 import { TRANSLATED_CORE_LOCALES } from "./messages";
 import styles from "./locale-switcher.module.css";
 
-const KEYWORD_RULE_LOCALES = new Set(["en", "ka", "es", "fr", "de", "pt", "it", "nl", "ru", "uk", "tr", "ar", "hi", "zh", "ja", "ko", "id", "vi", "pl", "sv"]);
+const KEYWORD_RULE_LOCALES = new Set(["en", "ka", "es", "fr", "de", "pt", "it", "nl", "ru", "uk", "tr", "ar", "hi", "zh", "zh-TW", "ja", "ko", "id", "vi", "pl", "sv"]);
 
 export default function LocaleSwitcher() {
   const [locale, setLocale] = useState("en");
