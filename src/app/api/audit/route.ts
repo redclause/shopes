@@ -3,6 +3,7 @@ import { isIP } from "node:net";
 import { request as httpRequest, type IncomingMessage } from "node:http";
 import { request as httpsRequest } from "node:https";
 import { NextResponse } from "next/server";
+import { auth } from "../../../../auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -230,6 +231,11 @@ function auditHtml(html: string, status: number, pageUrl: string): Finding[] {
 }
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Sign in to run a technical audit." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+  }
+
   try {
     const body = await request.json() as { url?: unknown };
     if (typeof body.url !== "string" || body.url.trim().length === 0 || body.url.length > 2_048) {
