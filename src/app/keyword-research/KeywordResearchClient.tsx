@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { ArrowDownUp, ArrowLeft, Download, FileUp, Search, Sparkles, Target, Upload, X } from "lucide-react";
+import { ArrowDownUp, ArrowLeft, Download, FileUp, Save, Search, Sparkles, Target, Upload, X } from "lucide-react";
 import {
   exportKeywordCsv, generateKeywordIdeas, parseImportedSerpData, summarizeDomainOverlap, SUPPORTED_KEYWORD_LANGUAGES,
   type ImportedSerpRecord, type KeywordIdea, type KeywordLanguage, type SearchIntent,
@@ -61,6 +61,7 @@ export default function KeywordResearchClient() {
   const [datasetName, setDatasetName] = useState("");
   const [datasetError, setDatasetError] = useState("");
   const [importedCount, setImportedCount] = useState(0);
+  const [saveMessage, setSaveMessage] = useState("");
 
   const allIdeas = useMemo(() => {
     if (!generated) return [];
@@ -109,6 +110,21 @@ export default function KeywordResearchClient() {
   function exportCsv() {
     const rows = selected.length ? allIdeas.filter((item) => selected.includes(item.normalized)) : allIdeas;
     if (rows.length) downloadCsv("shopes-keyword-research.csv", exportKeywordCsv(rows, country, language));
+  }
+
+  function saveKeywordSet() {
+    const rows = selected.length ? allIdeas.filter((item) => selected.includes(item.normalized)) : allIdeas;
+    if (!rows.length) return;
+    try {
+      const key = "shopes:keyword-sets:v1";
+      const parsed: unknown = JSON.parse(window.localStorage.getItem(key) || "[]");
+      const previous = Array.isArray(parsed) ? parsed : [];
+      const item = { id: Date.now().toString(), seed: submittedSeed, country, language, savedAt: new Date().toISOString(), keywords: rows };
+      window.localStorage.setItem(key, JSON.stringify([item, ...previous].slice(0, 30)));
+      setSaveMessage(rows.length + " keyword ideas saved in this browser only.");
+    } catch {
+      setSaveMessage("Could not save this keyword set. Browser storage may be unavailable or full.");
+    }
   }
 
   async function importDataset(event: ChangeEvent<HTMLInputElement>) {
@@ -175,8 +191,9 @@ export default function KeywordResearchClient() {
     <section className={styles.results} aria-live="polite">
       <div className={styles.resultsHead}>
         <div><h2>{t("keywordResearch")}</h2><p>{generated ? (filtered.length + " suggestions · " + country + " · " + language) : "Start with a seed keyword to generate related ideas."}</p></div>
-        <button className={styles.export} onClick={exportCsv} disabled={!generated}><Download size={15} /> {t("exportCsv")}</button>
+        <div className={styles.actionGroup}><button className={styles.export} onClick={saveKeywordSet} disabled={!generated}><Save size={15} /> Save set locally</button><button className={styles.export} onClick={exportCsv} disabled={!generated}><Download size={15} /> {t("exportCsv")}</button></div>
       </div>
+      {saveMessage && <p className={styles.fieldHelp} role="status">{saveMessage}</p>}
       <div className={styles.sourceNote}><Target size={17} /><div><strong>Source: Shopes local algorithms</strong><p>Opportunity and relevance are transparent heuristics. Modelled CPC is a broad, low-confidence range based on estimated intent—not Google Ads bids or measured keyword data. Verified search volume, competition metrics, and live SERP data are unavailable unless you import a dataset.</p></div></div>
 
       {generated && <div className={styles.filters}>
