@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, CircleUserRound, LayoutDashboard, Search, FileSearch, Sparkles, BookOpen, LogOut, UserRound } from "lucide-react";
+import { ChevronDown, CircleUserRound, LayoutDashboard, Search, FileSearch, Sparkles, BookOpen, Link2, LogOut, UserRound } from "lucide-react";
 import styles from "./UserMenu.module.css";
 
 type UserMenuProps = {
@@ -17,6 +17,7 @@ const links = [
   { href: "/keyword-research", label: "Keyword Research", icon: Search },
   { href: "/audit", label: "Site Audit", icon: FileSearch },
   { href: "/product-intelligence", label: "Product Analysis", icon: Sparkles },
+  { href: "/backlink-maker", label: "Backlink Maker", icon: Link2 },
   { href: "/blog", label: "Shopes Blog", icon: BookOpen },
 ];
 
