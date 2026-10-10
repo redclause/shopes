@@ -5,7 +5,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 
 declare global {
   interface Window {
@@ -20,6 +20,19 @@ declare global {
             cancel_on_tap_outside?: boolean;
             use_fedcm_for_prompt?: boolean;
           }) => void;
+          renderButton: (
+            parent: HTMLElement,
+            options: {
+              type?: "standard" | "icon";
+              theme?: "outline" | "filled_blue" | "filled_black";
+              size?: "large" | "medium" | "small";
+              text?: "signin_with" | "signup_with" | "continue_with" | "signin";
+              shape?: "rectangular" | "pill" | "circle" | "square";
+              logo_alignment?: "left" | "center";
+              width?: number;
+              locale?: string;
+            },
+          ) => void;
           prompt: (callback?: (notification: {
             isNotDisplayed: () => boolean;
             isSkippedMoment: () => boolean;
@@ -45,18 +58,21 @@ export default function GoogleOneTapButton({
   className = "",
   label = "Continue with Google",
   redirectTo,
-  autoPrompt = true,
+  autoPrompt = false,
   fallbackHref,
 }: GoogleOneTapButtonProps) {
   const router = useRouter();
+  const buttonContainerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
   const initializing = useRef(false);
+  const rendered = useRef(false);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
 
   const onCredential = useCallback(async (response: { credential?: string }) => {
-    if (!response.credential || busy) {
+    if (busy) return;
+    if (!response.credential) {
       setMessage("Google did not return a sign-in credential. Please try again.");
       return;
     }
@@ -116,29 +132,35 @@ export default function GoogleOneTapButton({
       if (autoPrompt) {
         window.google.accounts.id.prompt((notification) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            setMessage("Google One Tap isn’t available right now. Use the button to try again.");
+            setMessage("Google One Tap isn’t available right now. You can still use the Google button below.");
           }
         });
       }
     } catch {
-      setMessage("Google One Tap could not start. Please try again.");
+      setMessage("Google sign-in could not start. Please try again.");
     } finally {
       initializing.current = false;
     }
   }, [autoPrompt, onCredential]);
 
   useEffect(() => {
+    if (!ready || rendered.current || !buttonContainerRef.current || !window.google?.accounts?.id) return;
+    window.google.accounts.id.renderButton(buttonContainerRef.current, {
+      type: "standard",
+      theme: "outline",
+      size: "large",
+      text: "continue_with",
+      shape: "rectangular",
+      logo_alignment: "left",
+      width: Math.min(360, Math.max(240, buttonContainerRef.current.clientWidth || 320)),
+      locale: "en",
+    });
+    rendered.current = true;
+  }, [ready]);
+
+  useEffect(() => {
     if (window.google?.accounts?.id) void initialize();
   }, [initialize]);
-
-  function openOneTap() {
-    setMessage("");
-    if (window.google?.accounts?.id && initialized.current) {
-      window.google.accounts.id.prompt();
-    } else {
-      setMessage("Google sign-in is still loading. Please try again in a moment.");
-    }
-  }
 
   return (
     <span className="google-one-tap-control">
@@ -148,17 +170,14 @@ export default function GoogleOneTapButton({
         onLoad={() => { void initialize(); }}
         onError={() => setMessage("Google sign-in could not load. Check your connection and try again.")}
       />
-      <button
-        type="button"
-        className={className}
-        onClick={openOneTap}
-        disabled={busy || !ready}
-        aria-busy={busy}
-      >
-        {busy ? <LoaderCircle size={15} className="google-one-tap-spinner" aria-hidden="true" /> : null}
-        {label}
-        {!busy && <ArrowRight size={14} aria-hidden="true" />}
-      </button>
+      <span className={className} aria-label={label} aria-busy={busy}>
+        <span
+          ref={buttonContainerRef}
+          className={busy ? "google-one-tap-rendered-button is-busy" : "google-one-tap-rendered-button"}
+          aria-label={label}
+        />
+        {busy && <span className="google-one-tap-busy-indicator"><LoaderCircle size={15} className="google-one-tap-spinner" aria-hidden="true" /> Signing in…</span>}
+      </span>
       {message && <span className="google-one-tap-status" role="status" aria-live="polite">{message}{fallbackHref && !message.toLowerCase().includes("signed in") && <Link className="google-one-tap-fallback" href={fallbackHref}>Use standard Google sign-in</Link>}</span>}
     </span>
   );
