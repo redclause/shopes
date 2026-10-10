@@ -17,13 +17,7 @@
 @media(max-width:390px){.url-form{gap:6px;padding-left:10px}.url-form button{padding:0 9px;font-size:10px}.url-form input{font-size:11px}.hero-proof{font-size:9px}.floating-note{padding:8px}.floating-note b{font-size:8px}.floating-note small{font-size:7px}.note-one{left:-3px}.note-two{right:-3px}.integration-items{grid-template-columns:1fr}.footer-main{gap:25px 13px}}
 
 /* Futuristic Shopes visual foundation */
-:root{
-  color-scheme:dark;
-  --ink:#F4F7FB;--muted:#B2BDCC;--line:#293342;--paper:#11151C;--soft:#0B0D12;
-  --green:#49DDF5;--shopes-bg:#0B0D12;--shopes-surface:#11151C;--shopes-raised:#171D27;
-  --shopes-border:#293342;--shopes-text:#F4F7FB;--shopes-muted:#B2BDCC;
-  --shopes-cyan:#49DDF5;--shopes-lime:#B8F36B;--shopes-amber:#F2BE63;--shopes-red:#FF6B75;
-}
+:root{--ink:#17231f;--muted:#53635a;--line:#e7ebe7;--paper:#fff;--soft:#f7f9f6;--green:#a9ebcb;--font-body:"DM Sans",Arial,sans-serif;--font-display:"Manrope","DM Sans",sans-serif;--shopes-bg:#0B0D12;--shopes-surface:#11151C;--shopes-raised:#171D27;--shopes-border:#293342;--shopes-text:#F4F7FB;--shopes-muted:#B2BDCC;--shopes-cyan:#49DDF5;--shopes-lime:#B8F36B;--shopes-amber:#F2BE63;--shopes-red:#FF6B75}
 body{background:var(--shopes-bg);color:var(--shopes-text);font-size:16px}
 ::selection{background:#49DDF544;color:#fff}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--shopes-cyan);outline-offset:3px}
@@ -68,3 +62,32 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .spark-bars i{background:#49DDF5}
 .chart-summary{color:#B2BDCC}
 @media(max-width:760px){.site-header{padding-inline:18px}.nav-links{gap:14px}}
+
+/* Landing-page sections share the same restrained AI-core visual language */
+.trust-strip,.integration-section,.pricing-section{background:#0d1118;color:#F4F7FB;border-top:1px solid #202a37;border-bottom:1px solid #202a37}
+.trust-inner>span,.section-intro>p,.pricing-top>div:first-child>p,.integration-copy>p,.integration-copy>small,.step-number,.workflow-grid p{color:#B2BDCC}
+.trust-inner>b{color:#F4F7FB}.trust-inner>b svg,.integration-foot svg{color:#B8F36B}
+.feature-card,.feature-large,.integration-panel,.workflow-grid article,.price-card{background:linear-gradient(145deg,#141a23,#11151c);border:1px solid #293342;color:#F4F7FB;box-shadow:0 12px 34px #0003}
+.feature-card:hover,.integration-item:hover{background:#171f2a;border-color:#49DDF5}
+.feature-card h3,.integration-item-copy strong,.workflow-grid h3,.price-card h3{color:#F4F7FB}
+.feature-kicker,.feature-card>p,.integration-item-copy small,.integration-foot,.integration-count,.plan-subtitle,.plan-description,.plan-price span,.includes-label,.pricing-note,.final-cta>p,.final-cta>small{color:#B2BDCC}
+.feature-icon.purple,.feature-icon.blue,.feature-icon.green,.feature-icon.amber,.workflow-icon,.integration-logo,.mini-chip{background:#172d38;color:#49DDF5}
+.mini-audit{background:#11151C;border-color:#293342;color:#F4F7FB}
+.mini-audit-head,.mini-audit-foot{color:#B2BDCC}
+.mini-progress{background:#293342}.mini-progress i{background:#49DDF5}
+.keyword-pills span,.channel-stack span{background:#171D27;color:#B2BDCC;border-color:#293342}
+.keyword-pills b{color:#49DDF5}.gap-bars>span>i{background:#293342}.gap-bars>span>i>b{background:#F2BE63}
+.integration-item{border-color:#293342}.integration-logo.google,.integration-logo.bing,.integration-logo.meta,.integration-logo.shop,.integration-logo.zoovu,.integration-logo.feed{background:#172d38;color:#49DDF5}
+.workflow-icon{background:#172d38;color:#49DDF5}
+.pricing-section .billing-toggle,.pricing-section .billing-toggle>span{color:#B2BDCC}
+.billing-toggle>span.selected{background:#171D27;color:#F4F7FB}
+.billing-toggle b{background:#172d24;color:#B8F36B}
+.toggle{background:#354353}.toggle i{background:#F4F7FB}.toggle.on{background:#49DDF5}
+.popular-ribbon{background:#49DDF5;color:#07131a}
+.plan-divider{background:#293342}.price-card li{color:#B2BDCC}.price-card li svg{color:#B8F36B}
+.final-cta{background:radial-gradient(ellipse at 50% 0%,#142833 0,transparent 58%),#0B0D12;color:#F4F7FB}
+.final-cta h2,.final-cta h2 span{color:#49DDF5}
+.site-footer{background:#080a0f;border-top:1px solid #293342;color:#F4F7FB}
+.footer-brand .brand,.footer-column b{color:#F4F7FB}.footer-brand p,.footer-column a,.footer-bottom{color:#B2BDCC}
+.footer-column a:hover,.footer-bottom svg{color:#49DDF5}
+@media(max-width:640px){.hero{background:radial-gradient(ellipse at 80% 10%,#142632 0,transparent 50%),#0B0D12}.feature-card,.integration-panel,.workflow-grid article,.price-card{background:#11151C}}
