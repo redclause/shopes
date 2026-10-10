@@ -23,3 +23,31 @@ test("core translation lookup uses translated copy when available and English fa
   assert.equal(hasFullCoreTranslation("ka"), true);
   assert.equal(hasFullCoreTranslation("af"), false);
 });
+
+test("locale persistence accepts supported locales and safely handles unavailable storage", async () => {
+  const { readStoredLocale, persistLocale, applyLocaleToDocument } = await import("../src/lib/i18n/locale-state.ts");
+  const values = new Map([["shopes-locale", "ar"]]);
+  const storage = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+  };
+  assert.equal(readStoredLocale(storage), "ar");
+  assert.equal(persistLocale(storage, "ka"), true);
+  assert.equal(readStoredLocale(storage), "ka");
+  assert.equal(persistLocale(storage, "not-a-locale"), false);
+  assert.equal(readStoredLocale({ getItem: () => { throw new Error("blocked"); } }), "en");
+  assert.equal(persistLocale({ setItem: () => { throw new Error("blocked"); } }, "fr"), false);
+  const fakeDocument = { documentElement: { lang: "", dir: "" } };
+  applyLocaleToDocument(fakeDocument, "ar");
+  assert.deepEqual(fakeDocument.documentElement, { lang: "ar", dir: "rtl" });
+});
+
+test("translation coverage is explicit for every locale and never reported complete by fallback", () => {
+  const untranslated = LOCALES.filter((locale) => !hasFullCoreTranslation(locale.code));
+  assert.ok(untranslated.length > 0);
+  for (const locale of untranslated) {
+    assert.equal(hasFullCoreTranslation(locale.code), false);
+  }
+  assert.equal(hasFullCoreTranslation("ka"), true);
+  assert.equal(translate("af", "home"), "Home");
+});
