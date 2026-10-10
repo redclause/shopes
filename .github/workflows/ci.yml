@@ -18,6 +18,8 @@ jobs:
         run: npm install
       - name: Keyword engine tests
         run: npm run test:keyword-engine
+      - name: Product Intelligence tests
+        run: npm run test:product-intelligence
       - name: Locale and translation tests
         run: npm run test:i18n
       - name: Blog generator tests
