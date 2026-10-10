@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import {
   Activity, ArrowDownRight, ArrowRight, ArrowUpRight, Bell, Check,
-  ChevronDown, CircleHelp, Clock3, Command, ExternalLink, FileSearch,
+  ChevronDown, CircleHelp, Clock3, ExternalLink, FileSearch,
   Globe2, LayoutDashboard, LifeBuoy, Menu, Plus, Search, Settings2,
   ShieldCheck, ShoppingBag, Sparkles, Target, TrendingUp, X, Zap
 } from "lucide-react";
@@ -28,7 +28,7 @@ export default function DashboardPage() {
     const value = siteUrl.trim();
     try {
       const parsed = new URL(value.includes("://") ? value : "https://" + value);
-      if (!parsed.hostname.includes(".") || !parsed.hostname.includes(".")) throw new Error("Invalid domain");
+      if (!parsed.hostname.includes(".")) throw new Error("Invalid domain");
       setFeedback("Preview only: " + (projectName.trim() || parsed.hostname) + " is not saved. Project persistence will be added in a later phase.");
       setShowProjectForm(false);
     } catch {
