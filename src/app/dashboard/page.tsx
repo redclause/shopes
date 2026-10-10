@@ -66,6 +66,7 @@ export default async function DashboardPage() {
           <a className={styles.navItemActive} href="#overview" aria-current="page"><LayoutDashboard size={17} /> {t("dashboard")}</a>
           <a className={styles.navItem} href="#projects"><Globe2 size={17} /> Projects <span className={styles.navCount}>0</span></a>
           <a className={styles.navItem} href="/audit"><FileSearch size={17} /> Site audits</a>
+          <Link className={styles.navItem} href="/blog"><ShoppingBag size={17} /> Blog</Link>
           <Link className={styles.navItem} href="/keyword-research"><Target size={17} /> {t("keywordResearch")}</Link>
           <span className={styles.navLabel}>SHOPES</span>
           <Link className={styles.navItem} href="/#platform"><Target size={17} /> Explore platform <ArrowUpRight size={14} /></Link>
