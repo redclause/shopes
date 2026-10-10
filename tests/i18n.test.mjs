@@ -97,8 +97,14 @@ test("static JSX copy on primary routes has translations for every offered UI lo
           !/^shopes$/i.test(text) &&
           !/^[A-Z]{1,3}$/.test(text) &&
           !/^https?:\/\//i.test(text) &&
+          !/^[a-z0-9-]+\.[a-z]{2,}$/i.test(text) &&
           !/^[\d.,/%$–—·\s]+$/.test(text)
         ) visibleText.add(text);
+      }
+      if (ts.isJsxAttribute(node) && ts.isStringLiteral(node.initializer) &&
+          ["placeholder", "aria-label", "aria-description", "title", "alt"].includes(node.name.getText(ast))) {
+        const text = node.initializer.text.trim();
+        if (text && !/^https?:\/\//i.test(text) && /[A-Za-zÀ-ž]/.test(text)) visibleText.add(text);
       }
       ts.forEachChild(node, visit);
     };
