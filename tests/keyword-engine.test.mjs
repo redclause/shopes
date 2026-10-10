@@ -23,7 +23,12 @@ test("generates deterministic English keyword ideas with no duplicates", () => {
   assert.ok(first.some((idea) => idea.phrase === "best organic dog food"));
 });
 
-test("generates Georgian keyword ideas", () => {
+test("Georgian rules remain internal but are not offered as an AdSense-supported research language", async () => {
+  const { SUPPORTED_KEYWORD_LANGUAGES } = await import("../src/app/keyword-research/engine.ts");
+  assert.equal(SUPPORTED_KEYWORD_LANGUAGES.includes("Georgian"), false);
+});
+
+test("generates Georgian keyword ideas with internal rules", () => {
   const ideas = generateKeywordIdeas("ონლაინ მაღაზია", "Georgian");
   assert.ok(ideas.some((idea) => idea.phrase === "საუკეთესო ონლაინ მაღაზია"));
   assert.ok(ideas.some((idea) => idea.phrase.startsWith("როგორ ")));
@@ -86,7 +91,8 @@ test("imports JSON and rejects malformed or oversized inputs", () => {
 
 test("supports local generation and intent rules for all declared research languages", async () => {
   const { KEYWORD_LANGUAGE_RULES, SUPPORTED_KEYWORD_LANGUAGES } = await import("../src/app/keyword-research/engine.ts");
-  assert.equal(SUPPORTED_KEYWORD_LANGUAGES.length, 20);
+  assert.equal(SUPPORTED_KEYWORD_LANGUAGES.length, 19);
+  assert.equal(SUPPORTED_KEYWORD_LANGUAGES.includes("Georgian"), false);
   for (const language of SUPPORTED_KEYWORD_LANGUAGES) {
     const rules = KEYWORD_LANGUAGE_RULES[language];
     assert.ok(rules.modifiers.length >= 8, language + " should have commercial and transactional modifiers");
