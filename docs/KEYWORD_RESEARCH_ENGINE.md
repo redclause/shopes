@@ -27,11 +27,11 @@ Intent is heuristic and rule-based. Purchase/price terms map to transactional in
 - Generated phrases carry `provenance: locally-generated` and `metricsStatus: unavailable`.
 - The UI does not fabricate search volume, CPC, paid competition, organic difficulty, rankings, or trends.
 - Market selection is descriptive metadata only; it does not mean the engine has market-specific query data.
-- Imported rows retain the filename/source label and import timestamp. The UI does not independently verify the dataset's source or claim it represents live Google results.
+- Imported rows retain the filename/source label and import timestamp, and preserve an optional source date when a `source_date`, `date`, or `fetched_at` field is provided. The UI does not independently verify the dataset's source or claim it represents live Google results.
 
 ## Import format and safety limits
 
-CSV or JSON imports are processed in the browser, without network requests. Maximum input size is 2 MB and maximum row count is 5,000. Required fields are `keyword` (or `query`) and an absolute `http(s)` `url` (or `link`). Optional fields include `title`, `description`/`snippet`, and `rank`/`position`. Invalid rows are skipped; an import fails if no valid rows remain. Domain frequency, keyword overlap, and average rank are summaries of the supplied dataset, not live measurements.
+CSV or JSON imports are processed in the browser, without network requests. Maximum input size is 2 MB and maximum row count is 5,000. Required fields are `keyword` (or `query`) and an absolute `http(s)` `url` (or `link`). Optional fields include `title`, `description`/`snippet`, `rank`/`position`, and `source_date`/`date`/`fetched_at`. Invalid rows are skipped; an import fails if no valid rows remain. Domain frequency, keyword overlap, and average rank are summaries of the supplied dataset, not live measurements.
 
 CSV exports quote cells, escape embedded quotes, and neutralize spreadsheet formula prefixes.
 
