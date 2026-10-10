@@ -129,6 +129,18 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
     setSubmissionRecords((current) => current.map((record) => record.id === id ? { ...record, status, updatedAt: new Date().toISOString() } : record));
   }
 
+  const filteredCatalog = useMemo(() => {
+    const query = catalogSearch.trim().toLowerCase();
+    return backlinkSiteCatalog.filter((site) =>
+      (catalogCategory === "All" || site.category === catalogCategory) &&
+      [site.name, site.domain, site.category, site.submissionMethod, site.notes].some((value) => value.toLowerCase().includes(query))
+    );
+  }, [catalogCategory, catalogSearch]);
+
+  const catalogPageSize = 25;
+  const catalogPageCount = Math.max(1, Math.ceil(filteredCatalog.length / catalogPageSize));
+  const visibleCatalog = filteredCatalog.slice((catalogPage - 1) * catalogPageSize, catalogPage * catalogPageSize);
+
   async function checkSitePolicy(siteId: string) {
     setCheckingPolicySite(siteId);
     try {
