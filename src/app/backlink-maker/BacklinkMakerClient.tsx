@@ -39,6 +39,8 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   const [recordsLoaded, setRecordsLoaded] = useState(false);
   const [catalogSearch, setCatalogSearch] = useState("");
   const [catalogCategory, setCatalogCategory] = useState("All");
+  const [policyResults, setPolicyResults] = useState<Record<string, { status: string; message: string; evidence?: { path: string; kind: string; httpStatus: number; matchedKeywords?: string[]; excerpt?: string; summary?: { appliesToAll: boolean; directives: string[] } }[]; note?: string }>>({});
+  const [checkingPolicySite, setCheckingPolicySite] = useState("");
 
   useEffect(() => {
     try {
@@ -126,6 +128,23 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
     setSubmissionRecords((current) => current.map((record) => record.id === id ? { ...record, status, updatedAt: new Date().toISOString() } : record));
   }
 
+  async function checkSitePolicy(siteId: string) {
+    setCheckingPolicySite(siteId);
+    try {
+      const response = await fetch("/api/backlink-maker/policy-check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteId }),
+      });
+      const result = await response.json();
+      setPolicyResults((current) => ({ ...current, [siteId]: result }));
+    } catch {
+      setPolicyResults((current) => ({ ...current, [siteId]: { status: "error", message: "Could not inspect this site's public policy pages. Please review its official rules manually." } }));
+    } finally {
+      setCheckingPolicySite("");
+    }
+  }
+
   async function copySnippet(id: string, value: string) {
     try { await navigator.clipboard.writeText(value); setCopiedId(id); }
     catch { setError("Clipboard access was blocked. Select and copy the snippet manually."); }
@@ -209,7 +228,23 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
               <div className={styles.snippetList}>
                 {backlinkSiteCatalog.filter((site) => (catalogCategory === "All" || site.category === catalogCategory) && [site.name, site.domain, site.category, site.submissionMethod, site.notes].some((value) => value.toLowerCase().includes(catalogSearch.trim().toLowerCase()))).map((site) => <article className={styles.snippet} key={site.id}>
                   <div className={styles.snippetHead}><div><h3>{site.name} <span style={{ color: "#8da2b3", fontWeight: 500 }}>· {site.category}</span></h3><p>{site.domain} · {site.submissionMethod}</p><p>{site.notes}</p><p style={{ color: "#f0c879", marginTop: 6 }}>Policy status: needs manual review</p></div><a className={styles.export} href={site.url} target="_blank" rel="noopener noreferrer">Review site <ExternalLink size={13} /></a></div>
-                  <button type="button" className={styles.export} style={{ marginTop: 10 }} onClick={() => { setCandidateUrl(site.url); setVerifyResult(null); }}>Use as candidate page</button>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+                    <button type="button" className={styles.export} onClick={() => { setCandidateUrl(site.url); setVerifyResult(null); }}>Use as candidate page</button>
+                    <button type="button" className={styles.export} disabled={checkingPolicySite === site.id} onClick={() => checkSitePolicy(site.id)}>{checkingPolicySite === site.id ? "Checking rules…" : "Inspect public rules"}</button>
+                  </div>
+                  {policyResults[site.id] && <div className={styles.notice} role="status" style={{ marginTop: 12 }}>
+                    <ShieldCheck size={18} />
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <p><strong>{policyResults[site.id].status === "needs-human-review" ? "Policy evidence found — manual review required" : "Policy check result"}</strong><br />{policyResults[site.id].message}</p>
+                      {policyResults[site.id].evidence?.map((item) => <div key={item.path} style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #334352" }}>
+                        <p><strong>{item.path}</strong> · HTTP {item.httpStatus}{item.matchedKeywords?.length ? ` · Terms: ${item.matchedKeywords.join(", ")}` : ""}</p>
+                        {item.summary?.directives?.length ? <p>robots.txt directives: {item.summary.directives.join("; ")}</p> : null}
+                        {item.excerpt && <p style={{ overflowWrap: "anywhere" }}>{item.excerpt.slice(0, 420)}{item.excerpt.length > 420 ? "…" : ""}</p>}
+                        <a href={site.url.replace(/\/$/, "") + item.path} target="_blank" rel="noopener noreferrer" className={styles.export}>Open page <ExternalLink size={13} /></a>
+                      </div>)}
+                      {policyResults[site.id].note && <p>{policyResults[site.id].note}</p>}
+                    </div>
+                  </div>}
                 </article>)}
                 {backlinkSiteCatalog.filter((site) => (catalogCategory === "All" || site.category === catalogCategory) && [site.name, site.domain, site.category, site.submissionMethod, site.notes].some((value) => value.toLowerCase().includes(catalogSearch.trim().toLowerCase()))).length === 0 && <p style={{ color: "#aabac8", fontSize: 13 }}>No catalog entries match this search.</p>}
               </div>
