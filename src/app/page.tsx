@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import GoogleOneTapButton from "./components/GoogleOneTapButton";
 import { useShopesTranslation } from "../lib/i18n/useShopesTranslation";
 import { ArrowRight, ArrowUpRight, BarChart3, Check, ChevronDown, Compass, Globe2, Layers3, Menu, Search, ShieldCheck, ShoppingBag, Sparkles, Target, TrendingUp, X, Zap } from "lucide-react";
 
@@ -35,8 +36,8 @@ export default function Home() {
     <header className="site-header">
       <a className="brand" href="#" aria-label="Shopes home"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></a>
       <button className="mobile-menu" aria-label="Toggle navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X/> : <Menu/>}</button>
-      <nav className={menuOpen ? "nav-links open" : "nav-links"}><a href="#platform" onClick={() => setMenuOpen(false)}>Platform <ChevronDown size={13}/></a><a href="#features" onClick={() => setMenuOpen(false)}>Solutions</a><a href="#integrations" onClick={() => setMenuOpen(false)}>Integrations</a><Link href="/blog" onClick={() => setMenuOpen(false)}>{t("blog")}</Link><Link className="mobile-google-cta" href="/login" onClick={() => setMenuOpen(false)}>Continue with Google <ArrowRight size={15}/></Link></nav>
-      <div className="header-actions"><Link className="button button-dark button-small google-cta" href="/login">Continue with Google <ArrowRight size={14}/></Link></div>
+      <nav className={menuOpen ? "nav-links open" : "nav-links"}><a href="#platform" onClick={() => setMenuOpen(false)}>Platform <ChevronDown size={13}/></a><a href="#features" onClick={() => setMenuOpen(false)}>Solutions</a><a href="#integrations" onClick={() => setMenuOpen(false)}>Integrations</a><Link href="/blog" onClick={() => setMenuOpen(false)}>{t("blog")}</Link><GoogleOneTapButton className="mobile-google-cta" label="Continue with Google" /></nav>
+      <div className="header-actions"><GoogleOneTapButton className="button button-dark button-small google-cta" label="Continue with Google" /></div>
     </header>
 
     <section className="hero section-wrap" id="hero">
