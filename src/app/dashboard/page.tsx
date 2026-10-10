@@ -63,7 +63,7 @@ export default async function DashboardPage() {
           <Link className={styles.navItem} href="/keyword-research"><Target size={17} /> Keyword research</Link>
           <span className={styles.navLabel}>SHOPES</span>
           <Link className={styles.navItem} href="/#platform"><Target size={17} /> Explore platform <ArrowUpRight size={14} /></Link>
-          <Link className={styles.navItem} href="/#pricing"><Sparkles size={17} /> Free plan details <ArrowUpRight size={14} /></Link>
+          <Link className={styles.navItem} href="/#platform"><Sparkles size={17} /> Explore Shopes <ArrowUpRight size={14} /></Link>
         </nav>
 
         <div className={styles.sidebarBottom}>
@@ -148,7 +148,7 @@ export default async function DashboardPage() {
             <form action={signOutAction}><button className={styles.secondaryButton} type="submit"><LogOut size={15} /> Sign out</button></form>
           </section>
 
-          <footer className={styles.footer}><span>© {new Date().getFullYear()} Shopes</span><span>Permanent free plan · No credit card required</span></footer>
+          <footer className={styles.footer}><span>© {new Date().getFullYear()} Shopes</span><span>Always free · No credit card required</span></footer>
         </div>
       </section>
     </main>
