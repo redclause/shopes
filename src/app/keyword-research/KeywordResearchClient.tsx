@@ -10,6 +10,7 @@ import {
 } from "./engine";
 import styles from "./page.module.css";
 import { LOCALE_STORAGE_KEY } from "../../lib/i18n/languages";
+import { useShopesTranslation } from "../../lib/i18n/useShopesTranslation";
 import { SUPPORTED_KEYWORD_LANGUAGES, type KeywordLanguage } from "./engine";
 
 const PAGE_SIZE = 10;
@@ -22,6 +23,7 @@ const LOCALE_TO_KEYWORD_LANGUAGE: Record<string, KeywordLanguage> = {
 const INTENTS: Array<"All" | SearchIntent> = ["All", "Informational", "Commercial", "Transactional", "Navigational", "Local", "Unclassified"];
 
 export default function KeywordResearchClient() {
+  const { t } = useShopesTranslation();
   const [seed, setSeed] = useState("");
   const [submittedSeed, setSubmittedSeed] = useState("");
   const [country, setCountry] = useState("US");
@@ -144,8 +146,8 @@ export default function KeywordResearchClient() {
 
   return <main className={styles.shell}>
     <header className={styles.header}>
-      <Link href="/dashboard" className={styles.back}><ArrowLeft size={16} /> Dashboard</Link>
-      <span className={styles.free}>FREE WORKSPACE</span>
+      <Link href="/dashboard" className={styles.back}><ArrowLeft size={16} /> {t("dashboard")}</Link>
+      <span className={styles.free}>{t("freeForever").toUpperCase()}</span>
     </header>
 
     <section className={styles.intro}>
@@ -159,7 +161,7 @@ export default function KeywordResearchClient() {
       <div className={styles.searchRow}>
         <Search size={19} />
         <input id="seed" value={seed} onChange={(event) => setSeed(event.target.value)} placeholder={language === "Georgian" ? "მაგ. ონლაინ მაღაზია" : "e.g. organic dog food"} required maxLength={120} aria-describedby="seed-help" />
-        <button type="submit"><Sparkles size={16} /> Generate ideas</button>
+        <button type="submit"><Sparkles size={16} /> {t("search")}</button>
       </div>
       <p id="seed-help" className={styles.fieldHelp}>Maximum 120 characters. Results are generated locally from language rules.</p>
       <div className={styles.selectRow}>
@@ -173,7 +175,7 @@ export default function KeywordResearchClient() {
 
     <section className={styles.results} aria-live="polite">
       <div className={styles.resultsHead}>
-        <div><h2>Keyword ideas</h2><p>{generated ? (filtered.length + " suggestions · " + country + " · " + language) : "Start with a seed keyword to generate related ideas."}</p></div>
+        <div><h2>{t("keywordResearch")}</h2><p>{generated ? (filtered.length + " suggestions · " + country + " · " + language) : "Start with a seed keyword to generate related ideas."}</p></div>
         <button className={styles.export} onClick={exportCsv} disabled={!generated}><Download size={15} /> Export CSV</button>
       </div>
       <div className={styles.sourceNote}><Target size={17} /><div><strong>Source: Shopes local algorithms</strong><p>Opportunity and relevance are transparent heuristics. Modelled CPC is a broad, low-confidence range based on estimated intent—not Google Ads bids or measured keyword data. Verified search volume, competition metrics, and live SERP data are unavailable unless you import a dataset.</p></div></div>
