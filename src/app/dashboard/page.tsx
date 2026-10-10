@@ -20,6 +20,7 @@ export default function DashboardPage() {
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [siteUrl, setSiteUrl] = useState("");
   const [projectName, setProjectName] = useState("");
+  const [previewedHosts, setPreviewedHosts] = useState<string[]>([]);
   const [feedback, setFeedback] = useState("");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -28,11 +29,28 @@ export default function DashboardPage() {
     const value = siteUrl.trim();
     try {
       const parsed = new URL(value.includes("://") ? value : "https://" + value);
-      if (!parsed.hostname.includes(".")) throw new Error("Invalid domain");
+      if (
+        !["http:", "https:"].includes(parsed.protocol) ||
+        !parsed.hostname.includes(".") ||
+        parsed.username ||
+        parsed.password
+      ) {
+        throw new Error("Invalid website URL");
+      }
+      const normalizedHost = parsed.hostname.toLowerCase().replace(/^www\./, "");
+      if (previewedHosts.includes(normalizedHost)) {
+        setFeedback("This website has already been previewed in this session. No project was saved.");
+        setShowProjectForm(false);
+        return;
+      }
+      setPreviewedHosts((hosts) => [...hosts, normalizedHost]);
       setFeedback("Preview only: " + (projectName.trim() || parsed.hostname) + " is not saved. Project persistence will be added in a later phase.");
       setShowProjectForm(false);
     } catch {
       setFeedback("Enter a valid website address, such as yourstore.com.");
+    }
+  }
+k("Enter a valid website address, such as yourstore.com.");
     }
   }
 
