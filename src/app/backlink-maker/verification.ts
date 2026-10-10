@@ -42,7 +42,8 @@ export function comparableUrl(value: string, base?: string): string | null {
 export function extractBacklinkEvidence(html: string, pageUrl: string, targetUrl: string): BacklinkEvidence | null {
   const expected = comparableUrl(targetUrl);
   if (!expected) return null;
-  const links = html.match(/<a\b[^>]*>[\s\S]*?<\/a\s*>/gi) ?? [];
+  const source = html.replace(/<!--[\s\S]*?-->/g, " ").replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ").replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ");
+  const links = source.match(/<a\b[^>]*>[\s\S]*?<\/a\s*>/gi) ?? [];
   for (const tag of links) {
     const href = attribute(tag.slice(0, tag.indexOf(">") + 1), "href");
     if (!href) continue;
@@ -58,7 +59,8 @@ export function extractBacklinkEvidence(html: string, pageUrl: string, targetUrl
 }
 
 export function extractCanonicalUrl(html: string, pageUrl: string): string | null {
-  const links = html.match(/<link\b[^>]*>/gi) ?? [];
+  const source = html.replace(/<!--[\s\S]*?-->/g, " ").replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ").replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ");
+  const links = source.match(/<link\b[^>]*>/gi) ?? [];
   for (const tag of links) {
     const rel = (attribute(tag, "rel") ?? "").toLowerCase().split(/\s+/);
     if (!rel.includes("canonical")) continue;
