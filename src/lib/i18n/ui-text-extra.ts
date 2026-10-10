@@ -204,7 +204,8 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "volumen mensual, CPC medido, dificultad SEO, posiciones en directo y tendencias históricas. El mercado seleccionado es solo metadato y no implica métricas específicas de ese mercado.",
     "running shoes": "zapatillas de running",
     "trail sneakers": "zapatillas de trail",
-    "waterproof boots": "botas impermeables"
+    "waterproof boots": "botas impermeables",
+    "Run audit": "Ejecutar auditoría"
   },
   "fr": {
     "WORKSPACE": "ESPACE DE TRAVAIL",
@@ -411,7 +412,8 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "volume mensuel, CPC mesuré, difficulté SEO, classements en direct et tendances historiques. Le marché sélectionné n’est qu’une métadonnée et n’implique pas de métriques propres à ce marché.",
     "running shoes": "chaussures de course",
     "trail sneakers": "chaussures de trail",
-    "waterproof boots": "bottes imperméables"
+    "waterproof boots": "bottes imperméables",
+    "Run audit": "Lancer l’audit"
   },
   "de": {
     "WORKSPACE": "ARBEITSBEREICH",
@@ -618,6 +620,7 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "monatliches Suchvolumen, gemessener CPC, organische Keyword-Schwierigkeit, Live-Rankings und historische Trends. Die Marktauswahl ist nur Metadatum und bedeutet keine marktspezifischen Kennzahlen.",
     "running shoes": "Laufschuhe",
     "trail sneakers": "Trail-Sneaker",
-    "waterproof boots": "wasserdichte Stiefel"
+    "waterproof boots": "wasserdichte Stiefel",
+    "Run audit": "Audit starten"
   }
 };
