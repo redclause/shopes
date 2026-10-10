@@ -9,7 +9,14 @@ import type { ProductData } from "../../../lib/product-intelligence";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MAX_HTML_BYTES = 1_000_000;
+const DEFAULT_MAX_HTML_BYTES = 5 * 1024 * 1024;
+const HARD_MAX_HTML_BYTES = 10 * 1024 * 1024;
+const configuredHtmlLimit = Number(process.env.SHOPES_PRODUCT_HTML_MAX_BYTES);
+const MAX_HTML_BYTES = Number.isSafeInteger(configuredHtmlLimit) && configuredHtmlLimit > 0
+  ? Math.min(configuredHtmlLimit, HARD_MAX_HTML_BYTES)
+  : DEFAULT_MAX_HTML_BYTES;
+const MAX_HTML_MB = (MAX_HTML_BYTES / (1024 * 1024)).toFixed(1);
+const htmlLimitMessage = `The product page exceeds the configured HTML limit (${MAX_HTML_MB} MB). Set SHOPES_PRODUCT_HTML_MAX_BYTES to adjust it, up to 10 MB.`;
 const MAX_REDIRECTS = 3;
 const TIMEOUT_MS = 5_000;
 const USER_AGENT = "ShopesProductIntelligence/1.0 (+https://shopes.online)";
@@ -98,10 +105,16 @@ async function fetchPublicHtml(input: string): Promise<{ html: string; status: n
       response.destroy();
       throw new Error("The URL did not return an HTML product page.");
     }
-    const length = Number(response.headers["content-length"] || 0);
-    if (Number.isFinite(length) && length > MAX_HTML_BYTES) {
+    const contentEncoding = String(response.headers["content-encoding"] || "identity").toLowerCase();
+    if (contentEncoding !== "identity") {
       response.destroy();
-      throw new Error("The product page exceeds the 1 MB HTML limit.");
+      throw new Error("The product page returned compressed HTML that could not be safely processed.");
+    }
+    const contentLengthHeader = response.headers["content-length"];
+    const length = contentLengthHeader === undefined ? undefined : Number(contentLengthHeader);
+    if (length !== undefined && Number.isFinite(length) && length > MAX_HTML_BYTES) {
+      response.destroy();
+      throw new Error(htmlLimitMessage);
     }
     const chunks: Buffer[] = [];
     let bytes = 0;
@@ -110,7 +123,7 @@ async function fetchPublicHtml(input: string): Promise<{ html: string; status: n
         const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
         bytes += buffer.byteLength;
         if (bytes > MAX_HTML_BYTES) {
-          response.destroy(new Error("The product page exceeds the 1 MB HTML limit."));
+          response.destroy(new Error(htmlLimitMessage));
           return;
         }
         chunks.push(buffer);
