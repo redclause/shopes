@@ -7,13 +7,13 @@ export const metadata: Metadata = {
 };
 
 const section: React.CSSProperties = { marginTop: 28 };
-const paragraph: React.CSSProperties = { color: "#53635a", lineHeight: 1.85 };
-const heading: React.CSSProperties = { fontSize: 19, marginBottom: 8, color: "#17231f" };
+const paragraph: React.CSSProperties = { color: "#F4F7FB", lineHeight: 1.85 };
+const heading: React.CSSProperties = { fontSize: 19, marginBottom: 8, color: "#FFFFFF" };
 
 export default function TermsPage() {
-  return <main style={{ maxWidth: 820, margin: "0 auto", padding: "48px 24px 72px", color: "#17231f" }}>
-    <Link href="/" style={{ color: "#27865c", fontWeight: 700 }}>← Back to Shopes</Link>
-    <p style={{ marginTop: 32, color: "#27865c", fontWeight: 800, letterSpacing: ".12em", fontSize: 11 }}>LEGAL</p>
+  return <main style={{ maxWidth: 820, margin: "0 auto", padding: "48px 24px 72px", color: "#FFFFFF", background: "#000000", minHeight: "100vh" }}>
+    <Link href="/" style={{ color: "#49DDF5", fontWeight: 700 }}>← Back to Shopes</Link>
+    <p style={{ marginTop: 32, color: "#49DDF5", fontWeight: 800, letterSpacing: ".12em", fontSize: 11 }}>LEGAL</p>
     <h1 style={{ fontSize: "clamp(34px, 5vw, 48px)", letterSpacing: "-.05em", margin: "10px 0" }}>Terms of Service</h1>
     <p style={paragraph}>Last updated: October 11, 2026</p>
     <p style={paragraph}>These terms apply to your access to Shopes and its tools. By using the service, you agree to use it lawfully and in accordance with these terms. If you do not agree, do not use Shopes.</p>
