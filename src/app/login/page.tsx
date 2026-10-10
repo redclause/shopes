@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { translate } from "../../lib/i18n/messages";
 import { signIn } from "../../../auth";
+import GoogleOneTapButton from "../components/GoogleOneTapButton";
 import { ArrowLeft, ShieldCheck, ShoppingBag } from "lucide-react";
 
 type LoginPageProps = {
@@ -35,10 +36,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <p style={{ margin: "23px 0 10px", fontSize: 13, letterSpacing: ".08em", fontWeight: 800, color: "#B2BDCC" }}>YOUR SHOPES WORKSPACE</p>
         <h1 className="login-title" style={{ margin: "0 0 12px", fontSize: 40, lineHeight: 1.15, letterSpacing: "-.055em" }}>{t("signIn")}.</h1>
         <p className="login-description" style={{ margin: "0 0 26px", color: "#B2BDCC", fontSize: 17, lineHeight: 1.8 }}>{t("signIn")} securely with your Google account to access your workspace.</p>
-        <form action={signInWithGoogle}>
-          <button className="google-signin-button" type="submit" style={{ width: "100%", minHeight: 56, display: "flex", alignItems: "center", justifyContent: "center", gap: 11, border: "1px solid #dadce0", borderRadius: 6, background: "#fff", color: "#3c4043", fontSize: 16, fontWeight: 600, cursor: "pointer" }}>
-            <GoogleMark /> Continue with Google
-          </button>
+        <GoogleOneTapButton className="google-signin-button" label="Continue with Google" redirectTo={callbackUrl} />
+        <form action={signInWithGoogle} className="standard-google-fallback">
+          <button type="submit">Use standard Google sign-in</button>
         </form>
         <p style={{ margin: "19px 0 0", fontSize: 13, lineHeight: 1.8, color: "#8997AA" }}>Your Google client secret stays on the server and is never exposed in the browser.</p>
         <Link href="/" style={{ marginTop: 28, display: "inline-flex", alignItems: "center", gap: 7, color: "#B2BDCC", fontSize: 14, fontWeight: 700, textDecoration: "none" }}><ArrowLeft size={14} /> {t("back")} to Shopes</Link>
@@ -47,11 +47,3 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   );
 }
 
-function GoogleMark() {
-  return <svg aria-hidden="true" viewBox="0 0 48 48" width="19" height="19">
-    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.72 7.18l7.62 5.91c4.45-4.11 7.14-10.17 7.14-17.56Z" />
-    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.79l-7.62-5.91c-2.12 1.42-4.84 2.26-8.28 2.26-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z" />
-    <path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19Z" />
-    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z" />
-  </svg>;
-}
