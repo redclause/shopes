@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { getLocale, LOCALE_STORAGE_KEY } from "../../lib/i18n/languages";
+import { translate } from "../../lib/i18n/messages";
 import { signIn } from "../../../auth";
 import { ArrowLeft, ShieldCheck, ShoppingBag } from "lucide-react";
 
@@ -7,6 +10,9 @@ type LoginPageProps = {
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const cookieStore = await cookies();
+  const locale = getLocale(cookieStore.get(LOCALE_STORAGE_KEY)?.value);
+  const t = (key: Parameters<typeof translate>[1]) => translate(locale, key);
   const params = await searchParams;
   const requested = params.callbackUrl;
   const callbackUrl =
@@ -31,15 +37,15 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </Link>
         <div style={{ marginTop: 38, width: 44, height: 44, borderRadius: 13, display: "grid", placeItems: "center", background: "#e4f7eb", color: "#287d52" }}><ShieldCheck size={21} /></div>
         <p style={{ margin: "23px 0 10px", fontSize: 10, letterSpacing: ".14em", fontWeight: 800, color: "#5e6b64" }}>YOUR SHOPES WORKSPACE</p>
-        <h1 style={{ margin: "0 0 12px", fontSize: 34, lineHeight: 1.15, letterSpacing: "-.055em" }}>Welcome back.</h1>
-        <p style={{ margin: "0 0 26px", color: "#69766e", fontSize: 13, lineHeight: 1.8 }}>Sign in securely with your Google account to access your workspace.</p>
+        <h1 style={{ margin: "0 0 12px", fontSize: 34, lineHeight: 1.15, letterSpacing: "-.055em" }}>{t("signIn")}.</h1>
+        <p style={{ margin: "0 0 26px", color: "#69766e", fontSize: 13, lineHeight: 1.8 }}>{t("signIn")} securely with your Google account to access your workspace.</p>
         <form action={signInWithGoogle}>
           <button type="submit" style={{ width: "100%", minHeight: 49, display: "flex", alignItems: "center", justifyContent: "center", gap: 11, border: "1px solid #dce4dc", borderRadius: 10, background: "#fff", color: "#202923", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-            <GoogleMark /> Continue with Google
+            <GoogleMark /> {t("signIn")} with Google
           </button>
         </form>
         <p style={{ margin: "19px 0 0", fontSize: 10, lineHeight: 1.8, color: "#87938a" }}>Your Google client secret stays on the server and is never exposed in the browser.</p>
-        <Link href="/" style={{ marginTop: 28, display: "inline-flex", alignItems: "center", gap: 7, color: "#4f6a58", fontSize: 11, fontWeight: 700, textDecoration: "none" }}><ArrowLeft size={14} /> Back to Shopes</Link>
+        <Link href="/" style={{ marginTop: 28, display: "inline-flex", alignItems: "center", gap: 7, color: "#4f6a58", fontSize: 11, fontWeight: 700, textDecoration: "none" }}><ArrowLeft size={14} /> {t("back")} to Shopes</Link>
       </section>
     </main>
   );
