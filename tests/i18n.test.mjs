@@ -102,7 +102,7 @@ test("static JSX copy on primary routes has translations for every offered UI lo
           !/^[\d.,/%$–—·\s]+$/.test(text)
         ) visibleText.add(text);
       }
-      if (ts.isJsxAttribute(node) && ts.isStringLiteral(node.initializer) &&
+      if (ts.isJsxAttribute(node) && node.initializer && ts.isStringLiteral(node.initializer) &&
           ["placeholder", "aria-label", "aria-description", "title", "alt"].includes(node.name.getText(ast))) {
         const text = node.initializer.text.trim();
         if (text && !/^https?:\/\//i.test(text) && /[A-Za-zÀ-ž]/.test(text)) visibleText.add(text);
