@@ -13,7 +13,9 @@
     "test:i18n": "node --experimental-strip-types --test tests/i18n.test.mjs",
     "test:blog": "node --experimental-strip-types --test tests/blog.test.mjs",
     "test:backlink-verification": "node --experimental-strip-types --test tests/backlink-verification.test.mjs",
-    "backlink:audit": "node --experimental-strip-types scripts/backlink-catalog-audit.mjs"
+    "backlink:audit": "node --experimental-strip-types scripts/backlink-catalog-audit.mjs",
+    "test:backlink-submission-analysis": "node --experimental-strip-types --test tests/backlink-submission-analysis.test.mjs",
+    "test:backlink": "npm run test:backlink-verification && npm run test:backlink-submission-analysis"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
