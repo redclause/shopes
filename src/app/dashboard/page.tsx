@@ -69,6 +69,7 @@ export default async function DashboardPage() {
           <a className={styles.navItem} href="/audit"><FileSearch size={17} /> Site audits</a>
           <Link className={styles.navItem} href="/blog"><ShoppingBag size={17} /> {t("blog")}</Link>
           <Link className={styles.navItem} href="/keyword-research"><Target size={17} /> {t("keywordResearch")}</Link>
+          <Link className={styles.navItem} href="/product-intelligence"><Sparkles size={17} /> Product intelligence</Link>
           <span className={styles.navLabel}>SHOPES</span>
           <Link className={styles.navItem} href="/#platform"><Target size={17} /> Explore platform <ArrowUpRight size={14} /></Link>
           <Link className={styles.navItem} href="/#platform"><Sparkles size={17} /> {t("home")} <ArrowUpRight size={14} /></Link>
