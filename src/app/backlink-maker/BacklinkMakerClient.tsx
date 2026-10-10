@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Check, Clipboard, Download, ExternalLink, Link2,
 import UserMenu from "../../components/UserMenu";
 import styles from "./page.module.css";
 import { backlinkSiteCatalog, backlinkSiteCategories } from "./site-catalog";
+import { canReopenManualWorkflow, hasActiveDuplicate, normalizeStoredStatus, submissionStatusLabel } from "./submission-tracker.mjs";
 
 type Props = { userName: string; userEmail: string; userImage?: string | null; signOutAction: () => Promise<void> };
 type Snippet = { id: string; title: string; description: string; value: string };
@@ -51,7 +52,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
       const saved = window.localStorage.getItem("shopes-backlink-submissions-v1");
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setSubmissionRecords(parsed.filter((item) => item && typeof item.id === "string" && typeof item.targetUrl === "string" && typeof item.candidateUrl === "string").map((item) => ({ ...item, status: item.status === "backlink_verified" && item.verification?.resolvedUrl ? "backlink_verified" : item.status === "submitted" || item.status === "user-reported-submitted" ? "user-reported-submitted" : item.status === "rejected" ? "rejected" : "prepared" })));
+        if (Array.isArray(parsed)) setSubmissionRecords(parsed.filter((item) => item && typeof item.id === "string" && typeof item.targetUrl === "string" && typeof item.candidateUrl === "string").map((item) => ({ ...item, status: normalizeStoredStatus(item) })));
       }
     } catch { /* Ignore malformed local history and keep the tool usable. */ }
     setRecordsLoaded(true);
@@ -128,6 +129,11 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
     event.preventDefault();
     const site = backlinkSiteCatalog.find((entry) => entry.id === selectedSiteId);
     if (!generatedUrl || !site || !publisherPermission) return;
+    if (hasActiveDuplicate(submissionRecords, generatedUrl, site.id)) {
+      setError("A record for this target and site already exists in your local history. Open that record or choose another site.");
+      return;
+    }
+    setError("");
     const now = new Date().toISOString();
     const candidateHost = candidateUrl.trim() ? (() => { try { return new URL(candidateUrl.trim()).hostname.toLowerCase(); } catch { return ""; } })() : "";
     const candidateBelongsToSite = candidateHost === site.domain || candidateHost.endsWith("." + site.domain);
@@ -303,11 +309,12 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
               <div className={styles.cardHeading}><span className={styles.iconTile}><Check size={19} /></span><div><h2>Submission history</h2><p>Stored in this browser only; up to 100 records.</p></div></div>
               <div className={styles.snippetList}>
                 {submissionRecords.map((record) => <article className={styles.snippet} key={record.id}>
-                  <div className={styles.snippetHead}><div><h3>{record.status === "prepared" ? "Prepared — not submitted" : record.status === "user-reported-submitted" ? "User-reported submission — unverified" : record.status === "backlink_verified" ? "Backlink verified in page HTML" : "User-reported rejection"}</h3><p>{record.siteName || record.siteDomain || "Unspecified site"}{record.submissionMethod ? ` · ${record.submissionMethod}` : ""}</p>{record.title && <p>Title: {record.title}</p>}{record.description && <p>Description: {record.description}</p>}<p>Target: {record.targetUrl}</p>{record.candidateUrl && <p>Verified/candidate page: {record.candidateUrl}</p>}<p>Updated {new Date(record.updatedAt).toLocaleString()}</p>{record.verification && <p>Anchor: {record.verification.anchorText || "(empty anchor)"} · rel: {record.verification.rel.join(" ") || "none"} · {record.verification.isNofollow ? "nofollow/sponsored/ugc" : "not marked nofollow/sponsored/ugc"}{record.httpStatus ? ` · HTTP ${record.httpStatus}` : ""}</p>}{record.canonicalUrl && <p>Canonical: {record.canonicalUrl}</p>}</div>{record.submissionUrl && <a className={styles.export} href={record.submissionUrl} target="_blank" rel="noopener noreferrer">Open workflow <ExternalLink size={13} /></a>}</div>
+                  <div className={styles.snippetHead}><div><h3>{submissionStatusLabel(record.status)}</h3><p>{record.siteName || record.siteDomain || "Unspecified site"}{record.submissionMethod ? ` · ${record.submissionMethod}` : ""}</p>{record.title && <p>Title: {record.title}</p>}{record.description && <p>Description: {record.description}</p>}<p>Target: {record.targetUrl}</p>{record.candidateUrl && <p>Verified/candidate page: {record.candidateUrl}</p>}<p>Updated {new Date(record.updatedAt).toLocaleString()}</p>{record.verification && <p>Anchor: {record.verification.anchorText || "(empty anchor)"} · rel: {record.verification.rel.join(" ") || "none"} · {record.verification.isNofollow ? "nofollow/sponsored/ugc" : "not marked nofollow/sponsored/ugc"}{record.httpStatus ? ` · HTTP ${record.httpStatus}` : ""}</p>}{record.canonicalUrl && <p>Canonical: {record.canonicalUrl}</p>}</div>{record.submissionUrl && <a className={styles.export} href={record.submissionUrl} target="_blank" rel="noopener noreferrer">Open workflow <ExternalLink size={13} /></a>}</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
                     {record.status === "prepared" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "user-reported-submitted")}>I submitted this manually</button>}
                     {record.status !== "backlink_verified" && record.candidateUrl && <button type="button" className={styles.export} onClick={() => { setCandidateUrl(record.candidateUrl); setVerifyResult(null); }}>Verify backlink</button>}
-                    {record.status !== "rejected" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "rejected")}>Record rejection</button>}
+                    {record.status !== "rejected" && record.status !== "backlink_verified" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "rejected")}>Record rejection</button>}
+                    {canReopenManualWorkflow(record.status) && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "prepared")}>Reopen manual workflow</button>}
                   </div>
                 </article>)}
               </div>
