@@ -1,5 +1,5 @@
 import type { Locale } from "./languages";
-import { EXTRA_TEXT } from "./ui-text-extra";
+import { EXTRA_TEXT } from "./ui-text-extra.ts";
 
 type TextMap = Record<string, string>;
 const TEXT: Record<string, TextMap> = {
