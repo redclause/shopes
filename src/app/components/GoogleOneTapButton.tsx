@@ -85,6 +85,7 @@ export default function GoogleOneTapButton({
     initializing.current = true;
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     if (!clientId) {
+      initializing.current = false;
       setMessage("Google sign-in is not configured for this deployment.");
       return;
     }
