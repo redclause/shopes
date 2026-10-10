@@ -97,7 +97,7 @@ export function classifySubmissionPage(evidence, { robotsDisallow = false } = {}
   }
   const intent = evidence.intentEvidence ?? [];
   const relevantForm = (evidence.forms ?? []).find((form) =>
-    form.actionUrl && form.fieldCount > 0 &&
+    form.actionUrl && new URL(form.actionUrl).origin === new URL(evidence.pageUrl).origin && form.fieldCount > 0 &&
     form.fields.some((field) => /url|website|link|comment|message|content|article|description|name|email/i.test([field.name, field.id, field.placeholder, field.ariaLabel].filter(Boolean).join(" "))) &&
     !form.hasCaptchaSignal && !form.hasPasswordField
   );
