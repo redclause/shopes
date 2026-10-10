@@ -93,6 +93,14 @@ async function fetchPublicHtml(input: string): Promise<{ html: string; status: n
       current = new URL(location, validated.url).toString();
       continue;
     }
+    if (status === 403) {
+      const hostname = validated.url.hostname.toLowerCase();
+      response.destroy();
+      if (hostname === "ebay.com" || hostname.endsWith(".ebay.com")) {
+        throw new Error("eBay denied Shopes’ server-side request (HTTP 403). eBay blocks automated listing fetches, so this URL cannot be analyzed through raw HTML. Reliable eBay support requires the official eBay Browse API and its credentials. For now, import the listing details using a CSV or JSON catalog.");
+      }
+      throw new Error("This product site denied Shopes’ request (HTTP 403), likely because it restricts automated access. Try a publicly accessible product page or import the product details using a CSV or JSON catalog.");
+    }
     const type = String(response.headers["content-type"] || "").toLowerCase();
     if (!type.includes("text/html") && !type.includes("application/xhtml+xml")) {
       response.destroy();
