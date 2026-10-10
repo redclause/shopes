@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 const MAX_HTML_BYTES = 1_000_000;
 const MAX_REDIRECTS = 3;
-const TIMEOUT_MS = 8_000;
+const TIMEOUT_MS = 5_000;
 const USER_AGENT = "ShopesProductIntelligence/1.0 (+https://shopes.online)";
 
 function isPublicIPv4(address: string): boolean {
@@ -232,12 +232,10 @@ export async function POST(request: Request) {
     if (!body.url) return NextResponse.json({ error: "Enter a product URL to analyze." }, { status: 400 });
     const product = await analyzeUrl(body.url);
     const competitorsInput = Array.isArray(body.competitors) ? body.competitors.slice(0, 2) : [];
-    const competitors: ProductData[] = [];
-    for (const candidate of competitorsInput) {
-      if (typeof candidate !== "string" || !candidate.trim()) continue;
-      try { competitors.push(await analyzeUrl(candidate)); }
-      catch (error) { competitors.push({ url: candidate, title: "Could not analyze competitor", description: error instanceof Error ? error.message : "Fetch failed", source: "url" }); }
-    }
+    const competitors: ProductData[] = await Promise.all(competitorsInput.filter((candidate): candidate is string => typeof candidate === "string" && Boolean(candidate.trim())).map(async (candidate) => {
+      try { return await analyzeUrl(candidate); }
+      catch (error) { return { url: candidate, title: "Could not analyze competitor", description: error instanceof Error ? error.message : "Fetch failed", source: "url" as const }; }
+    }));
     return NextResponse.json({
       product,
       competitors,
