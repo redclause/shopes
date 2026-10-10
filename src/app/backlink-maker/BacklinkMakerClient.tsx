@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Check, Clipboard, Download, ExternalLink, Link2, ShieldCheck, Sparkles } from "lucide-react";
 import UserMenu from "../../components/UserMenu";
