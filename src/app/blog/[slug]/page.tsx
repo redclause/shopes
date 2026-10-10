@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getArticle, getArticleIdFromSlug } from "../../../lib/blog/shopping-articles";
 import styles from "../blog.module.css";
@@ -38,8 +39,15 @@ export default async function BlogArticlePage({ params }: Props) {
     author: { "@type": "Organization", name: "Shopes Blog" },
     publisher: { "@type": "Organization", name: "Shopes", url: "https://shopes.online" }
   };
-  return <main className={styles.blogPage}><article className={styles.articleWrap}>
-    <Link href="/blog" className={styles.backLink}>← Shopes Blog</Link>
+  return <main className={styles.blogPage}>
+    <header className={styles.articleHeader}>
+      <Link href="/" className={styles.articleBrand} aria-label="Shopes home">
+        <span className={styles.articleBrandMark}><ShoppingBag size={18} aria-hidden="true" /></span>
+        <span>shopes<span className={styles.articleBrandDot}>.</span></span>
+      </Link>
+      <Link href="/blog" className={styles.backLink}><ArrowLeft size={16} aria-hidden="true" /> <span>Back to articles</span></Link>
+    </header>
+    <article className={styles.articleWrap}>
     <p className={styles.eyebrow}>Online shopping guide · {article.topic}</p><h1 className={styles.articleTitle}>{article.title}</h1>
     <p className={styles.articleDescription}>{article.description}</p>
     <div className={styles.articleBody}><div className={styles.prose} dangerouslySetInnerHTML={{ __html: article.content }} /></div>
