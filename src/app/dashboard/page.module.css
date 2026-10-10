@@ -133,3 +133,7 @@
   color: #F8FAFF !important;
   font-weight: 800;
 }
+
+
+/* Dashboard heading color requested: black. */
+.shell h1,.shell h2,.shell h3,.shell .sectionHeading h2,.shell .accountPanelCopy h2{color:#000000!important}
