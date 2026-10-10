@@ -83,3 +83,14 @@ A successful build does not prove live Google OAuth works. Test sign-in end to e
 ## Git workflow
 
 Implementation branch: `feature/ecommerce-seo-saas-foundation`. Do not merge to `main` without explicit authorization.
+
+
+## Google One Tap sign-in
+
+The landing page and `/login` use the Google Identity Services One Tap prompt as the primary, on-page sign-in path. Successful sign-in creates the existing Auth.js JWT session through the `google-one-tap` Credentials provider; the existing Google OAuth redirect flow remains available only as a secondary fallback.
+
+- Keep `GOOGLE_CLIENT_ID` configured in the deployment environment. `next.config.ts` exposes this public identifier as `NEXT_PUBLIC_GOOGLE_CLIENT_ID` for the browser; this is an OAuth client ID, never a client secret.
+- Keep the existing server-side client secret and `AUTH_SECRET` private.
+- The nonce endpoint sets a short-lived, HttpOnly cookie. The server verifies the Google ID token signature against Google's published signing keys and checks issuer, audience, expiry, issue time, verified email, and nonce before creating a session.
+- Google One Tap may be suppressed by browser privacy settings, FedCM policy, or Google account state. In that case, the user can try the on-page button or choose the secondary standard OAuth fallback.
+- A successful build does not prove that production credentials, Google Cloud authorized origins, or the live sign-in callback are configured correctly. Test the actual flow on the Vercel Preview before deployment.
