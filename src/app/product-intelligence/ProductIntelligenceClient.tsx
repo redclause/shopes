@@ -177,7 +177,7 @@ export default function ProductIntelligenceClient() {
     }
   }
 
-  function useDraft(recommendation: ProductRecommendation) {
+  function applyDraft(recommendation: ProductRecommendation) {
     if (!recommendation.draft) return;
     if (recommendation.target === "title") setEditedTitle(recommendation.draft);
     if (recommendation.target === "description") setEditedDescription(recommendation.draft);
@@ -276,7 +276,7 @@ export default function ProductIntelligenceClient() {
                   {recommendations.map((recommendation) => <article className={styles.recommendation} key={recommendation.id}>
                     <div className={styles.recommendationTop}><span className={priorityClass(recommendation.priority)}>{recommendation.priority}</span><span className={styles.recommendationCategory}>{recommendation.category}</span></div>
                     <h3>{recommendation.title}</h3><p>{recommendation.detail}</p>
-                    {recommendation.draft && <div className={styles.draftBox}><span>Suggested draft</span><p>{recommendation.draft}</p><div className={styles.draftActions}><button type="button" onClick={() => useDraft(recommendation)}><Check size={13} /> Use in preview</button><button type="button" onClick={() => void copyDraft(recommendation.draft!, recommendation.id)}><Clipboard size={13} /> {copied === recommendation.id ? "Copied" : "Copy"}</button></div></div>}
+                    {recommendation.draft && <div className={styles.draftBox}><span>Suggested draft</span><p>{recommendation.draft}</p><div className={styles.draftActions}><button type="button" onClick={() => applyDraft(recommendation)}><Check size={13} /> Use in preview</button><button type="button" onClick={() => void copyDraft(recommendation.draft!, recommendation.id)}><Clipboard size={13} /> {copied === recommendation.id ? "Copied" : "Copy"}</button></div></div>}
                   </article>)}
                 </div>
               </section>
