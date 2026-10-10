@@ -137,3 +137,7 @@
 
 /* Dashboard heading color requested: black. */
 .shell h1,.shell h2,.shell h3,.shell .sectionHeading h2,.shell .accountPanelCopy h2{color:#000000!important}
+
+
+/* Keep the dashboard welcome greeting white against the dark workspace. */
+.shell .welcome h1{color:#F8FAFF!important}
