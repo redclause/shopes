@@ -37,12 +37,13 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   const [submissionRecords, setSubmissionRecords] = useState<SubmissionRecord[]>([]);
   const [submissionNote, setSubmissionNote] = useState("");
   const [selectedSiteId, setSelectedSiteId] = useState("");
+  const [selectedSubmissionUrl, setSelectedSubmissionUrl] = useState("");
   const [publisherPermission, setPublisherPermission] = useState(false);
   const [recordsLoaded, setRecordsLoaded] = useState(false);
   const [catalogSearch, setCatalogSearch] = useState("");
   const [catalogCategory, setCatalogCategory] = useState("All");
   const [catalogPage, setCatalogPage] = useState(1);
-  const [policyResults, setPolicyResults] = useState<Record<string, { status: string; message: string; evidence?: { path: string; kind: string; httpStatus: number; matchedKeywords?: string[]; excerpt?: string; summary?: { appliesToAll: boolean; directives: string[] } }[]; note?: string }>>({});
+  const [policyResults, setPolicyResults] = useState<Record<string, { status: string; message: string; evidence?: { path: string; kind: string; httpStatus: number; matchedKeywords?: string[]; excerpt?: string; summary?: { appliesToAll: boolean; directives: string[] } }[]; submissionCandidates?: { url: string; label: string }[]; note?: string }>>({});
   const [checkingPolicySite, setCheckingPolicySite] = useState("");
 
   useEffect(() => {
@@ -130,7 +131,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
     const now = new Date().toISOString();
     const candidateHost = candidateUrl.trim() ? (() => { try { return new URL(candidateUrl.trim()).hostname.toLowerCase(); } catch { return ""; } })() : "";
     const candidateBelongsToSite = candidateHost === site.domain || candidateHost.endsWith("." + site.domain);
-    const record: SubmissionRecord = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, targetUrl: generatedUrl, candidateUrl: candidateBelongsToSite ? candidateUrl.trim() : "", siteId: site.id, siteName: site.name, siteDomain: site.domain, submissionUrl: site.submissionUrl || site.url, submissionMethod: site.submissionMethod, title: pageTitle.trim() || undefined, description: description.trim() || undefined, status: "prepared", createdAt: now, updatedAt: now, note: submissionNote.trim() || undefined };
+    const record: SubmissionRecord = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, targetUrl: generatedUrl, candidateUrl: candidateBelongsToSite ? candidateUrl.trim() : "", siteId: site.id, siteName: site.name, siteDomain: site.domain, submissionUrl: selectedSubmissionUrl || site.submissionUrl || site.url, submissionMethod: site.submissionMethod, title: pageTitle.trim() || undefined, description: description.trim() || undefined, status: "prepared", createdAt: now, updatedAt: now, note: submissionNote.trim() || undefined };
     setSubmissionRecords((current) => [record, ...current].slice(0, 100));
     setSubmissionNote("");
     setPublisherPermission(false);
@@ -254,13 +255,14 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
                   <div className={styles.snippetHead}><div><h3>{site.name} <span style={{ color: "#8da2b3", fontWeight: 500 }}>· {site.category}</span></h3><p>{site.domain} · {site.submissionMethod}</p><p>{site.notes}</p><p style={{ color: "#f0c879", marginTop: 6 }}>Policy status: needs manual review</p>{site.sourceUrl && <p style={{ marginTop: 6 }}><a href={site.sourceUrl} target="_blank" rel="noopener noreferrer">Source list <ExternalLink size={12} /></a></p>}</div><a className={styles.export} href={site.url} target="_blank" rel="noopener noreferrer">Review site <ExternalLink size={13} /></a></div>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
                     {site.submissionUrl && <a className={styles.export} href={site.submissionUrl} target="_blank" rel="noopener noreferrer">Open submission page <ExternalLink size={13} /></a>}
-                    <button type="button" className={styles.export} onClick={() => { setSelectedSiteId(site.id); setSubmissionNote(site.notes); }}>{selectedSiteId === site.id ? "Selected for tracker" : "Prepare manual workflow"}</button>
+                    <button type="button" className={styles.export} onClick={() => { setSelectedSiteId(site.id); setSelectedSubmissionUrl(site.submissionUrl || ""); setSubmissionNote(site.notes); }}>{selectedSiteId === site.id ? "Selected for tracker" : "Prepare manual workflow"}</button>
                     <button type="button" className={styles.export} disabled={checkingPolicySite === site.id} onClick={() => checkSitePolicy(site.id)}>{checkingPolicySite === site.id ? "Checking rules…" : "Inspect public rules"}</button>
                   </div>
                   {policyResults[site.id] && <div className={styles.notice} role="status" style={{ marginTop: 12 }}>
                     <ShieldCheck size={18} />
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <p><strong>{policyResults[site.id].status === "needs-human-review" ? "Policy evidence found — manual review required" : "Policy check result"}</strong><br />{policyResults[site.id].message}</p>
+                      {policyResults[site.id].submissionCandidates?.length ? <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #334352" }}><p><strong>Potential submission links discovered on the homepage</strong> · These are link candidates, not verified submission endpoints or permission to publish.</p>{policyResults[site.id].submissionCandidates.map((candidate) => <div key={candidate.url} style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", marginTop: 8 }}><a href={candidate.url} target="_blank" rel="noopener noreferrer" className={styles.export}>{candidate.label || candidate.url} <ExternalLink size={13} /></a><button type="button" className={styles.export} onClick={() => { setSelectedSiteId(site.id); setSelectedSubmissionUrl(candidate.url); setSubmissionNote(site.notes); }}>Use this destination</button></div>)}</div> : <p style={{ marginTop: 10 }}>No likely same-site submission links were discovered on the homepage. You can still review the official site manually.</p>}
                       {policyResults[site.id].evidence?.map((item) => <div key={item.path} style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #334352" }}>
                         <p><strong>{item.path}</strong> · HTTP {item.httpStatus}{item.matchedKeywords?.length ? ` · Terms: ${item.matchedKeywords.join(", ")}` : ""}</p>
                         {item.summary?.directives?.length ? <p>robots.txt directives: {item.summary.directives.join("; ")}</p> : null}
@@ -292,7 +294,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
             <form onSubmit={addSubmissionRecord} style={{ marginTop: 22 }}>
               <div className={styles.cardHeading}><span className={styles.iconTile}><Clipboard size={19} /></span><div><h2>Submission tracker</h2><p>Choose a catalog site first. This prepares a user-assisted workflow; it does not submit anything automatically.</p></div></div>
               <p style={{ color: "#aabac8", fontSize: 13, lineHeight: 1.7 }}>Selected site: <strong style={{ color: "#f3f8fc" }}>{backlinkSiteCatalog.find((site) => site.id === selectedSiteId)?.name || "None — choose Prepare manual workflow in the catalog"}</strong></p>
-              {selectedSiteId && (() => { const site = backlinkSiteCatalog.find((item) => item.id === selectedSiteId); return site ? <p style={{ marginTop: 0, fontSize: 13, lineHeight: 1.7 }}><a href={site.submissionUrl || site.url} target="_blank" rel="noopener noreferrer" className={styles.export}>{site.submissionUrl ? "Open configured submission page" : "Open official site to find its submission process"} <ExternalLink size={13} /></a> <span style={{ color: "#aabac8" }}>No automated submission is performed.</span></p> : null; })()}
+              {selectedSiteId && (() => { const site = backlinkSiteCatalog.find((item) => item.id === selectedSiteId); return site ? <p style={{ marginTop: 0, fontSize: 13, lineHeight: 1.7 }}><a href={selectedSubmissionUrl || site.submissionUrl || site.url} target="_blank" rel="noopener noreferrer" className={styles.export}>{selectedSubmissionUrl || site.submissionUrl ? "Open discovered submission candidate" : "Open official site to find its submission process"} <ExternalLink size={13} /></a> <span style={{ color: "#aabac8" }}>No automated submission is performed.</span></p> : null; })()}
               <label className={styles.field}><span>Submission note <small>(optional)</small></span><textarea value={submissionNote} onChange={(event) => setSubmissionNote(event.target.value)} rows={2} maxLength={300} placeholder="e.g. Resource directory form; submission requires editor approval." /></label>
               <label className={styles.checkRow}><input type="checkbox" checked={publisherPermission} onChange={(event) => setPublisherPermission(event.target.checked)} /><span><strong>I reviewed this site and its rules permit this submission.</strong><small>Adding a record does not submit the form. “I submitted this manually” records your own report only. Do not submit unsolicited links or bypass CAPTCHA, login, or anti-spam controls.</small></span></label>
               <button className={styles.primary} type="submit" disabled={!publisherPermission || !selectedSiteId || !generatedUrl}><Clipboard size={16} /> Prepare submission record</button>
