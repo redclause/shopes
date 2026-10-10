@@ -192,7 +192,7 @@ const TEXT: Record<string, TextMap> = {
     "Unavailable without verified sources:": "No disponible sin fuentes verificadas:",
     "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "volumen mensual, CPC medido, dificultad SEO, posiciones en directo y tendencias históricas. El mercado seleccionado es solo metadato y no implica métricas específicas de ese mercado.",
     "Select all visible keywords": "Seleccionar todas las palabras clave visibles"
-  },,
+  },
     "Everything that helps": "Todo lo que ayuda",
     "customers": "los clientes",
     "find you.": "te encuentren.",
@@ -452,7 +452,7 @@ const TEXT: Record<string, TextMap> = {
     "Unavailable without verified sources:": "Indisponible sans sources vérifiées :",
     "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "volume mensuel, CPC mesuré, difficulté SEO, classements en direct et tendances historiques. Le marché sélectionné n’est qu’une métadonnée et n’implique pas de métriques propres à ce marché.",
     "Select all visible keywords": "Sélectionner tous les mots-clés visibles"
-  },,
+  },
     "Everything that helps": "Tout ce qui aide",
     "customers": "les clients à",
     "find you.": "vous trouver.",
