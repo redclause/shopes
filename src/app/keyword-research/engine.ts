@@ -170,12 +170,13 @@ export function normalizeKeyword(value: string): string {
 
 export function classifyIntent(phrase: string, language: KeywordLanguage): SearchIntent {
   const value = normalizeKeyword(phrase);
-  const rules = RULES[language];
-  if (/(?:^|\s)(?:near me|nearby|local|close to me)(?:\s|$)/i.test(value) || /ახლო მდებარე|ჩემთან ახლოს|ახლომახლო/.test(value)) return "Local";
-  if (/(?:^|\s)(?:buy|purchase|order|price|pricing|cost|shop|coupon|discount)(?:\s|$)/i.test(value) || /ყიდვა|შეძენა|შეკვეთა|ფასი|ღირებულება|ფასდაკლება/.test(value)) return "Transactional";
-  if (/(?:^|\s)(?:best|top|review|reviews|vs|versus|alternative|alternatives|compare|comparison|rating)(?:\s|$)/i.test(value) || /საუკეთესო|მიმოხილვა|შედარება|ალტერნატივა|რეიტინგი/.test(value)) return "Commercial";
-  if (rules.questions.some((prefix) => value === prefix || value.startsWith(prefix + " ")) || /(?:^|\s)(?:how|what|why|when|where|which|guide|tutorial|tips|examples|benefits)(?:\s|$)/i.test(value) || /^(რა არის|როგორ|რატომ|როდის|სად|რომელი|რჩევები|მაგალითები)(?:\s|$)/.test(value)) return "Informational";
-  if (/^(?:www\.)?[^\s]+\.(?:com|org|net|io|ge|co\.uk)(?:\s|$)/i.test(value) || /(?:^|\s)(?:login|sign in|official website|website)(?:\s|$)/i.test(value)) return "Navigational";
+  const rules = KEYWORD_LANGUAGE_KEYWORD_LANGUAGE_RULES[language];
+  for (const item of rules.modifiers) {
+    const modifier = normalizeKeyword(item.phrase);
+    if (modifier && (value === modifier || value.startsWith(modifier + " ") || value.endsWith(" " + modifier) || value.includes(" " + modifier + " "))) return item.intent;
+  }
+  if (rules.questions.some((prefix) => value === normalizeKeyword(prefix) || value.startsWith(normalizeKeyword(prefix) + " "))) return "Informational";
+  if (/^(?:www\\.)?[^\\s]+\\.(?:com|org|net|io|ge|co\\.uk)(?:\\s|$)/i.test(value) || /(?:^|\\s)(?:login|sign in|official website|website)(?:\\s|$)/i.test(value)) return "Navigational";
   return "Unclassified";
 }
 
@@ -226,22 +227,22 @@ export function generateKeywordIdeas(seedInput: string, language: KeywordLanguag
   const seed = seedInput.trim().replace(/\s+/g, " ");
   if (!seed) return [];
   if (seed.length > 120) throw new Error("Seed keyword must be 120 characters or fewer.");
-  const rules = RULES[language];
+  const rules = KEYWORD_LANGUAGE_RULES[language];
   const candidates: Array<{ phrase: string; kind: string; intent?: SearchIntent }> = [{ phrase: seed, kind: "Seed keyword", intent: classifyIntent(seed, language) }];
   for (const item of rules.modifiers) {
     candidates.push({ phrase: item.phrase + " " + seed, kind: item.kind, intent: item.intent });
     candidates.push({ phrase: seed + " " + item.phrase, kind: item.kind, intent: item.intent });
   }
-  for (const question of rules.questions) candidates.push({ phrase: question + " " + seed, kind: language === "Georgian" ? "კითხვითი ვარიანტი" : "Question variation", intent: "Informational" });
+  for (const question of rules.questions) candidates.push({ phrase: question + " " + seed, kind: language === "Georgian" ? "კითხვითი ვარიანტი" : `${rules.label} question variation`, intent: "Informational" });
   for (const item of rules.suffixes) candidates.push({ phrase: seed + " " + item.phrase, kind: item.kind, intent: item.intent });
   for (const [needle, alternatives] of Object.entries(rules.synonyms)) {
     if (normalizeKeyword(seed).includes(normalizeKeyword(needle))) {
-      for (const alternative of alternatives) candidates.push({ phrase: normalizeKeyword(seed).replace(normalizeKeyword(needle), alternative), kind: language === "Georgian" ? "სინონიმური ვარიანტი" : "Synonym variation" });
+      for (const alternative of alternatives) candidates.push({ phrase: normalizeKeyword(seed).replace(normalizeKeyword(needle), alternative), kind: language === "Georgian" ? "სინონიმური ვარიანტი" : `${rules.label} synonym variation` });
     }
   }
   const tokens = seed.split(" ");
   if (tokens.length > 1) {
-    candidates.push({ phrase: tokens.slice(0, -1).join(" "), kind: language === "Georgian" ? "მოკლე ფრაზა" : "Shorter phrase" });
+    candidates.push({ phrase: tokens.slice(0, -1).join(" "), kind: language === "Georgian" ? "მოკლე ფრაზა" : `${rules.label} shorter phrase` });
     candidates.push({ phrase: tokens.slice(1).join(" "), kind: language === "Georgian" ? "მოკლე ფრაზა" : "Shorter phrase" });
   }
   const unique = new Map<string, KeywordIdea>();
