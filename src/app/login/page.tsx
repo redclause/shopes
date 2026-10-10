@@ -25,18 +25,18 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   }
 
   return (
-    <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24, background: "#0B0D12", color: "#F4F7FB", fontFamily: '"DM Sans", Arial, sans-serif' }}>
-      <section style={{ width: "100%", maxWidth: 420, padding: "38px 34px", border: "1px solid #293342", borderRadius: 18, background: "#11151C", boxShadow: "0 28px 80px #0008" }}>
+    <main className="login-shell" style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24, background: "#0B0D12", color: "#F4F7FB", fontFamily: '"DM Sans", Arial, sans-serif' }}>
+      <section className="login-card" style={{ width: "100%", maxWidth: 420, padding: "38px 34px", border: "1px solid #293342", borderRadius: 18, background: "#11151C", boxShadow: "0 28px 80px #0008" }}>
         <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 9, fontWeight: 800, fontSize: 24, letterSpacing: "-1.3px", color: "inherit", textDecoration: "none" }}>
           <span style={{ width: 34, height: 34, display: "grid", placeItems: "center", background: "#49DDF5", borderRadius: 11, color: "#07131a" }}><ShoppingBag size={18} /></span>
           <span>shopes<span style={{ color: "#49DDF5" }}>.</span></span>
         </Link>
         <div style={{ marginTop: 38, width: 44, height: 44, borderRadius: 13, display: "grid", placeItems: "center", background: "#172d38", color: "#49DDF5" }}><ShieldCheck size={21} /></div>
         <p style={{ margin: "23px 0 10px", fontSize: 13, letterSpacing: ".08em", fontWeight: 800, color: "#B2BDCC" }}>YOUR SHOPES WORKSPACE</p>
-        <h1 style={{ margin: "0 0 12px", fontSize: 40, lineHeight: 1.15, letterSpacing: "-.055em" }}>{t("signIn")}.</h1>
-        <p style={{ margin: "0 0 26px", color: "#B2BDCC", fontSize: 17, lineHeight: 1.8 }}>{t("signIn")} securely with your Google account to access your workspace.</p>
+        <h1 className="login-title" style={{ margin: "0 0 12px", fontSize: 40, lineHeight: 1.15, letterSpacing: "-.055em" }}>{t("signIn")}.</h1>
+        <p className="login-description" style={{ margin: "0 0 26px", color: "#B2BDCC", fontSize: 17, lineHeight: 1.8 }}>{t("signIn")} securely with your Google account to access your workspace.</p>
         <form action={signInWithGoogle}>
-          <button type="submit" style={{ width: "100%", minHeight: 56, display: "flex", alignItems: "center", justifyContent: "center", gap: 11, border: "1px solid #49DDF5", borderRadius: 10, background: "#49DDF5", color: "#07131a", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+          <button className="google-signin-button" type="submit" style={{ width: "100%", minHeight: 56, display: "flex", alignItems: "center", justifyContent: "center", gap: 11, border: "1px solid #49DDF5", borderRadius: 10, background: "#49DDF5", color: "#07131a", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
             <GoogleMark /> Continue with Google
           </button>
         </form>
