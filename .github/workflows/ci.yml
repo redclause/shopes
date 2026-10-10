@@ -20,6 +20,8 @@ jobs:
         run: npm run test:keyword-engine
       - name: Locale and translation tests
         run: npm run test:i18n
+      - name: Blog generator tests
+        run: npm run test:blog
       - name: Type-check
         run: npm run typecheck
       - name: Lint
