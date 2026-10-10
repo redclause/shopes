@@ -2,24 +2,23 @@
 
 Shopes is an independent, container-first SEO and product-discovery SaaS for online stores. It is intentionally separate from `redclause/shopes.online`.
 
-## Phase 1 foundation
+## Current foundation
 
-- Premium responsive marketing homepage and product positioning.
-- Store URL input with client-side validation. It does **not** run a live crawl yet.
+- Responsive marketing homepage and product positioning.
+- Store URL input with client-side validation. It does not run a live crawl yet.
 - Free, Premium, and Max pricing cards with monthly/yearly display toggle.
-- Illustrative dashboard preview clearly labelled as demo/example data.
-- SEO audit, keyword research, product discovery, competitor and integration sections.
-- Next.js App Router, React, TypeScript, reusable visual styling and responsive layouts.
-- Docker production image and Docker Compose local development workflow.
-- Environment variable template with placeholders only.
-
-**Not implemented yet:** Google authentication, persistence, real crawling/audits, live keyword data, billing, or live third-party integrations. Do not interpret the landing-page preview as evidence that these services are connected. Displayed pricing and limits are initial product-design examples, not active subscriptions.
+- Dashboard preview with onboarding flow explicitly labelled as demo data.
+- Google sign-in implemented with Auth.js v5 / NextAuth beta on the `feature/main-google-oauth` branch.
+- App Router auth handler at `/api/auth/[...nextauth]`, login page at `/login`, and middleware protecting `/dashboard`.
+- Session strategy uses JWT.
+- Environment variables: `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, and `GOOGLE_CLIENT_SECRET_ID` (with `GOOGLE_CLIENT_SECRET` fallback).
+- PostgreSQL/Redis, project persistence, real crawling/audits, live keyword data, billing, and live third-party integrations are not implemented.
 
 ## Stack
 
 - Next.js App Router + TypeScript
 - React and Lucide icons
-- PostgreSQL/Redis are intentionally deferred until project persistence and background crawl jobs are designed.
+- Auth.js v5 (NextAuth beta) for Google OAuth
 - Docker / Docker Compose
 
 ## Run locally
@@ -32,32 +31,25 @@ Requirements: Node.js 22+ and npm.
 
 Open http://localhost:3000.
 
-## Run with Docker
+## Environment variables and Google OAuth
 
-    docker compose up --build
+Configure these variables in the deployment environment; never commit real credentials:
 
-Open http://localhost:3000. Compose is intended for local development; the multi-stage Dockerfile builds a standalone production image.
+- `AUTH_SECRET`: a long, random private secret for Auth.js sessions.
+- `GOOGLE_CLIENT_ID`: Google OAuth client ID.
+- `GOOGLE_CLIENT_SECRET_ID`: Google OAuth client secret. The app also supports `GOOGLE_CLIENT_SECRET` as a fallback.
+- `GOOGLE_REDIRECT_URI`: documentation/reference value. Auth.js uses the App Router callback path by default.
 
-## Environment variables
+For the beta domain, register this exact authorized redirect URI on the same Google OAuth client used by the beta deployment:
 
-See `.env.example`. Never commit real credentials. Google OAuth, database, Redis, billing, and SEO-provider variables are placeholders for later phases; the current landing page does not require them.
+`https://shopes-beta.vercel.app/api/auth/callback/google`
 
-## Planned phases
+The callback URL must match exactly. Deployment Protection may also affect whether the browser can reach the beta app and callback. Do not expose credentials in browser-side variables such as `NEXT_PUBLIC_*`.
 
-1. Marketing website, design system, pricing, container foundation.
-2. Google OAuth, onboarding, project persistence, subscription entitlements.
-3. Safe website crawler, technical audits, keyword-data provider architecture, indexability monitoring.
-4. Product catalogs, feed validation, competitor analysis, discovery integrations.
-5. Security review, automated tests, observability, production deployment.
+## Validation
 
-## Safety and data integrity
-
-- Demo dashboard figures are illustrative.
-- No search engine indexing guarantee is made.
-- Search Console access must be authorized separately from Google sign-in.
-- Marketplace and third-party integration availability depends on official APIs, permissions, regional eligibility, and provider terms.
-- A production crawler must include SSRF protections, DNS/redirect validation, rate limiting, robots.txt handling, and strict response limits.
+Run `npm run lint`, `npm run typecheck`, and `npm run build`. A successful build does not prove that the live Google OAuth flow works; test sign-in and callback on the deployed beta domain.
 
 ## Git workflow
 
-Implementation branch: `feature/ecommerce-seo-saas-foundation`. Do not merge to `main` without explicit authorization.
+This implementation is isolated on `feature/main-google-oauth`. Do not merge to `main` or deploy to Production without explicit authorization.
