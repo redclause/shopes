@@ -94,3 +94,16 @@ The landing page and `/login` use the Google Identity Services One Tap prompt as
 - The nonce endpoint sets a short-lived, HttpOnly cookie. The server verifies the Google ID token signature against Google's published signing keys and checks issuer, audience, expiry, issue time, verified email, and nonce before creating a session.
 - Google One Tap may be suppressed by browser privacy settings, FedCM policy, or Google account state. In that case, the user can try the on-page button or choose the secondary standard OAuth fallback.
 - A successful build does not prove that production credentials, Google Cloud authorized origins, or the live sign-in callback are configured correctly. Test the actual flow on the Vercel Preview before deployment.
+
+
+## Product Intelligence beta
+
+The authenticated `/product-intelligence` workspace supports a bounded public product-page inspection and browser-local CSV/JSON catalog scoring.
+
+- URL inspection extracts accessible title/description, canonical metadata, Product JSON-LD, images/alt text, price/availability, and published aggregate-rating fields when present.
+- CSV/JSON imports are parsed in the browser (up to 5 MB and 1,000 rows); imported catalog data is not uploaded to Shopes.
+- The score uses six transparent heuristic categories: SEO/discoverability (25%), content (20%), visual merchandising (15%), conversion readiness (20%), pricing signals (10%), and review signals (10%).
+- Recommendations are labeled Critical, Recommended, or Optional. Draft title/description changes only update the local preview and can be copied; they are not published to a store.
+- Competitor comparisons work only for up to two URLs explicitly supplied by the user. They do not identify verified top performers or have access to sales/traffic data.
+- No paid AI model, external search API, database, or persistent report storage is connected. Do not describe the rule-based recommendations as AI-generated or the lexical review keyword counts as full sentiment analysis.
+- URL fetching is authenticated and bounded, uses DNS resolution/pinned public addresses, blocks private/local destinations and nonstandard ports, follows at most three redirects, and caps HTML at 1 MB. It is a single-page HTML inspection, not a JavaScript-rendered crawl.
