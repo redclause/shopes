@@ -7,6 +7,7 @@ import {
   Download, FileSearch, LoaderCircle, ShieldCheck, TriangleAlert, XCircle,
 } from "lucide-react";
 import styles from "./page.module.css";
+import { useShopesTranslation } from "../../lib/i18n/useShopesTranslation";
 
 type Finding = {
   id: string;
@@ -29,6 +30,7 @@ function formatTime(value: string): string {
 }
 
 export default function AuditClient() {
+  const { t } = useShopesTranslation();
   const [url, setUrl] = useState("");
   const [result, setResult] = useState<AuditResult | null>(null);
   const [error, setError] = useState("");
@@ -155,11 +157,11 @@ export default function AuditClient() {
             </div>
 
             <div className={styles.findingsToolbar}>
-              <label>Filter findings <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}>
-                <option value="all">All results</option><option value="error">Errors</option><option value="warning">Warnings</option><option value="pass">Passed checks</option>
+              <label>{t("filterFindings")} <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}>
+                <option value="all">{t("allResults")}</option><option value="error">Errors</option><option value="warning">Warnings</option><option value="pass">{t("passedChecks")}</option>
               </select></label>
               <div className={styles.reportActions}>
-                <button type="button" className={styles.secondaryButton} onClick={saveReportLocally}>Save in this browser</button>
+                <button type="button" className={styles.secondaryButton} onClick={saveReportLocally}>{t("saveInBrowser")}</button>
                 <button type="button" className={styles.secondaryButton} onClick={exportReport}><Download size={15} /> Export JSON report</button>
               </div>
             </div>
@@ -169,7 +171,7 @@ export default function AuditClient() {
                 const Icon = finding.status === "pass" ? CheckCircle2 : finding.status === "error" ? XCircle : TriangleAlert;
                 return <article className={styles.finding} key={finding.id}>
                   <span className={styles.findingIcon + " " + styles[finding.status]}><Icon size={17} /></span>
-                  <div className={styles.findingCopy}><h3>{finding.title} <span className={styles.severityLabel}>{severity(finding)} priority</span></h3><p>{finding.detail}</p><p className={styles.recommendation}><strong>Recommended next step:</strong> {recommendation(finding)}</p></div>
+                  <div className={styles.findingCopy}><h3>{finding.title} <span className={styles.severityLabel}>{severity(finding)} {t("priority")}</span></h3><p>{finding.detail}</p><p className={styles.recommendation}><strong>{t("recommendedNextStep")}</strong> {recommendation(finding)}</p></div>
                   <span className={styles.statusLabel + " " + styles[finding.status]}>{finding.status === "pass" ? "Passed" : finding.status === "error" ? "Issue" : "Review"}</span>
                 </article>;
               })}
