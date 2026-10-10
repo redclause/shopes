@@ -56,8 +56,8 @@ export default function DashboardPage() {
           <Link className={styles.navItem} href="#audits"><FileSearch size={17}/> Site audits</Link>
           <Link className={styles.navItem} href="/#platform"><TrendingUp size={17}/> SEO insights <ExternalLink size={12} className={styles.external}/></Link>
           <span className={styles.navSection}>WORKSPACE</span>
-          <Link className={styles.navItem} href="/#integrations"><Zap size={17}/> Integrations <ExternalLink size={12} className={styles.external}/></a>
-          <Link className={styles.navItem} href="/#pricing"><Sparkles size={17}/> Plans & pricing <ExternalLink size={12} className={styles.external}/></a>
+          <Link className={styles.navItem} href="/#integrations"><Zap size={17}/> Integrations <ExternalLink size={12} className={styles.external}/></Link>
+          <Link className={styles.navItem} href="/#pricing"><Sparkles size={17}/> Plans & pricing <ExternalLink size={12} className={styles.external}/></Link>
         </nav>
         <div className={styles.sidebarBottom}>
           <div className={styles.helpCard}>
