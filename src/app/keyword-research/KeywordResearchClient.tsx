@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { ArrowDownUp, ArrowLeft, Download, FileUp, Save, Search, Sparkles, Target, Upload, X } from "lucide-react";
+import { ArrowDownUp, Download, FileUp, Save, Search, Sparkles, Target, Upload, X } from "lucide-react";
 import {
   exportKeywordCsv, generateKeywordIdeas, parseImportedSerpData, summarizeDomainOverlap, SUPPORTED_KEYWORD_LANGUAGES,
   type ImportedSerpRecord, type KeywordIdea, type KeywordLanguage, type SearchIntent,
