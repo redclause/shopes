@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useShopesTranslation } from "../lib/i18n/useShopesTranslation";
 import { ArrowRight, ArrowUpRight, BarChart3, Check, ChevronDown, Compass, Globe2, Layers3, Menu, Search, ShieldCheck, ShoppingBag, Sparkles, Target, TrendingUp, X, Zap } from "lucide-react";
 
 const issues = [
@@ -10,6 +11,7 @@ const issues = [
 ];
 
 export default function Home() {
+  const { t } = useShopesTranslation();
   const [siteUrl, setSiteUrl] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -33,7 +35,7 @@ export default function Home() {
       <a className="brand" href="#" aria-label="Shopes home"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></a>
       <button className="mobile-menu" aria-label="Toggle navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X/> : <Menu/>}</button>
       <nav className={menuOpen ? "nav-links open" : "nav-links"}><a href="#platform">Platform <ChevronDown size={13}/></a><a href="#features">Solutions</a><a href="#integrations">Integrations</a></nav>
-      <div className="header-actions"><a href="/login">Log in</a><a className="button button-dark button-small" href="#get-started">Get started <ArrowUpRight size={15}/></a></div>
+      <div className="header-actions"><a href="/login">{t("signIn")}</a><a className="button button-dark button-small" href="#get-started">Get started <ArrowUpRight size={15}/></a></div>
     </header>
 
     <section className="hero section-wrap" id="get-started">
@@ -44,7 +46,7 @@ export default function Home() {
         <form className="url-form" onSubmit={startAudit}><Globe2 size={18}/><input aria-label="Your store URL" placeholder="Enter your store URL" value={siteUrl} onChange={event => { setSiteUrl(event.target.value); setMessage(""); }}/><button type="submit">Analyze store <ArrowRight size={15}/></button></form>
         {message && <p className="form-message" role="status">{message}</p>}
         <div className="hero-proof"><span className="proof-avatars"><i>S</i><i>M</i><i>A</i></span><span>Built for teams who care about being found.</span><span className="proof-separator">·</span><span><ShieldCheck size={13}/> Practical insights, not guesswork</span></div>
-        <div className="hero-links"><a href="#features">Explore the platform <ArrowRight size={14}/></a><span>Free forever. No paid plans or upgrade fees.</span></div>
+        <div className="hero-links"><a href="#features">Explore the platform <ArrowRight size={14}/></a><span>{t("freeForever")}. No paid plans or upgrade fees.</span></div>
       </div>
       <div className="hero-visual">
         <div className="dashboard-window">
