@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LOCALES, LOCALE_STORAGE_KEY, getDirection } from "./languages";
+import { TRANSLATED_CORE_LOCALES } from "./messages";
 import styles from "./locale-switcher.module.css";
 
 export default function LocaleSwitcher() {
@@ -10,9 +11,13 @@ export default function LocaleSwitcher() {
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-      if (saved && LOCALES.some((item) => item.code === saved)) setLocale(saved);
+      const initial = saved && LOCALES.some((item) => item.code === saved) ? saved : "en";
+      setLocale(initial);
+      document.documentElement.lang = initial;
+      document.documentElement.dir = getDirection(initial);
     } catch {
-      // Storage can be disabled; English remains a safe default.
+      document.documentElement.lang = "en";
+      document.documentElement.dir = "ltr";
     }
   }, []);
 
@@ -32,8 +37,14 @@ export default function LocaleSwitcher() {
     <label className={styles.control}>
       <span>Language / ენა</span>
       <select aria-label="Interface language" value={locale} onChange={(event) => changeLocale(event.target.value)}>
-        {LOCALES.map((item) => <option key={item.code} value={item.code}>{item.nativeName} — {item.englishName}</option>)}
+        {LOCALES.map((item) => {
+          const translationStatus = TRANSLATED_CORE_LOCALES.includes(item.code)
+            ? "core labels only"
+            : "English fallback";
+          return <option key={item.code} value={item.code}>{item.nativeName} — {item.englishName} · {translationStatus}</option>;
+        })}
       </select>
+      <small className={styles.note}>Interface translations are incomplete; some or most page text may remain in English.</small>
     </label>
   );
 }
