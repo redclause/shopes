@@ -34,7 +34,7 @@ export default function Home() {
     <header className="site-header">
       <a className="brand" href="#" aria-label="Shopes home"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></a>
       <button className="mobile-menu" aria-label="Toggle navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X/> : <Menu/>}</button>
-      <nav className={menuOpen ? "nav-links open" : "nav-links"}><a href="#platform">Platform <ChevronDown size={13}/></a><a href="#features">Solutions</a><a href="#integrations">Integrations</a><a href="/blog">Blog</a></nav>
+      <nav className={menuOpen ? "nav-links open" : "nav-links"}><a href="#platform">Platform <ChevronDown size={13}/></a><a href="#features">Solutions</a><a href="#integrations">Integrations</a><a href="/blog">{t("blog")}</a></nav>
       <div className="header-actions"><a href="/login">{t("signIn")}</a><a className="button button-dark button-small" href="#get-started">Get started <ArrowUpRight size={15}/></a></div>
     </header>
 
