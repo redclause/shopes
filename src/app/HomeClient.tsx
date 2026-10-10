@@ -39,7 +39,7 @@ export default function Home({ user, signOutAction }: HomeClientProps) {
   return <main>
     <div className="announcement"><Sparkles size={14}/> Built for the next generation of e-commerce <ArrowRight size={14}/></div>
     <header className="site-header">
-      <a className="brand" href="/" aria-label="Shopes home"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></a>
+      <Link className="brand" href="/" aria-label="Shopes home"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></Link>
       {user && signOutAction ? (
         <div className="header-actions"><UserMenu name={user.name} email={user.email} image={user.image} signOutAction={signOutAction} /></div>
       ) : (
