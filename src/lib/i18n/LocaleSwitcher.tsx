@@ -19,6 +19,7 @@ export default function LocaleSwitcher() {
   function changeLocale(code: string) {
     setLocale(code);
     persistLocale(window.localStorage, code);
+    document.cookie = "shopes-locale=" + encodeURIComponent(code) + "; path=/; max-age=31536000; SameSite=Lax";
     applyLocaleToDocument(document, code);
     window.dispatchEvent(new CustomEvent("shopes:locale-change", { detail: { locale: code } }));
   }
