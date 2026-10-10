@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useShopesTranslation } from "../lib/i18n/useShopesTranslation";
 import { ArrowRight, ArrowUpRight, BarChart3, Check, ChevronDown, Compass, Globe2, Layers3, Menu, Search, ShieldCheck, ShoppingBag, Sparkles, Target, TrendingUp, X, Zap } from "lucide-react";
 
-const plans = [
-  { name: "Free", subtitle: "Free forever", price: 0, description: "All available Shopes features, with no paid tiers or upgrade fees.", features: ["Website project setup", "Technical SEO audit tools as they become available", "Store search", "Sitemap and robots.txt checks", "CSV export when supported"], featured: true }
-];
 const issues = [
   ["Product pages missing meta descriptions", "128 URLs", "orange"],
   ["Product schema detected", "1,842 URLs", "green"],
@@ -13,7 +11,7 @@ const issues = [
 ];
 
 export default function Home() {
-  const [annual, setAnnual] = useState(false);
+  const { t } = useShopesTranslation();
   const [siteUrl, setSiteUrl] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -36,8 +34,8 @@ export default function Home() {
     <header className="site-header">
       <a className="brand" href="#" aria-label="Shopes home"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></a>
       <button className="mobile-menu" aria-label="Toggle navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X/> : <Menu/>}</button>
-      <nav className={menuOpen ? "nav-links open" : "nav-links"}><a href="#platform">Platform <ChevronDown size={13}/></a><a href="#features">Solutions</a><a href="#integrations">Integrations</a><a href="#pricing">Pricing</a></nav>
-      <div className="header-actions"><a href="/login">Log in</a><a className="button button-dark button-small" href="#get-started">Get started <ArrowUpRight size={15}/></a></div>
+      <nav className={menuOpen ? "nav-links open" : "nav-links"}><a href="#platform">Platform <ChevronDown size={13}/></a><a href="#features">Solutions</a><a href="#integrations">Integrations</a></nav>
+      <div className="header-actions"><a href="/login">{t("signIn")}</a><a className="button button-dark button-small" href="#get-started">Get started <ArrowUpRight size={15}/></a></div>
     </header>
 
     <section className="hero section-wrap" id="get-started">
@@ -48,7 +46,7 @@ export default function Home() {
         <form className="url-form" onSubmit={startAudit}><Globe2 size={18}/><input aria-label="Your store URL" placeholder="Enter your store URL" value={siteUrl} onChange={event => { setSiteUrl(event.target.value); setMessage(""); }}/><button type="submit">Analyze store <ArrowRight size={15}/></button></form>
         {message && <p className="form-message" role="status">{message}</p>}
         <div className="hero-proof"><span className="proof-avatars"><i>S</i><i>M</i><i>A</i></span><span>Built for teams who care about being found.</span><span className="proof-separator">·</span><span><ShieldCheck size={13}/> Practical insights, not guesswork</span></div>
-        <div className="hero-links"><a href="#features">Explore the platform <ArrowRight size={14}/></a><span>Free plan available. No credit card required.</span></div>
+        <div className="hero-links"><a href="#features">Explore the platform <ArrowRight size={14}/></a><span>{t("freeForever")}. No paid plans or upgrade fees.</span></div>
       </div>
       <div className="hero-visual">
         <div className="dashboard-window">
@@ -74,9 +72,9 @@ export default function Home() {
       <div className="section-intro"><div className="eyebrow">ONE STORE. MORE WAYS TO BE FOUND.</div><h2>Everything that helps<br/>customers <span className="headline-accent">find you.</span></h2><p>Stop stitching together disconnected tools. Bring technical SEO, keyword research, and product discovery into one clear workspace.</p></div>
       <div className="feature-grid" id="features">
         <article className="feature-card feature-large"><div className="feature-icon purple"><Search size={21}/></div><span className="feature-kicker">01 / TECHNICAL SEO</span><h3>Know what is holding<br/>your store back.</h3><p>Crawl your store, uncover technical issues, and turn audit findings into a prioritized plan your team can act on.</p><a href="#get-started">Explore site audits <ArrowRight size={15}/></a><div className="mini-audit"><div className="mini-audit-head"><span>Latest audit</span><span className="mini-chip">Overview</span></div><div className="mini-score"><strong>Site health</strong><b>92 <small>/100</small></b></div><div className="mini-progress"><i/></div><div className="mini-audit-foot"><span>34 passed</span><span>6 to review</span></div></div></article>
-        <article className="feature-card"><div className="feature-icon blue"><Target size={21}/></div><span className="feature-kicker">02 / KEYWORD INTELLIGENCE</span><h3>Find the searches<br/>worth pursuing.</h3><p>Discover keyword ideas, understand intent, and spot gaps between your store and competitors.</p><a href="#pricing">Explore keywords <ArrowRight size={15}/></a><div className="keyword-pills"><span>running shoes <b>1.2k</b></span><span>trail sneakers <b>840</b></span><span>waterproof boots <b>620</b></span></div></article>
+        <article className="feature-card"><div className="feature-icon blue"><Target size={21}/></div><span className="feature-kicker">02 / KEYWORD INTELLIGENCE</span><h3>Find the searches<br/>worth pursuing.</h3><p>Discover keyword ideas, understand intent, and spot gaps between your store and competitors.</p><a href="/keyword-research">Explore keywords <ArrowRight size={15}/></a><div className="keyword-pills"><span>running shoes <b>1.2k</b></span><span>trail sneakers <b>840</b></span><span>waterproof boots <b>620</b></span></div></article>
         <article className="feature-card"><div className="feature-icon green"><Layers3 size={21}/></div><span className="feature-kicker">03 / PRODUCT DISCOVERY</span><h3>Make every product<br/>easier to discover.</h3><p>Validate product data, spot feed errors, and prepare catalogs for supported discovery destinations.</p><a href="#integrations">Explore integrations <ArrowRight size={15}/></a><div className="channel-stack"><span><ShoppingBag size={14}/> Product catalog <i>Validation-ready</i></span><span><Globe2 size={14}/> Search channels <i>Connect sources</i></span></div></article>
-        <article className="feature-card"><div className="feature-icon amber"><TrendingUp size={21}/></div><span className="feature-kicker">04 / COMPETITIVE CONTEXT</span><h3>See the gaps.<br/>Choose your next move.</h3><p>Compare keyword coverage and discover content and category opportunities you may be missing.</p><a href="#pricing">Explore opportunities <ArrowRight size={15}/></a><div className="gap-bars"><span>YOUR STORE <i><b style={{width:"61%"}}/></i></span><span>COMPETITOR A <i><b style={{width:"82%"}}/></i></span><span>COMPETITOR B <i><b style={{width:"44%"}}/></i></span></div></article>
+        <article className="feature-card"><div className="feature-icon amber"><TrendingUp size={21}/></div><span className="feature-kicker">04 / COMPETITIVE CONTEXT</span><h3>See the gaps.<br/>Choose your next move.</h3><p>Compare keyword coverage and discover content and category opportunities you may be missing.</p><a href="/keyword-research">Explore opportunities <ArrowRight size={15}/></a><div className="gap-bars"><span>YOUR STORE <i><b style={{width:"61%"}}/></i></span><span>COMPETITOR A <i><b style={{width:"82%"}}/></i></span><span>COMPETITOR B <i><b style={{width:"44%"}}/></i></span></div></article>
       </div>
     </section>
 
@@ -84,11 +82,10 @@ export default function Home() {
 
     <section className="section-wrap workflow-section"><div className="section-intro centered"><div className="eyebrow">LESS GUESSWORK. MORE DIRECTION.</div><h2>A clearer path from audit<br/>to <span className="headline-accent">opportunity.</span></h2><p>Get a practical view of what is happening, what matters, and what to do next.</p></div><div className="workflow-grid"><article><span className="step-number">01</span><div className="workflow-icon"><Globe2 size={21}/></div><h3>Connect your store</h3><p>Start with a domain and configure your store, market, and preferred data sources.</p></article><article><span className="step-number">02</span><div className="workflow-icon"><Search size={21}/></div><h3>Discover the gaps</h3><p>Review technical findings, keyword opportunities, and product data issues.</p></article><article><span className="step-number">03</span><div className="workflow-icon"><Zap size={21}/></div><h3>Prioritize your next move</h3><p>Turn evidence into a focused action list and track progress over time.</p></article></div></section>
 
-    <section className="pricing-section" id="pricing"><div className="section-wrap"><div className="pricing-top"><div><div className="eyebrow">FREE FOR EVERYONE</div><h2>Every plan. <span className="headline-accent">One price: free.</span></h2><p>Shopes is free to use. There are no Pro, Premium, Max, paid plans, or upgrade fees.</p></div></div><div className="pricing-grid">{plans.map(plan => <article className="price-card featured" key={plan.name}><div className="plan-head"><span>{plan.name}</span><span className="plan-subtitle">{plan.subtitle}</span></div><p className="plan-description">{plan.description}</p><div className="plan-price"><strong>$0</strong><span>forever</span></div><a className="button button-dark plan-cta" href="#get-started">Get started for free <ArrowRight size={15}/></a><div className="plan-divider"/><span className="includes-label">AVAILABLE FEATURES</span><ul>{plan.features.map(feature => <li key={feature}><Check size={15}/>{feature}</li>)}</ul></article>)}</div><p className="pricing-note"><ShieldCheck size={14}/> No paid subscriptions, paid feature tiers, or upgrade prompts.</p></div></section>
 
-    <section className="final-cta section-wrap"><div className="cta-decoration"><span/><span/><span/></div><div className="eyebrow">YOUR NEXT GROWTH OPPORTUNITY STARTS HERE</div><h2>Make discoverability<br/>your <span>competitive edge.</span></h2><p>Bring your store&apos;s SEO and product discovery into focus.</p><a href="#get-started" className="button button-dark">Get started for free <ArrowRight size={16}/></a><small>No credit card. No paid plans. Free forever.</small></section>
+    <section className="final-cta section-wrap"><div className="cta-decoration"><span/><span/><span/></div><div className="eyebrow">YOUR NEXT GROWTH OPPORTUNITY STARTS HERE</div><h2>Make discoverability<br/>your <span>competitive edge.</span></h2><p>Bring your store&apos;s SEO and product discovery into focus.</p><a href="#get-started" className="button button-dark">Get started for free <ArrowRight size={16}/></a><small>Free forever. No paid plans or upgrade fees.</small></section>
 
-    <footer className="site-footer"><div className="section-wrap"><div className="footer-main"><div className="footer-brand"><a className="brand" href="#"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></a><p>SEO and product discovery intelligence for online stores.</p></div><div className="footer-column"><b>Platform</b><a href="#features">Site audits</a><a href="#features">Keyword research</a><a href="#integrations">Product discovery</a><a href="#pricing">Pricing</a></div><div className="footer-column"><b>Resources</b><a href="#platform">How it works</a><a href="#integrations">Integrations</a><a href="#pricing">Plans and limits</a><a href="mailto:hello@shopes.online">Contact</a></div><div className="footer-column"><b>Company</b><a href="mailto:hello@shopes.online">Support</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Shopes. Built for better discovery.</span><span><ShieldCheck size={14}/> Clear data. Practical decisions.</span></div></div></footer>
+    <footer className="site-footer"><div className="section-wrap"><div className="footer-main"><div className="footer-brand"><a className="brand" href="#"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></a><p>SEO and product discovery intelligence for online stores.</p></div><div className="footer-column"><b>Platform</b><a href="#features">Site audits</a><a href="#features">Keyword research</a><a href="#integrations">Product discovery</a></div><div className="footer-column"><b>Resources</b><a href="#platform">How it works</a><a href="#integrations">Integrations</a><a href="mailto:hello@shopes.online">Contact</a></div><div className="footer-column"><b>Company</b><a href="mailto:hello@shopes.online">Support</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Shopes. Built for better discovery.</span><span><ShieldCheck size={14}/> Clear data. Practical decisions.</span></div></div></footer>
     <div className="sr-only" id="privacy">Privacy policy will be published before production launch.</div><div className="sr-only" id="terms">Terms of service will be published before production launch.</div>
   </main>;
 }
