@@ -199,9 +199,6 @@ export default function ProductIntelligenceClient({ userName, userEmail, userIma
 
       <section className={styles.main}>
         <header className={styles.topbar}>
-          <nav className={styles.mainNav} aria-label="Main navigation">
-            <Link href="/dashboard">Dashboard</Link><Link href="/keyword-research">Keyword Research</Link><Link href="/audit">Site Audit</Link><Link href="/product-intelligence" aria-current="page">Product Analysis</Link>
-          </nav>
           <div className={styles.topbarActions}>
             <span className={styles.topbarBadge}><ShieldCheck size={14} /> Evidence-first analysis</span>
             <UserMenu name={userName} email={userEmail} image={userImage} signOutAction={signOutAction} />
