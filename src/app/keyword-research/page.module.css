@@ -124,3 +124,14 @@
 
 .header .back a{white-space:nowrap}.header .back a:hover{color:#287d52}
 @media(max-width:640px){.header{height:auto;min-height:60px;gap:10px;padding-top:10px;padding-bottom:10px}.header .back{gap:8px;max-width:75%;font-size:11px}.header .back a{font-size:11px}}
+
+
+/* Make primary navigation easy to scan and reserve space for the user menu. */
+.header{gap:16px}
+.header .back{gap:clamp(10px,1.6vw,20px);flex-wrap:wrap;color:#0086a8}
+.header .back a{color:#0086a8;font-size:13px;font-weight:800;white-space:nowrap;transition:color .16s}
+.header .back a:hover,.header .back a[aria-current="page"]{color:#005c78}
+.header .back a[aria-current="page"]{text-decoration:underline;text-decoration-color:#26b9dc;text-decoration-thickness:2px;text-underline-offset:7px}
+.headerActions{display:flex;align-items:center;gap:12px;flex-shrink:0}
+@media(max-width:900px){.header{height:auto;min-height:72px;padding-top:10px;padding-bottom:10px;gap:12px}.header .back{flex:1;min-width:0;gap:10px}.headerActions{gap:8px}}
+@media(max-width:640px){.header{align-items:flex-start}.header .back{max-width:100%;gap:8px}.header .back a{font-size:11px}.headerActions{align-items:flex-start;flex-direction:column;gap:8px}}
