@@ -36,6 +36,8 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   const [verifyResult, setVerifyResult] = useState<{status:string; message:string; checkedUrl?:string; targetUrl?:string; checkedAt?:string; note?:string; httpStatus?:number; canonicalUrl?:string | null; redirectUrl?:string; evidence?:VerificationEvidence | null} | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [submissionRecords, setSubmissionRecords] = useState<SubmissionRecord[]>([]);
+  const [historySearch, setHistorySearch] = useState("");
+  const [historyStatus, setHistoryStatus] = useState("all");
   const [submissionNote, setSubmissionNote] = useState("");
   const [selectedSiteId, setSelectedSiteId] = useState("");
   const [selectedSubmissionUrl, setSelectedSubmissionUrl] = useState("");
@@ -154,6 +156,15 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
       [site.name, site.domain, site.category, site.submissionMethod, site.notes].some((value) => value.toLowerCase().includes(query))
     );
   }, [catalogCategory, catalogSearch]);
+
+  const filteredSubmissionRecords = useMemo(() => {
+    const query = historySearch.trim().toLowerCase();
+    return submissionRecords.filter((record) =>
+      (historyStatus === "all" || record.status === historyStatus) &&
+      [record.siteName, record.siteDomain, record.targetUrl, record.candidateUrl, record.title, record.description, record.status]
+        .some((value) => (value || "").toLowerCase().includes(query))
+    );
+  }, [submissionRecords, historySearch, historyStatus]);
 
   const catalogPageSize = 25;
   const catalogPageCount = Math.max(1, Math.ceil(filteredCatalog.length / catalogPageSize));
@@ -306,13 +317,17 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
               <button className={styles.primary} type="submit" disabled={!publisherPermission || !selectedSiteId || !generatedUrl}><Clipboard size={16} /> Prepare submission record</button>
             </form>
             {submissionRecords.length > 0 && <div style={{ marginTop: 20 }}>
-              <div className={styles.cardHeading}><span className={styles.iconTile}><Check size={19} /></span><div><h2>Submission history</h2><p>Stored in this browser only; up to 100 records.</p></div></div>
+              <div className={styles.cardHeading}><span className={styles.iconTile}><Check size={19} /></span><div><h2>Submission history</h2><p>Stored in this browser only; up to 100 records. {filteredSubmissionRecords.length} shown.</p></div></div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, margin: "12px 0" }}>
+                <label className={styles.field} style={{ flex: "1 1 220px", margin: 0 }}><span>Search history</span><input type="search" value={historySearch} onChange={(event) => setHistorySearch(event.target.value)} placeholder="Site, target URL, title…" /></label>
+                <label className={styles.field} style={{ flex: "0 1 220px", margin: 0 }}><span>Submission status</span><select value={historyStatus} onChange={(event) => setHistoryStatus(event.target.value)}><option value="all">All statuses</option><option value="prepared">Prepared</option><option value="user-reported-submitted">User-reported submitted</option><option value="backlink_verified">Backlink verified</option><option value="rejected">Rejected</option></select></label>
+              </div>
               <div className={styles.snippetList}>
-                {submissionRecords.map((record) => <article className={styles.snippet} key={record.id}>
+                {filteredSubmissionRecords.map((record) => <article className={styles.snippet} key={record.id}>
                   <div className={styles.snippetHead}><div><h3>{submissionStatusLabel(record.status)}</h3><p>{record.siteName || record.siteDomain || "Unspecified site"}{record.submissionMethod ? ` · ${record.submissionMethod}` : ""}</p>{record.title && <p>Title: {record.title}</p>}{record.description && <p>Description: {record.description}</p>}<p>Target: {record.targetUrl}</p>{record.candidateUrl && <p>Verified/candidate page: {record.candidateUrl}</p>}<p>Updated {new Date(record.updatedAt).toLocaleString()}</p>{record.verification && <p>Anchor: {record.verification.anchorText || "(empty anchor)"} · rel: {record.verification.rel.join(" ") || "none"} · {record.verification.isNofollow ? "nofollow/sponsored/ugc" : "not marked nofollow/sponsored/ugc"}{record.httpStatus ? ` · HTTP ${record.httpStatus}` : ""}</p>}{record.canonicalUrl && <p>Canonical: {record.canonicalUrl}</p>}</div>{record.submissionUrl && <a className={styles.export} href={record.submissionUrl} target="_blank" rel="noopener noreferrer">Open workflow <ExternalLink size={13} /></a>}</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
                     {record.status === "prepared" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "user-reported-submitted")}>I submitted this manually</button>}
-                    {record.status !== "backlink_verified" && record.candidateUrl && <button type="button" className={styles.export} onClick={() => { setCandidateUrl(record.candidateUrl); setVerifyResult(null); }}>Verify backlink</button>}
+                    {record.status !== "backlink_verified" && record.candidateUrl && <button type="button" className={styles.export} onClick={() => { setTargetUrl(record.targetUrl); setGeneratedUrl(record.targetUrl); setCandidateUrl(record.candidateUrl); setVerifyResult(null); }}>Verify backlink</button>}
                     {record.status !== "rejected" && record.status !== "backlink_verified" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "rejected")}>Record rejection</button>}
                     {canReopenManualWorkflow(record.status) && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "prepared")}>Reopen manual workflow</button>}
                   </div>
