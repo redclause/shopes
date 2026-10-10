@@ -127,6 +127,7 @@ img,svg,video,canvas{max-width:100%}
 .google-signin-button:hover{background:#f8faff!important;box-shadow:0 1px 3px #0003}
 @media(max-width:760px){
   .header-actions{display:none}
+  .site-header:has(.header-actions [aria-haspopup="menu"]) .header-actions{display:flex}
   .nav-links.open .mobile-google-cta{display:flex!important;align-items:center;justify-content:center;gap:8px;margin-top:12px;padding:13px 14px;border:1px solid #293342;border-radius:9px;background:#11151C;color:#F4F7FB;font-weight:800}
   .nav-links.open .mobile-google-cta svg{color:#49DDF5}
   .hero{min-width:0}

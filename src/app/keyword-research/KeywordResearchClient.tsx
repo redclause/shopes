@@ -162,9 +162,6 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
 
   return <main className={styles.shell}>
     <header className={styles.header}>
-      <nav className={styles.back} aria-label="Main navigation">
-        <Link href="/dashboard">{t("dashboard")}</Link><Link href="/audit">Site Audit</Link><Link href="/keyword-research" aria-current="page">Keyword Research</Link><Link href="/product-intelligence">Product Analysis</Link><Link href="/">Home</Link>
-      </nav>
       <div className={styles.headerActions}>
         <span className={styles.free}>{t("freeForever").toUpperCase()}</span>
         <UserMenu name={userName} email={userEmail} image={userImage} signOutAction={signOutAction} />
