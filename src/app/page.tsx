@@ -24,7 +24,8 @@ export default function Home() {
     event.preventDefault();
     const value = siteUrl.trim();
     try {
-      const parsed = new URL(/^https?:\\/\\//i.test(value) ? value : "https://" + value);
+      const hasProtocol = value.startsWith("https://") || value.startsWith("http://");
+      const parsed = new URL(hasProtocol ? value : "https://" + value);
       if (!parsed.hostname.includes(".")) throw new Error("Invalid host");
       setMessage("Ready to set up an audit for " + parsed.hostname + ". Create a free account to continue.");
     } catch {
