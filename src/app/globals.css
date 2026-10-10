@@ -15,3 +15,56 @@
 @media(max-width:1000px){.hero{grid-template-columns:1fr 1fr;gap:20px;padding-top:65px}.hero h1{font-size:54px}.hero-proof{gap:7px}.note-one{left:-10px}.note-two{right:-7px}.integration-inner{gap:40px}.feature-card{padding:22px}.mini-audit{right:17px;width:46%}.pricing-grid{gap:10px}.price-card{padding:22px 17px}.plan-price strong{font-size:34px}}
 @media(max-width:760px){.announcement{font-size:9px;padding:0 12px}.site-header{height:67px;padding:0 20px}.brand{font-size:22px}.brand-mark{width:31px;height:31px}.mobile-menu{display:grid;place-items:center}.header-actions{display:none}.nav-links{display:none;position:absolute;left:14px;right:14px;top:60px;padding:16px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 15px 30px #17251f16;align-items:stretch;gap:0}.nav-links.open{display:flex;flex-direction:column}.nav-links a{padding:13px 5px;border-bottom:1px solid #f0f2ef}.nav-links a:last-child{border-bottom:0}.section-wrap{padding-left:21px;padding-right:21px}.hero{grid-template-columns:1fr;padding-top:58px;padding-bottom:65px;gap:42px}.hero h1{font-size:clamp(48px,11vw,68px)}.hero-description{font-size:13px;max-width:480px}.hero-visual{max-width:560px;width:100%;margin:auto}.dashboard-window{transform:none}.note-one{left:-8px;bottom:90px}.note-two{right:-5px;top:65px}.trust-inner{padding-top:19px;padding-bottom:19px;justify-content:flex-start;gap:17px 25px}.trust-inner>span{width:100%}.trust-inner>b{font-size:10px}.feature-section,.workflow-section{padding-top:76px;padding-bottom:76px}.section-intro h2,.integration-copy h2{font-size:39px}.section-intro>p{font-size:12px}.feature-grid{grid-template-columns:1fr}.feature-card{min-height:315px;padding:23px}.feature-large{min-height:355px}.integration-section{padding:75px 0}.integration-inner{grid-template-columns:1fr;gap:35px}.integration-copy h2{font-size:44px}.integration-panel{padding:16px}.workflow-grid{grid-template-columns:1fr;gap:11px}.workflow-grid article{padding:20px}.workflow-icon{margin-bottom:17px}.pricing-section{padding:76px 0}.pricing-top{align-items:flex-start;flex-direction:column;margin-bottom:25px}.pricing-top h2{font-size:37px}.billing-toggle{margin:0}.pricing-grid{grid-template-columns:1fr;gap:13px}.price-card{padding:24px}.plan-description{min-height:0}.plan-price strong{font-size:40px}.price-card.featured{order:-1}.final-cta{padding-top:80px;padding-bottom:80px}.final-cta h2{font-size:43px}.footer-main{grid-template-columns:1fr 1fr;gap:30px 18px}.footer-brand{grid-column:1/-1}.footer-bottom{align-items:flex-start;flex-direction:column;justify-content:center;padding:14px 0}.pricing-note{align-items:flex-start;text-align:left}}
 @media(max-width:390px){.url-form{gap:6px;padding-left:10px}.url-form button{padding:0 9px;font-size:10px}.url-form input{font-size:11px}.hero-proof{font-size:9px}.floating-note{padding:8px}.floating-note b{font-size:8px}.floating-note small{font-size:7px}.note-one{left:-3px}.note-two{right:-3px}.integration-items{grid-template-columns:1fr}.footer-main{gap:25px 13px}}
+
+/* Futuristic Shopes visual foundation */
+:root{
+  color-scheme:dark;
+  --ink:#F4F7FB;--muted:#B2BDCC;--line:#293342;--paper:#11151C;--soft:#0B0D12;
+  --green:#49DDF5;--shopes-bg:#0B0D12;--shopes-surface:#11151C;--shopes-raised:#171D27;
+  --shopes-border:#293342;--shopes-text:#F4F7FB;--shopes-muted:#B2BDCC;
+  --shopes-cyan:#49DDF5;--shopes-lime:#B8F36B;--shopes-amber:#F2BE63;--shopes-red:#FF6B75;
+}
+body{background:var(--shopes-bg);color:var(--shopes-text);font-size:16px}
+::selection{background:#49DDF544;color:#fff}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--shopes-cyan);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+/* Public landing page — dark technical surfaces, readable content */
+.announcement{background:#111923;color:#B2BDCC;border-bottom:1px solid #293342;font-size:12px}
+.site-header{background:#0B0D12;color:#F4F7FB;border-bottom:1px solid #293342}
+.brand-mark,.mini-mark{background:#49DDF5;color:#07131a}
+.brand-dot{color:#49DDF5}
+.nav-links{color:#B2BDCC}
+.nav-links a:hover,.header-actions>a:first-child:hover{color:#49DDF5}
+.mobile-menu{background:#11151C;border-color:#293342;color:#F4F7FB}
+.button-dark{background:#49DDF5;color:#07131a}
+.button-dark:hover{background:#7be8f8}
+.button-light{background:#171D27;color:#F4F7FB;border:1px solid #293342}
+.eyebrow{color:#49DDF5}
+.eyebrow-dot{background:#B8F36B;box-shadow:0 0 0 4px #B8F36B22}
+.hero{background:radial-gradient(ellipse at 78% 40%,#142632 0,transparent 43%),#0B0D12;color:#F4F7FB}
+.hero-description,.hero-proof,.hero-links{color:#B2BDCC}
+.headline-accent,.hero-links a{color:#49DDF5}
+.url-form{background:#11151C;border-color:#293342;box-shadow:0 10px 36px #0005}
+.url-form:focus-within{border-color:#49DDF5;box-shadow:0 0 0 4px #49DDF522}
+.url-form input{color:#F4F7FB}
+.url-form input::placeholder{color:#8997AA}
+.url-form button{background:#49DDF5;color:#07131a}
+.url-form button:hover{background:#7be8f8}
+.hero-visual:before{background:radial-gradient(ellipse,#153541 0%,#0d1720 42%,transparent 72%)}
+.dashboard-window{background:#11151C;border-color:#293342;box-shadow:0 30px 75px #0008}
+.dash-top,.chart-card,.metric-card{border-color:#293342}
+.dash-top{background:#11151C}
+.dash-tag,.tiny-label,.metric-card>span,.chart-summary span{color:#8997AA}
+.dash-brand,.dash-heading h3,.chart-head strong{color:#F4F7FB}
+.dash-user{background:#171D27;color:#B2BDCC}
+.live-status,.chart-period{background:#11151C;border-color:#293342;color:#B2BDCC}
+.live-status i{background:#B8F36B}
+.metric-card,.chart-card{background:#141A23}
+.metric-number{color:#F4F7FB}
+.metric-number>span{color:#B2BDCC}
+.metric-foot{color:#B8F36B}
+.health-ring{background:conic-gradient(#B8F36B 0 92%,#293342 92%)}
+.health-ring:before{background:#141A23}
+.spark-bars i{background:#49DDF5}
+.chart-summary{color:#B2BDCC}
+@media(max-width:760px){.site-header{padding-inline:18px}.nav-links{gap:14px}}
