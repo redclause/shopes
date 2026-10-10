@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "../../../../../auth";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { backlinkSiteCatalog } from "../../../backlink-maker/site-catalog";
@@ -118,7 +119,32 @@ function robotsSummary(text: string) {
   return { appliesToAll, directives: [...new Set(relevant)].slice(0, 30) };
 }
 
+function discoverSubmissionCandidates(html: string, origin: string) {
+  const anchors = html.match(/<a\b[^>]*>[\s\S]*?<\/a\s*>/gi) ?? [];
+  const candidates: { url: string; label: string }[] = [];
+  const keywords = /\b(submit|submission|contribut|add[-_/ ]?(listing|business|product|site|resource)|suggest|write[-_/ ]?for[-_/ ]?us|guest[-_/ ]?post|get[-_/ ]?listed|claim[-_/ ]?(profile|business)|create[-_/ ]?profile|register)\b/i;
+  for (const tag of anchors) {
+    const opening = tag.slice(0, tag.indexOf(">") + 1);
+    const match = /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(opening);
+    const rawHref = match?.[1] ?? match?.[2] ?? match?.[3];
+    if (!rawHref) continue;
+    try {
+      const url = new URL(rawHref.replace(/&amp;/gi, "&").replace(/&#x2f;/gi, "/").replace(/&#47;/g, "/"), origin);
+      if ((url.protocol !== "https:" && url.protocol !== "http:") || url.origin !== origin || url.username || url.password) continue;
+      const label = plainText(tag.slice(tag.indexOf(">") + 1).replace(/<\/?[^>]+>/g, " ")).slice(0, 140);
+      if (!keywords.test(url.pathname + " " + label)) continue;
+      url.hash = "";
+      const candidate = { url: url.toString(), label: label || url.pathname };
+      if (!candidates.some((item) => item.url === candidate.url)) candidates.push(candidate);
+      if (candidates.length >= 12) break;
+    } catch { /* Ignore malformed links in third-party HTML. */ }
+  }
+  return candidates;
+}
+
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ status: "unauthorized", message: "Sign in to use the Backlink Maker." }, { status: 401 });
   try {
     const body = await request.json();
     const siteId = typeof body?.siteId === "string" ? body.siteId : "";
@@ -127,7 +153,9 @@ export async function POST(request: Request) {
 
     const origin = new URL(site.url).origin;
     await assertPublicHost(new URL(origin).hostname);
-    const checks = await Promise.all(PATHS.map(async (path) => {
+    const [homepage, checks] = await Promise.all([
+      readText(new URL("/", origin)),
+      Promise.all(PATHS.map(async (path) => {
       const url = new URL(path, origin);
       const result = await readText(url);
       if (!result.status || result.status === 404 || result.status === 410 || result.redirected) return null;
@@ -140,14 +168,17 @@ export async function POST(request: Request) {
       const matched = keywords.filter((keyword) => text.toLowerCase().includes(keyword));
       if (!matched.length) return null;
       return { path, kind: "policy-page", httpStatus: result.status, matchedKeywords: matched, excerpt: text.slice(0, 900) };
-    }));
+      })),
+    ]);
 
+    const submissionCandidates = discoverSubmissionCandidates(homepage.text, origin);
     const evidence = checks.filter(Boolean);
     return NextResponse.json({
       status: "needs-human-review",
       site: { id: site.id, name: site.name, domain: site.domain },
       checkedAt: new Date().toISOString(),
       pagesChecked: PATHS.length,
+      submissionCandidates,
       evidence,
       message: evidence.length
         ? "Potential policy pages were found. Review the official pages and the site's current rules manually before submitting."

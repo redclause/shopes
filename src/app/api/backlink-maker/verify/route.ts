@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { auth } from "../../../../../auth";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import { extractBacklinkEvidence, extractCanonicalUrl } from "../../../backlink-maker/verification";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,11 +37,9 @@ async function assertPublicHost(url: URL) {
   }
 }
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ status: "unauthorized", message: "Sign in to use the Backlink Maker." }, { status: 401 });
   try {
     const body = await request.json();
     const targetUrl = parsePublicUrl(body?.targetUrl);
@@ -61,7 +61,15 @@ export async function POST(request: Request) {
     }
 
     if (response.status >= 300 && response.status < 400) {
-      return NextResponse.json({ status: "redirect", message: "The page redirected. Open the final destination and verify that URL instead.", httpStatus: response.status });
+      const location = response.headers.get("location");
+      let redirectUrl: string | undefined;
+      if (location) {
+        try {
+          const destination = new URL(location, candidateUrl);
+          if (destination.protocol === "http:" || destination.protocol === "https:") redirectUrl = destination.toString();
+        } catch { /* Ignore malformed redirect destinations. */ }
+      }
+      return NextResponse.json({ status: "redirect", message: "The page redirected. Review the destination and verify that URL instead.", httpStatus: response.status, redirectUrl });
     }
     if (!response.ok) {
       return NextResponse.json({ status: "unavailable", message: "The candidate page could not be checked successfully.", httpStatus: response.status });
@@ -90,30 +98,19 @@ export async function POST(request: Request) {
       await reader.cancel().catch(() => undefined);
     }
     const html = new TextDecoder().decode(Buffer.concat(chunks));
-    const hrefPattern = /href\s*=\s*(['"])(.*?)\1/gi;
-    let match: RegExpExecArray | null;
-    let found = false;
-    while ((match = hrefPattern.exec(html))) {
-      const rawHref = match[2].replace(/&amp;/g, "&").replace(/&#x2f;/gi, "/").replace(/&#47;/g, "/");
-      try {
-        const resolved = new URL(rawHref, candidateUrl);
-        if (resolved.href.replace(/#.*$/, "").replace(/\/$/, "") === targetUrl.href.replace(/#.*$/, "").replace(/\/$/, "")) {
-          found = true;
-          break;
-        }
-      } catch {}
-    }
-    const nofollow = found && new RegExp("<a\\b[^>]*href\\s*=\\s*(['\"])" + escapeRegExp(targetUrl.href) + "\\1[^>]*>", "i").test(html) &&
-      new RegExp("<a\\b[^>]*href\\s*=\\s*(['\"])" + escapeRegExp(targetUrl.href) + "\\1[^>]*>", "i").exec(html)?.[0].toLowerCase().includes("nofollow");
+    const evidence = extractBacklinkEvidence(html, candidateUrl.toString(), targetUrl.toString());
+    const canonicalUrl = extractCanonicalUrl(html, candidateUrl.toString());
 
     return NextResponse.json({
-      status: found ? "found" : "not-found",
-      message: found ? "A link to the target URL was found in the page HTML." : "No matching link was found in the page HTML checked.",
-      linkAttribute: found ? (nofollow ? "nofollow or sponsored/ugc may be present" : "link found; rel attributes should be reviewed") : null,
+      status: evidence ? "found" : "not-found",
+      message: evidence ? "A matching link to the target URL was found in the fetched page HTML." : "No matching link was found in the page HTML checked.",
       checkedUrl: candidateUrl.toString(),
       targetUrl: targetUrl.toString(),
+      canonicalUrl,
+      httpStatus: response.status,
       checkedAt: new Date().toISOString(),
-      note: "This checks the fetched HTML only. It does not confirm indexing, link quality, or SEO value.",
+      evidence,
+      note: "This checks the fetched HTML only. It does not confirm indexing, link quality, or SEO value. rel=nofollow, sponsored, or ugc is reported when present.",
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to verify this page.";
