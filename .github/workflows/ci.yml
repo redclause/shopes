@@ -30,6 +30,8 @@ jobs:
         run: npm run test:backlink-submission-analysis
       - name: Public URL safety tests
         run: npm run test:public-url
+      - name: Backlink local tracker tests
+        run: npm run test:backlink-tracker
       - name: Type-check
         run: npm run typecheck
       - name: Lint
