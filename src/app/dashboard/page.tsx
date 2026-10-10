@@ -119,7 +119,7 @@ export default async function DashboardPage() {
 
           <section className={styles.section} id="projects" aria-labelledby="projects-title">
             <div className={styles.sectionHeading}>
-              <div><h2 id="projects-title">Your workspace projects</h2><p>Organize target websites and review audit snapshots saved in this browser.</p></div>
+              <div><h2 id="projects-title">{t("workspaceProjects")}</h2><p>{t("organizeTargetWebsites")}</p></div>
             </div>
             <WorkspaceProjects />
           </section>
