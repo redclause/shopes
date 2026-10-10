@@ -57,7 +57,7 @@ type GoogleOneTapButtonProps = {
 export default function GoogleOneTapButton({
   className = "",
   label = "Continue with Google",
-  redirectTo,
+  redirectTo = "/dashboard",
   autoPrompt = false,
   fallbackHref,
 }: GoogleOneTapButtonProps) {
@@ -90,8 +90,7 @@ export default function GoogleOneTapButton({
       }
 
       setMessage("You’re signed in to Shopes.");
-      router.refresh();
-      if (redirectTo) router.replace(redirectTo);
+      router.replace(redirectTo);
     } catch {
       setMessage("Sign-in is temporarily unavailable. Please try again.");
     } finally {
