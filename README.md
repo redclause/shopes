@@ -51,7 +51,8 @@ Set these server-side environment variables:
 
 - `AUTH_SECRET`: a long, random secret for Auth.js.
 - `GOOGLE_CLIENT_ID`: the Google OAuth client ID.
-- `GOOGLE_CLIENT_SECRET_ID`: the client secret. For compatibility, `GOOGLE_CLIENT_SECRET` is accepted as a fallback.
+- `CLIENT_SECRET_ID_GOOGLE`: supported client-secret variable name.
+- `GOOGLE_CLIENT_SECRET_ID`: also supported. For compatibility, `GOOGLE_CLIENT_SECRET` is accepted as a fallback. The client ID (`GOOGLE_CLIENT_ID`) and `AUTH_SECRET` are still required; the client secret variable cannot replace them.
 - `GOOGLE_API_KEY` is not used for Google sign-in. An API key is different from an OAuth client ID/secret and will not resolve Google's `401 invalid_client` error.
 - `GOOGLE_REDIRECT_URI`: documentation/reference only; Auth.js uses its default App Router callback path.
 
