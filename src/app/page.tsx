@@ -13,7 +13,6 @@ const issues = [
 ];
 
 export default function Home() {
-  const [annual, setAnnual] = useState(false);
   const [siteUrl, setSiteUrl] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [message, setMessage] = useState("");
