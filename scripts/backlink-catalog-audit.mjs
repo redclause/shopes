@@ -120,7 +120,8 @@ function candidateLinks(html, baseUrl) {
     const label = match[6].replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
     try {
       const candidate = new URL(raw, baseUrl);
-      if (!["http:", "https:"].includes(candidate.protocol) || candidate.username || candidate.password) continue;\n      if (candidate.origin !== new URL(baseUrl).origin) continue;
+      if (!["http:", "https:"].includes(candidate.protocol) || candidate.username || candidate.password) continue;
+      if (candidate.origin !== new URL(baseUrl).origin) continue;
       if (!keywords.test(candidate.pathname + " " + label)) continue;
       if (!out.some((item) => item.url === candidate.href)) out.push({ url: candidate.href, label: label || candidate.pathname });
       if (out.length >= 20) break;
