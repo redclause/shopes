@@ -201,7 +201,10 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "Modelled CPC (USD):": "CPC estimado (USD):",
     "broad intent-based ranges (informational $0.05–$1.25; commercial $0.25–$2.75; transactional $0.35–$3.50; local $0.20–$2.50; navigational $0.05–$1.50; unclassified $0.05–$1.75). These ranges are uncalibrated, low-confidence placeholders—not market observations or predictions. They do not vary by country or niche.": "Rangos amplios por intención (informativa 0,05–1,25 USD; comercial 0,25–2,75; transaccional 0,35–3,50; local 0,20–2,50; navegacional 0,05–1,50; sin clasificar 0,05–1,75). Son estimaciones de baja confianza sin calibrar, no observaciones ni predicciones del mercado. No varían según el país o el nicho.",
     "Unavailable without verified sources:": "No disponible sin fuentes verificadas:",
-    "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "volumen mensual, CPC medido, dificultad SEO, posiciones en directo y tendencias históricas. El mercado seleccionado es solo metadato y no implica métricas específicas de ese mercado."
+    "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "volumen mensual, CPC medido, dificultad SEO, posiciones en directo y tendencias históricas. El mercado seleccionado es solo metadato y no implica métricas específicas de ese mercado.",
+    "running shoes": "zapatillas de running",
+    "trail sneakers": "zapatillas de trail",
+    "waterproof boots": "botas impermeables"
   },
   "fr": {
     "WORKSPACE": "ESPACE DE TRAVAIL",
@@ -405,7 +408,10 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "Modelled CPC (USD):": "CPC estimé (USD) :",
     "broad intent-based ranges (informational $0.05–$1.25; commercial $0.25–$2.75; transactional $0.35–$3.50; local $0.20–$2.50; navigational $0.05–$1.50; unclassified $0.05–$1.75). These ranges are uncalibrated, low-confidence placeholders—not market observations or predictions. They do not vary by country or niche.": "Fourchettes indicatives selon l’intention (informationnelle 0,05–1,25 USD ; commerciale 0,25–2,75 ; transactionnelle 0,35–3,50 ; locale 0,20–2,50 ; navigationnelle 0,05–1,50 ; non classée 0,05–1,75). Ces estimations non calibrées et peu fiables ne sont ni des observations ni des prévisions du marché. Elles ne varient pas selon le pays ou le secteur.",
     "Unavailable without verified sources:": "Indisponible sans sources vérifiées :",
-    "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "volume mensuel, CPC mesuré, difficulté SEO, classements en direct et tendances historiques. Le marché sélectionné n’est qu’une métadonnée et n’implique pas de métriques propres à ce marché."
+    "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "volume mensuel, CPC mesuré, difficulté SEO, classements en direct et tendances historiques. Le marché sélectionné n’est qu’une métadonnée et n’implique pas de métriques propres à ce marché.",
+    "running shoes": "chaussures de course",
+    "trail sneakers": "chaussures de trail",
+    "waterproof boots": "bottes imperméables"
   },
   "de": {
     "WORKSPACE": "ARBEITSBEREICH",
@@ -609,6 +615,9 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "Modelled CPC (USD):": "Geschätzter CPC (USD):",
     "broad intent-based ranges (informational $0.05–$1.25; commercial $0.25–$2.75; transactional $0.35–$3.50; local $0.20–$2.50; navigational $0.05–$1.50; unclassified $0.05–$1.75). These ranges are uncalibrated, low-confidence placeholders—not market observations or predictions. They do not vary by country or niche.": "Breite Spannen nach Suchintention (informativ 0,05–1,25 USD; kommerziell 0,25–2,75; transaktional 0,35–3,50; lokal 0,20–2,50; navigational 0,05–1,50; nicht klassifiziert 0,05–1,75). Diese unkalibrierten Schätzungen mit geringer Zuverlässigkeit sind keine Marktbeobachtungen oder Prognosen und variieren nicht nach Land oder Nische.",
     "Unavailable without verified sources:": "Ohne verifizierte Quellen nicht verfügbar:",
-    "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "monatliches Suchvolumen, gemessener CPC, organische Keyword-Schwierigkeit, Live-Rankings und historische Trends. Die Marktauswahl ist nur Metadatum und bedeutet keine marktspezifischen Kennzahlen."
+    "monthly search volume, measured CPC, organic keyword difficulty, live rankings, and historical trends. Market selection is metadata only and does not imply market-specific search metrics.": "monatliches Suchvolumen, gemessener CPC, organische Keyword-Schwierigkeit, Live-Rankings und historische Trends. Die Marktauswahl ist nur Metadatum und bedeutet keine marktspezifischen Kennzahlen.",
+    "running shoes": "Laufschuhe",
+    "trail sneakers": "Trail-Sneaker",
+    "waterproof boots": "wasserdichte Stiefel"
   }
 };
