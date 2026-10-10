@@ -37,7 +37,7 @@ export default function Home() {
       <a className="brand" href="#" aria-label="Shopes home"><span className="brand-mark"><ShoppingBag size={19}/></span><span>shopes<span className="brand-dot">.</span></span></a>
       <button className="mobile-menu" aria-label="Toggle navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X/> : <Menu/>}</button>
       <nav className={menuOpen ? "nav-links open" : "nav-links"}><a href="#platform" onClick={() => setMenuOpen(false)}>Platform <ChevronDown size={13}/></a><a href="#features" onClick={() => setMenuOpen(false)}>Solutions</a><a href="#integrations" onClick={() => setMenuOpen(false)}>Integrations</a><Link href="/blog" onClick={() => setMenuOpen(false)}>{t("blog")}</Link></nav>
-      <div className="header-actions"><GoogleOneTapButton className="button button-dark button-small google-cta" label="Continue with Google" /></div>
+      <div className="header-actions"><GoogleOneTapButton className="button button-dark button-small google-cta" label="Continue with Google" fallbackHref="/login" /></div>
     </header>
 
     <section className="hero section-wrap" id="hero">
