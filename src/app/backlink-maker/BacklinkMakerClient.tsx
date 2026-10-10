@@ -147,7 +147,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   }
 
   function updateSubmissionStatus(id: string, status: SubmissionRecord["status"]) {
-    setSubmissionRecords((current) => current.map((record) => record.id === id ? { ...record, status, updatedAt: new Date().toISOString() } : record));
+    setSubmissionRecords((current) => current.map((record) => record.id === id ? { ...record, status, submissionStatus: status, updatedAt: new Date().toISOString() } : record));
   }
 
   const filteredCatalog = useMemo(() => {
