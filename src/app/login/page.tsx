@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
-import { getLocale, LOCALE_STORAGE_KEY } from "../../lib/i18n/languages";
 import { translate } from "../../lib/i18n/messages";
 import { signIn } from "../../../auth";
 import { ArrowLeft, ShieldCheck, ShoppingBag } from "lucide-react";
@@ -10,9 +8,7 @@ type LoginPageProps = {
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const cookieStore = await cookies();
-  const locale = getLocale(cookieStore.get(LOCALE_STORAGE_KEY)?.value);
-  const t = (key: Parameters<typeof translate>[1]) => translate(locale, key);
+  const t = (key: Parameters<typeof translate>[1]) => translate("en", key);
   const params = await searchParams;
   const requested = params.callbackUrl;
   const callbackUrl =
@@ -29,23 +25,23 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   }
 
   return (
-    <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24, background: "radial-gradient(ellipse at 50% 15%, #e8f7ed, #f8faf7 58%, #f5f7f4)", color: "#19251f", fontFamily: '"DM Sans", Arial, sans-serif' }}>
-      <section style={{ width: "100%", maxWidth: 420, padding: "38px 34px", border: "1px solid #e3eae2", borderRadius: 22, background: "#ffffffed", boxShadow: "0 28px 80px #1b35250f" }}>
+    <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24, background: "#0B0D12", color: "#F4F7FB", fontFamily: '"DM Sans", Arial, sans-serif' }}>
+      <section style={{ width: "100%", maxWidth: 420, padding: "38px 34px", border: "1px solid #293342", borderRadius: 18, background: "#11151C", boxShadow: "0 28px 80px #0008" }}>
         <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 9, fontWeight: 800, fontSize: 24, letterSpacing: "-1.3px", color: "inherit", textDecoration: "none" }}>
-          <span style={{ width: 34, height: 34, display: "grid", placeItems: "center", background: "#a6e9c7", borderRadius: 11, color: "#173c2b" }}><ShoppingBag size={18} /></span>
-          <span>shopes<span style={{ color: "#5db88b" }}>.</span></span>
+          <span style={{ width: 34, height: 34, display: "grid", placeItems: "center", background: "#49DDF5", borderRadius: 11, color: "#07131a" }}><ShoppingBag size={18} /></span>
+          <span>shopes<span style={{ color: "#49DDF5" }}>.</span></span>
         </Link>
-        <div style={{ marginTop: 38, width: 44, height: 44, borderRadius: 13, display: "grid", placeItems: "center", background: "#e4f7eb", color: "#287d52" }}><ShieldCheck size={21} /></div>
-        <p style={{ margin: "23px 0 10px", fontSize: 10, letterSpacing: ".14em", fontWeight: 800, color: "#5e6b64" }}>YOUR SHOPES WORKSPACE</p>
-        <h1 style={{ margin: "0 0 12px", fontSize: 34, lineHeight: 1.15, letterSpacing: "-.055em" }}>{t("signIn")}.</h1>
-        <p style={{ margin: "0 0 26px", color: "#69766e", fontSize: 13, lineHeight: 1.8 }}>{t("signIn")} securely with your Google account to access your workspace.</p>
+        <div style={{ marginTop: 38, width: 44, height: 44, borderRadius: 13, display: "grid", placeItems: "center", background: "#172d38", color: "#49DDF5" }}><ShieldCheck size={21} /></div>
+        <p style={{ margin: "23px 0 10px", fontSize: 13, letterSpacing: ".08em", fontWeight: 800, color: "#B2BDCC" }}>YOUR SHOPES WORKSPACE</p>
+        <h1 style={{ margin: "0 0 12px", fontSize: 40, lineHeight: 1.15, letterSpacing: "-.055em" }}>{t("signIn")}.</h1>
+        <p style={{ margin: "0 0 26px", color: "#B2BDCC", fontSize: 17, lineHeight: 1.8 }}>{t("signIn")} securely with your Google account to access your workspace.</p>
         <form action={signInWithGoogle}>
-          <button type="submit" style={{ width: "100%", minHeight: 49, display: "flex", alignItems: "center", justifyContent: "center", gap: 11, border: "1px solid #dce4dc", borderRadius: 10, background: "#fff", color: "#202923", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-            <GoogleMark /> {t("signIn")} with Google
+          <button type="submit" style={{ width: "100%", minHeight: 56, display: "flex", alignItems: "center", justifyContent: "center", gap: 11, border: "1px solid #49DDF5", borderRadius: 10, background: "#49DDF5", color: "#07131a", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+            <GoogleMark /> Continue with Google
           </button>
         </form>
-        <p style={{ margin: "19px 0 0", fontSize: 10, lineHeight: 1.8, color: "#87938a" }}>Your Google client secret stays on the server and is never exposed in the browser.</p>
-        <Link href="/" style={{ marginTop: 28, display: "inline-flex", alignItems: "center", gap: 7, color: "#4f6a58", fontSize: 11, fontWeight: 700, textDecoration: "none" }}><ArrowLeft size={14} /> {t("back")} to Shopes</Link>
+        <p style={{ margin: "19px 0 0", fontSize: 13, lineHeight: 1.8, color: "#8997AA" }}>Your Google client secret stays on the server and is never exposed in the browser.</p>
+        <Link href="/" style={{ marginTop: 28, display: "inline-flex", alignItems: "center", gap: 7, color: "#B2BDCC", fontSize: 14, fontWeight: 700, textDecoration: "none" }}><ArrowLeft size={14} /> {t("back")} to Shopes</Link>
       </section>
     </main>
   );
