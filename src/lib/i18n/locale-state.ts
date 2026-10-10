@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, getDirection, getLocale, LOCALES, LOCALE_STORAGE_KEY } from "./languages";
+import { DEFAULT_LOCALE, getDirection, getLocale, LOCALES, LOCALE_STORAGE_KEY } from "./languages.ts";
 
 export type LocaleStorage = Pick<Storage, "getItem" | "setItem">;
 export type LocaleDocument = Pick<Document, "documentElement">;
