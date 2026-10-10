@@ -17,7 +17,7 @@ export type ManualWorkflow = {
   caution: string;
 };
 export function normalizeStoredStatus(record: Partial<LocalSubmissionRecord>): LocalSubmissionStatus;
-export function normalizeStoredRecord<T extends Record<string, any>>(record: T): T & {
+export function normalizeStoredRecord<T extends Record<string, unknown>>(record: T): T & {
   status: LocalSubmissionStatus;
   submissionStatus: LocalSubmissionStatus;
   verificationStatus: LocalVerificationStatus;
