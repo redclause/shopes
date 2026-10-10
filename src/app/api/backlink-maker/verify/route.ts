@@ -36,10 +36,6 @@ async function assertPublicHost(url: URL) {
   }
 }
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
