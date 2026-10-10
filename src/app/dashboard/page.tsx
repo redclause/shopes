@@ -5,10 +5,11 @@ import Link from "next/link";
 import {
   Activity, ArrowDownRight, ArrowRight, ArrowUpRight, Bell, Check,
   ChevronDown, CircleHelp, Clock3, ExternalLink, FileSearch,
-  Globe2, LayoutDashboard, LifeBuoy, Menu, Plus, Search, Settings2,
+  Globe2, LayoutDashboard, LifeBuoy, Menu, Plus, Search,
   ShieldCheck, ShoppingBag, Sparkles, Target, TrendingUp, X, Zap
 } from "lucide-react";
 import styles from "./page.module.css";
+import SignOutButton from "@/components/sign-out-button";
 
 const sampleActivity = [
   { icon: FileSearch, tone: "mint", title: "Technical audit completed", detail: "northstar.store · Example activity", time: "2 hours ago" },
@@ -83,8 +84,8 @@ export default function DashboardPage() {
           </div>
           <div className={styles.sidebarFoot}>
             <span className={styles.avatar}>G</span>
-            <span className={styles.userMeta}><strong>Guest preview</strong><small>Not signed in</small></span>
-            <button type="button" className={styles.iconButton} aria-label="Settings are coming soon" title="Settings are coming soon"><Settings2 size={17}/></button>
+            <span className={styles.userMeta}><strong>Shopes account</strong><small>Signed-in session</small></span>
+            <SignOutButton />
           </div>
         </div>
       </aside>
