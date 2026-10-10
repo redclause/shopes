@@ -17,6 +17,7 @@ export type BacklinkSite = {
   submissionMethod: "Profile" | "Community post" | "Editorial pitch" | "Directory listing" | "Repository/project page" | "User review" | "Manual review";
   policyStatus: "review-required";
   notes: string;
+  sourceUrl?: string;
 };
 
 /**
@@ -66,6 +67,7 @@ export const backlinkSiteCatalog: BacklinkSite[] = [
   { id: "disqus", name: "Disqus", domain: "disqus.com", category: "Community", url: "https://disqus.com/", submissionMethod: "Profile", policyStatus: "review-required", notes: "Avoid promotional comments; use only where discussion is relevant." },
   { id: "openstreetmap", name: "OpenStreetMap", domain: "openstreetmap.org", category: "Community", url: "https://www.openstreetmap.org/", submissionMethod: "Manual review", policyStatus: "review-required", notes: "Not a general backlink directory; contribute only valid map data." },
   { id: "wikipedia", name: "Wikipedia", domain: "wikipedia.org", category: "Community", url: "https://www.wikipedia.org/", submissionMethod: "Manual review", policyStatus: "review-required", notes: "Only add links when they meet encyclopedia sourcing rules; never for SEO." }
+
 ];
 
 export const backlinkSiteCategories = ["All", "Community", "Forum", "Developer", "Publishing", "Directory", "Reviews", "Startup", "Social"] as const;
