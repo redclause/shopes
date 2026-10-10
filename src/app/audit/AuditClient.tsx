@@ -34,6 +34,7 @@ export default function AuditClient() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"all" | Finding["status"]>("all");
+  const [saveMessage, setSaveMessage] = useState("");
 
   const visibleFindings = result?.findings.filter((finding) => statusFilter === "all" || finding.status === statusFilter) ?? [];
 
@@ -62,6 +63,19 @@ export default function AuditClient() {
       "structured-data": "Validate JSON-LD syntax and separately verify schema properties.",
     };
     return guidance[finding.id] || "Review the evidence and confirm whether this applies to the page's intended behavior.";
+  }
+
+  function saveReportLocally() {
+    if (!result) return;
+    try {
+      const key = "shopes:audit-history:v1";
+      const previous = JSON.parse(window.localStorage.getItem(key) || "[]") as Array<Record<string, unknown>>;
+      const saved = { ...result, findings: result.findings.map((finding) => ({ ...finding, severity: severity(finding), recommendation: recommendation(finding) })), savedAt: new Date().toISOString() };
+      window.localStorage.setItem(key, JSON.stringify([saved, ...previous.filter((item) => item.url !== result.url || item.checkedAt !== result.checkedAt)].slice(0, 30)));
+      setSaveMessage("Report saved in this browser. It will not sync across devices.");
+    } catch {
+      setSaveMessage("Could not save locally. Browser storage may be unavailable or full.");
+    }
   }
 
   function exportReport() {
@@ -144,8 +158,12 @@ export default function AuditClient() {
               <label>Filter findings <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}>
                 <option value="all">All results</option><option value="error">Errors</option><option value="warning">Warnings</option><option value="pass">Passed checks</option>
               </select></label>
-              <button type="button" className={styles.secondaryButton} onClick={exportReport}><Download size={15} /> Export JSON report</button>
+              <div className={styles.reportActions}>
+                <button type="button" className={styles.secondaryButton} onClick={saveReportLocally}>Save in this browser</button>
+                <button type="button" className={styles.secondaryButton} onClick={exportReport}><Download size={15} /> Export JSON report</button>
+              </div>
             </div>
+            {saveMessage && <p className={styles.saveMessage} role="status">{saveMessage}</p>}
             <div className={styles.findings}>
               {visibleFindings.map((finding) => {
                 const Icon = finding.status === "pass" ? CheckCircle2 : finding.status === "error" ? XCircle : TriangleAlert;
