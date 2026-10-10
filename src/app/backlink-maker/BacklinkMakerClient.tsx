@@ -112,13 +112,14 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
       const response = await fetch("/api/backlink-maker/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetUrl: generatedUrl, candidateUrl: candidateUrl.trim() }) });
       const result = await response.json();
       setVerifyResult(result);
-      if (result.status === "found") {
-        const checkedHost = new URL(candidateUrl.trim()).hostname.toLowerCase();
+      if (["found", "not-found", "error", "redirect"].includes(result.status)) {
+        let checkedHost = "";
+        try { checkedHost = new URL(candidateUrl.trim()).hostname.toLowerCase(); } catch { /* The API reports malformed URLs. */ }
         setSubmissionRecords((current) => current.map((record) => {
           const sameTarget = record.targetUrl === generatedUrl;
           const samePage = record.candidateUrl === candidateUrl.trim();
           const belongsToSelectedSite = !record.candidateUrl && record.siteDomain && (checkedHost === record.siteDomain || checkedHost.endsWith("." + record.siteDomain));
-          return sameTarget && (samePage || belongsToSelectedSite) ? { ...record, candidateUrl: candidateUrl.trim(), verificationStatus: "found", verification: result.evidence ?? undefined, canonicalUrl: result.canonicalUrl ?? undefined, httpStatus: result.httpStatus, updatedAt: new Date().toISOString() } : record;
+          return sameTarget && (samePage || belongsToSelectedSite) ? { ...record, candidateUrl: candidateUrl.trim(), verificationStatus: result.status, verification: result.evidence ?? undefined, canonicalUrl: result.canonicalUrl ?? undefined, httpStatus: result.httpStatus, updatedAt: new Date().toISOString() } : record;
         }));
       }
     } catch {
