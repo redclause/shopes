@@ -123,7 +123,9 @@ export default function AuditClient() {
     <main className={styles.page}>
       <header className={styles.header}>
         <Link href="/dashboard" className={styles.brand}><span className={styles.brandMark}><FileSearch size={18} /></span><span>shopes<span className={styles.brandDot}>.</span></span></Link>
-        <Link href="/dashboard" className={styles.backLink}><ArrowLeft size={15} /> Back to dashboard</Link>
+        <nav className={styles.backLink} aria-label="Main navigation">
+          <Link href="/dashboard">Dashboard</Link><Link href="/audit" aria-current="page">Site audit</Link><Link href="/keyword-research">Keyword research</Link><Link href="/product-intelligence">Product analysis</Link><Link href="/">Home</Link>
+        </nav>
       </header>
 
       <div className={styles.content}>

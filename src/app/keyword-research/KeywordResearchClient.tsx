@@ -161,7 +161,9 @@ export default function KeywordResearchClient() {
 
   return <main className={styles.shell}>
     <header className={styles.header}>
-      <Link href="/dashboard" className={styles.back}><ArrowLeft size={16} /> {t("dashboard")}</Link>
+      <nav className={styles.back} aria-label="Main navigation">
+        <Link href="/dashboard">{t("dashboard")}</Link><Link href="/audit">Site audit</Link><Link href="/keyword-research" aria-current="page">Keyword research</Link><Link href="/product-intelligence">Product analysis</Link><Link href="/">Home</Link>
+      </nav>
       <span className={styles.free}>{t("freeForever").toUpperCase()}</span>
     </header>
 

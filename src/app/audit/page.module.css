@@ -55,3 +55,8 @@
 .securityNote{background:#141A23;border-color:#293342;color:#B2BDCC}
 .securityNote strong{color:#49DDF5}.securityNote p{font-size:14px}
 @media(max-width:600px){.formCard,.results{background:#11151C}.content>h1{font-size:clamp(32px,8vw,42px)}.findingCopy p{font-size:14px}}
+
+.header .backLink{display:flex;align-items:center;gap:clamp(10px,2vw,22px);flex-wrap:wrap}
+.header .backLink a{font-size:12px;font-weight:700;color:#52645a;white-space:nowrap}
+.header .backLink a:hover{color:#287d52}
+@media(max-width:640px){.header{height:auto;min-height:72px;gap:12px;align-items:flex-start;padding-top:12px;padding-bottom:12px}.header .backLink{justify-content:flex-end;gap:8px;max-width:70%}.header .backLink a{font-size:11px}}

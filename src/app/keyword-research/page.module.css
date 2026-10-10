@@ -121,3 +121,6 @@
 .importButton:hover{background:#202b38;border-color:#49DDF5}
 @media(max-width:640px){.searchForm,.results{background:#11151C}.tableWrap{border:1px solid #293342;border-radius:9px}.tableWrap th,.tableWrap td{padding:12px 9px}}
 @media(prefers-reduced-motion:reduce){.shell *{transition:none!important;animation:none!important}}
+
+.header .back a{white-space:nowrap}.header .back a:hover{color:#287d52}
+@media(max-width:640px){.header{height:auto;min-height:60px;gap:10px;padding-top:10px;padding-bottom:10px}.header .back{gap:8px;max-width:75%;font-size:11px}.header .back a{font-size:11px}}
