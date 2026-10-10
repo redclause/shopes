@@ -7,7 +7,7 @@ export default function SignOutButton() {
   return (
     <button
       type="button"
-      onClick={() => signOut({ callbackUrl: "/" })}
+      onClick={() => signOut({ redirectTo: "/" })}
       aria-label="Sign out"
       title="Sign out"
       style={{
