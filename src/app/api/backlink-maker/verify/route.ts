@@ -1,50 +1,18 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../../../auth";
-import { lookup } from "node:dns/promises";
-import { isIP } from "node:net";
+import { assertPublicHttpUrl } from "../../../../lib/public-url";
 import { extractBacklinkEvidence, extractCanonicalUrl } from "../../../backlink-maker/verification";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-function parsePublicUrl(value: unknown): URL {
-  if (typeof value !== "string" || value.length > 2048) throw new Error("Enter a valid public URL.");
-  const url = new URL(value);
-  if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error("Only HTTP and HTTPS URLs are supported.");
-  if (url.username || url.password) throw new Error("URLs containing credentials are not supported.");
-  const hostname = url.hostname.toLowerCase().replace(/^\[|\]$/g, "");
-  if (hostname === "localhost" || hostname.endsWith(".localhost") || hostname.endsWith(".local") || hostname === "metadata.google.internal") {
-    throw new Error("Private or local addresses cannot be checked.");
-  }
-  if (isIP(hostname)) {
-    if (hostname === "127.0.0.1" || hostname === "::1" || hostname.startsWith("10.") || hostname.startsWith("192.168.") || hostname.startsWith("169.254.") || /^172\.(1[6-9]|2\d|3[01])\./.test(hostname) || hostname.startsWith("fc") || hostname.startsWith("fd") || hostname.startsWith("fe80:")) {
-      throw new Error("Private or local addresses cannot be checked.");
-    }
-  }
-  return url;
-}
-
-async function assertPublicHost(url: URL) {
-  const hostname = url.hostname.replace(/^\[|\]$/g, "");
-  if (isIP(hostname)) return;
-  const addresses = await lookup(hostname, { all: true, verbatim: true });
-  if (!addresses.length) throw new Error("The website hostname could not be resolved.");
-  for (const item of addresses) {
-    const ip = item.address.toLowerCase();
-    if (ip === "127.0.0.1" || ip === "::1" || ip.startsWith("10.") || ip.startsWith("192.168.") || ip.startsWith("169.254.") || /^172\.(1[6-9]|2\d|3[01])\./.test(ip) || ip.startsWith("fc") || ip.startsWith("fd") || ip.startsWith("fe80:") || ip === "0.0.0.0") {
-      throw new Error("Private or local addresses cannot be checked.");
-    }
-  }
-}
 
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ status: "unauthorized", message: "Sign in to use the Backlink Maker." }, { status: 401 });
   try {
     const body = await request.json();
-    const targetUrl = parsePublicUrl(body?.targetUrl);
-    const candidateUrl = parsePublicUrl(body?.candidateUrl);
-    await Promise.all([assertPublicHost(targetUrl), assertPublicHost(candidateUrl)]);
+    const targetUrl = await assertPublicHttpUrl(body?.targetUrl);
+    const candidateUrl = await assertPublicHttpUrl(body?.candidateUrl);
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);

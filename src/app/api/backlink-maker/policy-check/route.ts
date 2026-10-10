@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "../../../../../auth";
-import { lookup } from "node:dns/promises";
-import { isIP } from "node:net";
+import { assertPublicHttpUrl } from "../../../../lib/public-url";
 import { backlinkSiteCatalog } from "../../../backlink-maker/site-catalog";
 
 export const runtime = "nodejs";
@@ -25,29 +24,6 @@ const PATHS = [
   "/submission-guidelines",
   "/editorial-guidelines",
 ];
-
-function isPrivateAddress(address: string) {
-  const value = address.toLowerCase();
-  if (value.includes(":")) {
-    if (value === "::1" || value === "::" || value.startsWith("fc") || value.startsWith("fd") || value.startsWith("fe8") || value.startsWith("fe9") || value.startsWith("fea") || value.startsWith("feb") || value.startsWith("::ffff:127.") || value.startsWith("::ffff:10.") || value.startsWith("::ffff:192.168.")) return true;
-    return false;
-  }
-  const parts = value.split(".").map(Number);
-  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return true;
-  const [a, b] = parts;
-  return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a >= 224);
-}
-
-async function assertPublicHost(hostname: string) {
-  const normalized = hostname.toLowerCase().replace(/^\[|\]$/g, "");
-  if (normalized === "localhost" || normalized.endsWith(".localhost") || normalized.endsWith(".local") || normalized.endsWith(".internal")) throw new Error("Local hosts are not supported.");
-  if (isIP(normalized)) {
-    if (isPrivateAddress(normalized)) throw new Error("Private hosts are not supported.");
-    return;
-  }
-  const addresses = await lookup(normalized, { all: true, verbatim: true });
-  if (!addresses.length || addresses.some((entry) => isPrivateAddress(entry.address))) throw new Error("The host did not resolve to public addresses only.");
-}
 
 async function readText(url: URL) {
   const controller = new AbortController();
@@ -151,8 +127,8 @@ export async function POST(request: Request) {
     const site = backlinkSiteCatalog.find((entry) => entry.id === siteId);
     if (!site) return NextResponse.json({ status: "error", message: "Choose a site from the Shopes catalog." }, { status: 400 });
 
-    const origin = new URL(site.url).origin;
-    await assertPublicHost(new URL(origin).hostname);
+    const safeSiteUrl = await assertPublicHttpUrl(site.url);
+    const origin = safeSiteUrl.origin;
     const [homepage, checks] = await Promise.all([
       readText(new URL("/", origin)),
       Promise.all(PATHS.map(async (path) => {
