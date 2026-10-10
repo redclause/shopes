@@ -167,3 +167,15 @@ img,svg,video,canvas{max-width:100%}
   .note-icon{width:25px;height:25px}
   .login-card{padding:24px 17px!important}
 }
+
+
+/* Google One Tap control: keep sign-in on the current page and expose status accessibly. */
+.google-one-tap-control{position:relative;display:inline-flex;align-items:center;min-width:0}
+.google-one-tap-status{position:absolute;z-index:30;top:calc(100% + 8px);right:0;width:max-content;max-width:min(320px,85vw);padding:9px 11px;border:1px solid #354353;border-radius:9px;background:#111820;color:#edf5fb;font-size:12px;font-weight:500;line-height:1.5;box-shadow:0 12px 30px #0003}
+.google-one-tap-spinner{animation:shopes-one-tap-spin .9s linear infinite}
+@keyframes shopes-one-tap-spin{to{transform:rotate(360deg)}}
+.google-signin-button{width:100%;min-height:56px;display:flex;align-items:center;justify-content:center;gap:11px;border:1px solid #dadce0;border-radius:7px;background:#fff;color:#3c4043;font-size:16px;font-weight:600;cursor:pointer;padding:12px 16px}
+.google-signin-button:disabled{opacity:.7;cursor:wait}
+.standard-google-fallback{margin-top:12px}
+.standard-google-fallback button{width:100%;min-height:44px;border:1px solid #354353;border-radius:8px;background:transparent;color:#c5d0dc;font-size:14px;font-weight:600;cursor:pointer}
+@media(max-width:720px){.google-one-tap-status{right:auto;left:0}.mobile-google-cta{width:100%;justify-content:center}.nav-links .google-one-tap-control{width:100%}}
