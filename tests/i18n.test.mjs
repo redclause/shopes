@@ -51,3 +51,12 @@ test("translation coverage is explicit for every locale and never reported compl
   assert.equal(hasFullCoreTranslation("ka"), true);
   assert.equal(translate("af", "home"), "Home");
 });
+
+test("Keyword Research controls have localized labels in every translated core locale", () => {
+  assert.equal(translate("ka", "generateIdeas"), "იდეების გენერირება");
+  assert.equal(translate("es", "seedKeyword"), "Palabra clave inicial o tema");
+  assert.equal(translate("fr", "targetMarket"), "Marché cible");
+  assert.equal(translate("de", "keywordLanguage"), "Keyword-Sprache");
+  assert.equal(translate("ja", "exportCsv"), "CSVをエクスポート");
+  assert.equal(hasFullCoreTranslation("es"), true);
+});
