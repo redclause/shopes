@@ -21,6 +21,7 @@ import {
   Target,
 } from "lucide-react";
 import styles from "./page.module.css";
+import WorkspaceProjects from "./WorkspaceProjects";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -66,7 +67,9 @@ export default async function DashboardPage() {
           <a className={styles.navItemActive} href="#overview" aria-current="page"><LayoutDashboard size={17} /> {t("dashboard")}</a>
           <a className={styles.navItem} href="#projects"><Globe2 size={17} /> Projects <span className={styles.navCount}>0</span></a>
           <a className={styles.navItem} href="/audit"><FileSearch size={17} /> Site audits</a>
+          <Link className={styles.navItem} href="/blog"><ShoppingBag size={17} /> {t("blog")}</Link>
           <Link className={styles.navItem} href="/keyword-research"><Target size={17} /> {t("keywordResearch")}</Link>
+          <Link className={styles.navItem} href="/product-intelligence"><Sparkles size={17} /> Product intelligence</Link>
           <span className={styles.navLabel}>SHOPES</span>
           <Link className={styles.navItem} href="/#platform"><Target size={17} /> Explore platform <ArrowUpRight size={14} /></Link>
           <Link className={styles.navItem} href="/#platform"><Sparkles size={17} /> {t("home")} <ArrowUpRight size={14} /></Link>
@@ -117,22 +120,9 @@ export default async function DashboardPage() {
 
           <section className={styles.section} id="projects" aria-labelledby="projects-title">
             <div className={styles.sectionHeading}>
-              <div><h2 id="projects-title">Your projects</h2><p>Websites you choose to monitor will appear here.</p></div>
-              <span className={styles.countBadge}>0 projects</span>
+              <div><h2 id="projects-title">{t("workspaceProjects")}</h2><p>{t("organizeTargetWebsites")}</p></div>
             </div>
-            <div className={styles.emptyState}>
-              <div className={styles.emptyArtwork} aria-hidden="true">
-                <span className={styles.orbit} />
-                <span className={styles.globeCard}><Globe2 size={28} /></span>
-                <span className={styles.sparkleCard}><Sparkles size={16} /></span>
-              </div>
-              <div className={styles.emptyCopy}>
-                <span className={styles.kicker}>A CLEAR PLACE TO BEGIN</span>
-                <h3>Your first project is the next step.</h3>
-                <p>Project saving is not connected yet. When it is available, you’ll be able to add a store and keep its audit history in one place.</p>
-                <Link className={styles.secondaryButton} href="/#get-started">Explore the store workflow <ArrowRight size={15} /></Link>
-              </div>
-            </div>
+            <WorkspaceProjects />
           </section>
 
           <section className={styles.section} id="audits" aria-labelledby="activity-title">

@@ -69,3 +69,55 @@
   .tableWrap th{font-size:10px}
   .tableWrap td{font-size:13px}
 }
+.actionGroup{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.actionGroup .export{font-size:13px;min-height:40px}.fieldHelp[role="status"]{padding:10px 12px;border-radius:9px;background:#edf8f0;color:#315b40;font-weight:600}@media(max-width:640px){.actionGroup{width:100%;justify-content:stretch}.actionGroup .export{flex:1;white-space:normal}}
+/* Futuristic keyword intelligence workspace */
+.shell{background:#0B0D12;color:#F4F7FB}
+.header{border-color:#293342}
+.back{color:#B2BDCC;font-size:14px}.back:hover{color:#49DDF5}
+.free{background:#172d24;color:#B8F36B;font-size:11px}
+.intro h1{color:#F4F7FB;font-size:clamp(34px,4.2vw,50px)}
+.intro h1 span{color:#49DDF5}
+.intro>p{color:#B2BDCC;font-size:15px}
+.eyebrow{color:#49DDF5;font-size:12px}
+.searchForm,.results{background:#11151C;border-color:#293342;box-shadow:0 12px 38px #0003}
+.seedLabel{color:#F4F7FB;font-size:14px}
+.searchRow{background:#0B0D12;border-color:#354353}
+.searchRow>svg{color:#B2BDCC}
+.searchRow input{color:#F4F7FB;font-size:15px}
+.searchRow input::placeholder{color:#8997AA}
+.searchRow button{background:#49DDF5;color:#07131a;font-size:13px}
+.searchRow button:hover{background:#7be8f8}
+.selectRow label,.filterSelect{color:#B2BDCC;font-size:13px}
+.selectRow select,.filterSelect select{background:#11151C;border-color:#354353;color:#F4F7FB;font-size:13px}
+.resultsHead h2{color:#F4F7FB;font-size:21px}.resultsHead p{color:#B2BDCC;font-size:13px}
+.export,.sort{background:#171D27;border-color:#354353;color:#F4F7FB;font-size:12px}
+.export:hover,.sort:hover{background:#202b38}
+.sourceNote{background:#13232b;border-color:#293342;color:#49DDF5}
+.sourceNote strong{color:#F4F7FB;font-size:14px}.sourceNote p{color:#B2BDCC;font-size:13px}
+.filters{gap:11px}
+.filterSearch{background:#0B0D12;border-color:#354353;color:#B2BDCC}
+.filterSearch input{background:transparent;color:#F4F7FB;font-size:14px}
+.filterSearch input::placeholder{color:#8997AA}
+.filterSelect{border-color:#354353}
+.tableWrap th{background:#171D27;color:#B2BDCC;font-size:11px}
+.tableWrap th,.tableWrap td{border-color:#293342;padding:15px 11px}
+.tableWrap td{color:#B2BDCC;font-size:13px}
+.keyword{color:#F4F7FB;font-size:14px}
+.intent{background:#172d38;color:#49DDF5;font-size:11px}
+.unavailable{color:#8997AA}
+.tableWrap td input,.tableWrap th input{accent-color:#49DDF5}
+.tableFooter{color:#B2BDCC;font-size:13px}
+.tableFooter button{background:#171D27;border-color:#354353;color:#F4F7FB;font-size:12px}
+.tableFooter button:hover:not(:disabled){background:#202b38}
+.empty>div{background:#172d38;color:#49DDF5}
+.empty h3{color:#F4F7FB;font-size:18px}
+.empty p,.footer{color:#B2BDCC;font-size:13px}
+.fieldHelp{font-size:13px;color:#B2BDCC}
+.errorMessage{background:#2a171a;border-color:#62343a;color:#FF9BA2;font-size:14px}
+.longTail{background:#302719;color:#F2BE63;font-size:10px}
+.score{background:#172d24;color:#B8F36B;font-size:13px}
+.scoreLabel{color:#B2BDCC;font-size:11px}
+.importButton{background:#171D27;border-color:#354353;color:#F4F7FB;font-size:13px}
+.importButton:hover{background:#202b38;border-color:#49DDF5}
+@media(max-width:640px){.searchForm,.results{background:#11151C}.tableWrap{border:1px solid #293342;border-radius:9px}.tableWrap th,.tableWrap td{padding:12px 9px}}
+@media(prefers-reduced-motion:reduce){.shell *{transition:none!important;animation:none!important}}
