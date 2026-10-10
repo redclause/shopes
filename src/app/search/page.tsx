@@ -10,8 +10,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "/search" },
 };
 
+// Google Programmable Search Engine IDs are public identifiers, not credentials.
+// Allow deployment configuration to override the provided default.
+const DEFAULT_GOOGLE_CSE_ID = "e2dc391aa286b4b8d";
+
 export default function StoreSearchPage() {
-  const searchEngineId = process.env.NEXT_PUBLIC_GOOGLE_CSE_ID?.trim();
+  const searchEngineId =
+    process.env.NEXT_PUBLIC_GOOGLE_CSE_ID?.trim() || DEFAULT_GOOGLE_CSE_ID;
 
   return (
     <main className={styles.page}>
@@ -30,26 +35,13 @@ export default function StoreSearchPage() {
       </section>
 
       <section className={styles.searchPanel} aria-label="Online store search">
-        {searchEngineId ? (
-          <>
-            <Script
-              id="shopes-google-programmable-search"
-              src={`https://cse.google.com/cse.js?cx=${encodeURIComponent(searchEngineId)}`}
-              strategy="afterInteractive"
-            />
-            <div className="gcse-search" />
-            <noscript>Enable JavaScript to use the online store search.</noscript>
-          </>
-        ) : (
-          <div className={styles.setupNotice} role="status">
-            <span className={styles.searchIcon}><Search size={20} /></span>
-            <h2>Search is not connected yet</h2>
-            <p>
-              Shopes does not have a Google Programmable Search Engine ID configured in this deployment.
-              Search results are unavailable until the existing search engine is connected.
-            </p>
-          </div>
-        )}
+        <Script
+          id="shopes-google-programmable-search"
+          src={`https://cse.google.com/cse.js?cx=${encodeURIComponent(searchEngineId)}`}
+          strategy="afterInteractive"
+        />
+        <div className="gcse-search" />
+        <noscript>Enable JavaScript to use the online store search.</noscript>
       </section>
 
       <footer className={styles.footer}>
