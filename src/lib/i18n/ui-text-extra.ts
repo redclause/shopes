@@ -205,7 +205,9 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "running shoes": "zapatillas de running",
     "trail sneakers": "zapatillas de trail",
     "waterproof boots": "botas impermeables",
-    "Run audit": "Ejecutar auditoría"
+    "Run audit": "Ejecutar auditoría",
+    "Toggle navigation": "Alternar navegación",
+    "Illustrative trend chart": "Gráfico de tendencia ilustrativo"
   },
   "fr": {
     "WORKSPACE": "ESPACE DE TRAVAIL",
@@ -413,7 +415,9 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "running shoes": "chaussures de course",
     "trail sneakers": "chaussures de trail",
     "waterproof boots": "bottes imperméables",
-    "Run audit": "Lancer l’audit"
+    "Run audit": "Lancer l’audit",
+    "Toggle navigation": "Afficher/masquer la navigation",
+    "Illustrative trend chart": "Graphique de tendance illustratif"
   },
   "de": {
     "WORKSPACE": "ARBEITSBEREICH",
@@ -621,6 +625,8 @@ export const EXTRA_TEXT: Record<string, Record<string, string>> = {
     "running shoes": "Laufschuhe",
     "trail sneakers": "Trail-Sneaker",
     "waterproof boots": "wasserdichte Stiefel",
-    "Run audit": "Audit starten"
+    "Run audit": "Audit starten",
+    "Toggle navigation": "Navigation umschalten",
+    "Illustrative trend chart": "Illustratives Trenddiagramm"
   }
 };
