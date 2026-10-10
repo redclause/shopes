@@ -27,6 +27,10 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   const [generatedUrl, setGeneratedUrl] = useState("");
   const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState("");
+  const [topic, setTopic] = useState("");
+  const [candidateUrl, setCandidateUrl] = useState("");
+  const [verifyResult, setVerifyResult] = useState<{status:string; message:string; checkedUrl?:string; targetUrl?:string; checkedAt?:string; note?:string; httpStatus?:number} | null>(null);
+  const [verifying, setVerifying] = useState(false);
 
   const snippets = useMemo<Snippet[]>(() => {
     if (!generatedUrl) return [];
@@ -49,6 +53,35 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
     setCopiedId("");
     try { setGeneratedUrl(normalizeUrl(targetUrl)); }
     catch { setGeneratedUrl(""); setError("Enter a valid page URL, such as https://example.com/article."); }
+  }
+
+  const opportunitySearches = useMemo(() => {
+    if (!generatedUrl) return [];
+    const host = new URL(generatedUrl).hostname;
+    const subject = topic.trim() || pageTitle.trim() || host;
+    const queries = [
+      { title: "Relevant resource pages", query: `"${subject}" (resources OR "useful links" OR references)` },
+      { title: "Relevant directories", query: `"${subject}" (directory OR listings OR submit)` },
+      { title: "Contributor and submission pages", query: `"${subject}" ("submit a resource" OR "write for us" OR contribute)` },
+      { title: "Unlinked brand mentions", query: `"${host}" -site:${host}` },
+      { title: "Relevant partner pages", query: `"${subject}" (partners OR associations OR recommended)` },
+    ];
+    return queries.map((item) => ({ ...item, googleUrl: `https://www.google.com/search?q=${encodeURIComponent(item.query)}`, bingUrl: `https://www.bing.com/search?q=${encodeURIComponent(item.query)}` }));
+  }, [generatedUrl, topic, pageTitle]);
+
+  async function verifyBacklink(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setVerifying(true);
+    setVerifyResult(null);
+    try {
+      const response = await fetch("/api/backlink-maker/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetUrl: generatedUrl, candidateUrl: candidateUrl.trim() }) });
+      const result = await response.json();
+      setVerifyResult(result);
+    } catch {
+      setVerifyResult({ status: "error", message: "The verification request failed. Please try again." });
+    } finally {
+      setVerifying(false);
+    }
   }
 
   async function copySnippet(id: string, value: string) {
@@ -112,6 +145,26 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
               })}
             </div>
             <div className={styles.notice}><ShieldCheck size={18} /><p><strong>Important:</strong> These are link snippets, not published backlinks. A backlink only exists after another page publishes the link. Focus on relevant, useful placements; mass automated submissions can be treated as spam and may harm SEO.</p></div>
+          </section>
+        )}
+        {generatedUrl && (
+          <section className={styles.results} aria-labelledby="opportunities-title">
+            <div className={styles.eyebrow}><Sparkles size={14} /> DISCOVERY WORKSPACE</div>
+            <h2 id="opportunities-title" style={{ margin: "9px 0 7px", fontSize: 23 }}>Find backlink opportunities</h2>
+            <p style={{ color: "#aabac8", fontSize: 13, lineHeight: 1.7, marginTop: 0 }}>Shopes prepares focused searches using your page and topic. Open a search, review each website, and only submit where the site explicitly permits relevant links. Search results are not confirmed opportunities until you review them.</p>
+            <label className={styles.field}><span>Topic or niche <small>(optional, improves searches)</small></span><input value={topic} onChange={(event) => setTopic(event.target.value)} placeholder="e.g. sustainable home products" maxLength={120} /></label>
+            <div className={styles.snippetList}>
+              {opportunitySearches.map((item) => <article className={styles.snippet} key={item.title}>
+                <div className={styles.snippetHead}><div><h3>{item.title}</h3><p>{item.query}</p></div><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><a className={styles.export} href={item.googleUrl} target="_blank" rel="noreferrer">Google <ExternalLink size={13} /></a><a className={styles.export} href={item.bingUrl} target="_blank" rel="noreferrer">Bing <ExternalLink size={13} /></a></div></div>
+              </article>)}
+            </div>
+            <div className={styles.notice} style={{ marginTop: 16 }}><ShieldCheck size={18} /><p><strong>Honest status reporting:</strong> Search links open public search results in your browser; Shopes does not claim that a backlink has been submitted or published. Direct automated scraping of search engines is intentionally not used.</p></div>
+            <form onSubmit={verifyBacklink} style={{ marginTop: 22 }}>
+              <div className={styles.cardHeading}><span className={styles.iconTile}><Check size={19} /></span><div><h2>Verify a candidate page</h2><p>Paste a public page URL to check whether its HTML contains a link to your target.</p></div></div>
+              <label className={styles.field}><span>Candidate page URL <b>*</b></span><input type="url" inputMode="url" placeholder="https://example.com/resources" value={candidateUrl} onChange={(event) => setCandidateUrl(event.target.value)} required /></label>
+              <button className={styles.primary} type="submit" disabled={verifying} style={verifying ? { opacity: .7, cursor: "wait" } : undefined}>{verifying ? "Checking page…" : "Check for backlink"} <ArrowRight size={16} /></button>
+            </form>
+            {verifyResult && <div className={styles.notice} role="status" style={{ marginTop: 16, borderColor: verifyResult.status === "found" ? "#2c7569" : "#6c5960" }}><ShieldCheck size={18} /><p><strong>{verifyResult.status === "found" ? "Link found" : verifyResult.status === "not-found" ? "Link not found" : verifyResult.status === "redirect" ? "Page redirected" : "Could not verify"}</strong><br />{verifyResult.message}{verifyResult.httpStatus ? ` (HTTP ${verifyResult.httpStatus})` : ""}{verifyResult.checkedAt ? ` Checked at ${new Date(verifyResult.checkedAt).toLocaleString()}.` : ""}{verifyResult.note ? ` ${verifyResult.note}` : ""}</p></div>}
           </section>
         )}
         <footer className={styles.footer}>Shopes Backlink Maker <span>Build useful links. Avoid spam.</span></footer>
