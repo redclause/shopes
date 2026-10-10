@@ -21,3 +21,15 @@
   .projectCopy strong,.auditList strong{font-size:14px}
   .projectCopy small,.auditList small{font-size:13px}
 }
+
+
+/* Make project workspace panel headings and saved shop names clearly readable. */
+.panelHead h3 {
+  color: #F8FAFF;
+  font-weight: 800;
+}
+.projectCopy strong,
+.auditList strong {
+  color: #F8FAFF;
+  font-weight: 800;
+}

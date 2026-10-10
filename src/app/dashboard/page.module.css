@@ -125,3 +125,11 @@
   .metricCard>p{font-size:13px}
   .footer{font-size:12px;flex-wrap:wrap}
 }
+
+
+/* Improve contrast for dashboard section headings and account title. */
+.sectionHeading h2,
+.accountPanelCopy h2 {
+  color: #F8FAFF !important;
+  font-weight: 800;
+}
