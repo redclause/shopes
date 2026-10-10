@@ -11,7 +11,6 @@ const TEXT: Record<string, TextMap> = {
     "Your store URL":"URL de tu tienda","Enter your store URL":"Introduce la URL de tu tienda","Analyze store":"Analizar tienda",
     "Built for teams who care about being found.":"Para equipos que quieren mejorar su visibilidad.","Practical insights, not guesswork":"Información práctica, sin suposiciones",
     "Explore the platform":"Explorar la plataforma","No paid plans or upgrade fees.":"Sin planes de pago ni tarifas de actualización.",
-    "E-COMMERCE SEARCH INTELLIGENCE":"INTELIGENCIA DE BÚSQUEDA PARA COMERCIO ELECTRÓNICO",
     "STORE OVERVIEW":"RESUMEN DE LA TIENDA","PROJECT OVERVIEW":"RESUMEN DEL PROYECTO","Demo preview":"Vista previa de demostración",
     "Site health":"Estado del sitio","Technical overview":"Resumen técnico","Tracked keywords":"Palabras clave monitorizadas",
     "Keyword workspace":"Espacio de palabras clave","ORGANIC VISIBILITY":"VISIBILIDAD ORGÁNICA","Search opportunity overview":"Resumen de oportunidades de búsqueda",
