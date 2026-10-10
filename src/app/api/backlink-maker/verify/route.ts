@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "../../../../../auth";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { extractBacklinkEvidence, extractCanonicalUrl } from "../../../backlink-maker/verification";
@@ -37,6 +38,8 @@ async function assertPublicHost(url: URL) {
 }
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ status: "unauthorized", message: "Sign in to use the Backlink Maker." }, { status: 401 });
   try {
     const body = await request.json();
     const targetUrl = parsePublicUrl(body?.targetUrl);
