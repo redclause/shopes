@@ -64,7 +64,8 @@ async function validateAndResolve(input: string): Promise<{ url: URL; address: s
 
   if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error("Only HTTP and HTTPS website URLs are supported.");
   if (url.username || url.password) throw new Error("URLs containing usernames or passwords are not allowed.");
-  if (url.port && url.port !== "80" && url.port !== "443") throw new Error("Only standard HTTP and HTTPS ports are allowed.");
+  const expectedPort = url.protocol === "https:" ? "443" : "80";
+  if (url.port && url.port !== expectedPort) throw new Error("Only standard HTTP and HTTPS ports are allowed.");
   if (url.hostname.length > 253 || !url.hostname.includes(".") || url.hostname.endsWith(".local") || url.hostname.endsWith(".internal") || url.hostname === "localhost") {
     throw new Error("Enter a public website hostname.");
   }
