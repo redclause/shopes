@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { auth, signOut } from "../../../auth";
 import { redirect } from "next/navigation";
 import AuditClient from "./AuditClient";
+export const metadata: Metadata = {
+  title: "Site Audit",
+  description: "Authenticated Shopes site audit workspace.",
+  robots: { index: false, follow: false },
+};
+
 
 type AuditPageProps = {
   searchParams: Promise<{ url?: string | string[] }>;
