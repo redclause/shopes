@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { auth, signOut } from "../../../auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -24,6 +25,12 @@ import {
 import styles from "./page.module.css";
 import WorkspaceProjects from "./WorkspaceProjects";
 import UserMenu from "../../components/UserMenu";
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Private Shopes account dashboard.",
+  robots: { index: false, follow: false },
+};
+
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
