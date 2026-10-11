@@ -354,7 +354,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
                     </article>
                   ))}
                 </div>
-                <div className={styles.notice} style={{ marginTop: 12 }}><ShieldCheck size={18} /><p><strong>Status definitions:</strong> “I completed this workflow” is your report only. It does not mean a search engine indexed the URL or a directory published a backlink. Use the existing verification workflow for public backlink evidence; search-engine indexing must be checked in the search engine's own webmaster tools.</p></div>
+                <div className={styles.notice} style={{ marginTop: 12 }}><ShieldCheck size={18} /><p><strong>Status definitions:</strong> “I completed this workflow” is your report only. It does not mean a search engine indexed the URL or a directory published a backlink. Use the existing verification workflow for public backlink evidence; search-engine indexing must be checked in the search engine&apos;s own webmaster tools.</p></div>
               </div>
             )}
           </section>
