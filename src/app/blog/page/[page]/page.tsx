@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { page: raw } = await params;
   const page = Number(raw);
   if (!Number.isInteger(page) || page < 2 || page > PAGE_COUNT) return { title: "Shopes Blog", robots: { index: false, follow: true } };
-  const title = `Online Shopping Guides — Page ${page} | Shopes Blog`;
+  const title = `Online Shopping Guides — Page ${page}`;
   const description = `Browse shopping guides ${page} of ${PAGE_COUNT}, with practical advice on product research, store comparisons, delivery, returns, and buying decisions.`;
   const url = `https://shopes.online/blog/page/${page}`;
   return {
