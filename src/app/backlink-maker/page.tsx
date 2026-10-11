@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { auth, signOut } from "../../../auth";
 import { redirect } from "next/navigation";
 import BacklinkMakerClient from "./BacklinkMakerClient";
+export const metadata: Metadata = {
+  title: "Backlink Maker",
+  description: "Authenticated Shopes backlink submission workspace.",
+  robots: { index: false, follow: false },
+};
+
 
 export default async function BacklinkMakerPage() {
   const session = await auth();
