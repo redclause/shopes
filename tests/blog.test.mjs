@@ -1,4 +1,5 @@
 import test from "node:test";
+import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 import { buildCoreSitemapXml, buildSitemapIndexXml } from "../src/lib/seo/sitemaps.ts";
 import {
@@ -65,4 +66,17 @@ test("sitemap XML escapes unsafe characters in URL values", () => {
   const xml = buildCoreSitemapXml(["/test?x=<tag>&q='quote'"]);
   assert.match(xml, /&lt;tag&gt;/);
   assert.match(xml, /&amp;q=&apos;quote&apos;/);
+});
+
+test("generated blog routes stay noindex until editorial review", async () => {
+  const files = [
+    "src/app/blog/[slug]/page.tsx",
+    "src/app/blog/page.tsx",
+    "src/app/blog/page/[page]/page.tsx"
+  ];
+
+  for (const file of files) {
+    const source = await readFile(file, "utf8");
+    assert.match(source, /robots:\s*\{\s*index:\s*false,\s*follow:\s*true\s*\}/, file);
+  }
 });
