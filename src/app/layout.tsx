@@ -2,10 +2,23 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
-  title: { default: "Shopes — Make your store discoverable everywhere", template: "%s | Shopes" },
-  description: "Technical SEO audits, keyword intelligence, and product discovery tools built for online stores.",
+  metadataBase: new URL("https://shopes.online"),
+  title: { default: "Shopes — E-commerce SEO & Product Discovery", template: "%s | Shopes" },
+  description: "Improve your online store's discoverability with technical SEO audits, keyword research, product data checks, and e-commerce search intelligence.",
   applicationName: "Shopes",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Shopes",
+    url: "https://shopes.online/",
+    title: "Shopes — E-commerce SEO & Product Discovery",
+    description: "Technical SEO audits, keyword research, product data checks, and search intelligence for online stores."
+  },
+  twitter: {
+    card: "summary",
+    title: "Shopes — E-commerce SEO & Product Discovery",
+    description: "Technical SEO audits, keyword research, product data checks, and search intelligence for online stores."
+  },
   robots: { index: true, follow: true }
 };
 
