@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ShoppingBag } from "lucide-react";
 import { ARTICLE_COUNT, getArticleMeta } from "../../lib/blog/shopping-articles";
 import styles from "./blog.module.css";
 
@@ -67,6 +68,16 @@ export default function BlogIndexPage() {
         }}
       />
       <main className={styles.blogPage}>
+        <header className={styles.articleHeader}>
+          <Link href="/" className={styles.articleBrand} aria-label="Shopes home">
+            <span className={styles.articleBrandMark}>
+              <ShoppingBag size={18} aria-hidden="true" />
+            </span>
+            <span>
+              shopes<span className={styles.articleBrandDot}>.</span>
+            </span>
+          </Link>
+        </header>
         <div className={styles.container}>
           <p className={styles.eyebrow}>Shopes Blog</p>
           <h1 className={styles.title}>Online shopping knowledge.</h1>
