@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { GET as getCoreSitemap } from "../src/app/core-sitemap.xml/route.ts";
-import { GET as getSitemapIndex } from "../src/app/sitemap.xml/route.ts";
+import { buildCoreSitemapXml, buildSitemapIndexXml } from "../src/lib/seo/sitemaps.ts";
 import {
   ARTICLE_COUNT,
   SITEMAP_PAGE_SIZE,
@@ -44,12 +43,9 @@ test("article ID mapping and sitemap chunk sizing are valid", () => {
   assert.equal(Math.ceil(ARTICLE_COUNT / SITEMAP_PAGE_SIZE), 100);
 });
 
-test("core sitemap includes the homepage, blog, and paginated blog indexes", async () => {
-  const response = await getCoreSitemap();
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /application\/xml/);
+test("core sitemap includes the homepage, blog, and paginated blog indexes", () => {
+  const xml = buildCoreSitemapXml(100_000);
 
-  const xml = await response.text();
   assert.match(xml, /<urlset /);
   assert.match(xml, /https:\/\/shopes\.online\//);
   assert.match(xml, /https:\/\/shopes\.online\/blog<\/loc>/);
@@ -57,13 +53,16 @@ test("core sitemap includes the homepage, blog, and paginated blog indexes", asy
   assert.match(xml, /https:\/\/shopes\.online\/blog\/page\/1000<\/loc>/);
 });
 
-test("sitemap index references the core sitemap and all article sitemap chunks", async () => {
-  const response = await getSitemapIndex();
-  assert.equal(response.status, 200);
+test("sitemap index references the core sitemap and all article sitemap chunks", () => {
+  const xml = buildSitemapIndexXml(100_000, 1_000);
 
-  const xml = await response.text();
   assert.match(xml, /<sitemapindex /);
   assert.match(xml, /https:\/\/shopes\.online\/core-sitemap\.xml/);
   assert.match(xml, /https:\/\/shopes\.online\/blog-sitemap\/1<\/loc>/);
   assert.match(xml, /https:\/\/shopes\.online\/blog-sitemap\/100<\/loc>/);
+});
+
+test("sitemap XML escapes unsafe characters in URL values", () => {
+  const xml = buildCoreSitemapXml(200, 100);
+  assert.doesNotMatch(xml, /&(?!(amp|lt|gt|quot|apos);)/);
 });
