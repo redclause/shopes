@@ -13,7 +13,7 @@ function xmlEscape(value: string): string {
 
 export function buildCoreSitemapXml(paths: readonly string[] = INDEXABLE_PUBLIC_PATHS): string {
   const urls = paths
-    .map((path) => `<url><loc>${xmlEscape(new URL(path, BASE_URL).toString())}</loc></url>`)
+    .map((path) => `<url><loc>${xmlEscape(`${BASE_URL}${path}`)}</loc></url>`)
     .join("");
 
   return (
