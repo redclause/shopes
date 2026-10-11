@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: url },
     openGraph: { type: "website", siteName: "Shopes", title, description, url },
     twitter: { card: "summary", title, description },
-    robots: { index: true, follow: true }
+    robots: { index: false, follow: true }
   };
 }
 
