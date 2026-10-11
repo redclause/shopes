@@ -170,7 +170,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
         submissionMethod: destination.method,
         title: pageTitle.trim() || undefined,
         description: description.trim() || undefined,
-        status: "prepared",
+        status: "prepared" as const,
         submissionStatus: "prepared",
         verificationStatus: "not-checked",
         createdAt: now,
