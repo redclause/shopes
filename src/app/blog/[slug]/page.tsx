@@ -37,7 +37,18 @@ export default async function BlogArticlePage({ params }: Props) {
     url: `https://shopes.online/blog/${article.slug}`,
     articleSection: article.topic,
     author: { "@type": "Organization", name: "Shopes Blog" },
-    publisher: { "@type": "Organization", name: "Shopes", url: "https://shopes.online" }
+    publisher: { "@type": "Organization", name: "Shopes", url: "https://shopes.online" },
+    isPartOf: { "@type": "Blog", name: "Shopes Blog", url: "https://shopes.online/blog" },
+    inLanguage: "en"
+  };
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://shopes.online/" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://shopes.online/blog" },
+      { "@type": "ListItem", position: 3, name: article.title, item: `https://shopes.online/blog/${article.slug}` }
+    ]
   };
   return <main className={styles.blogPage}>
     <header className={styles.articleHeader}>
@@ -52,5 +63,6 @@ export default async function BlogArticlePage({ params }: Props) {
     <p className={styles.articleDescription}>{article.description}</p>
     <div className={styles.articleBody}><div className={styles.prose} dangerouslySetInnerHTML={{ __html: article.content }} /></div>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData).replace(/</g, "\\u003c") }} />
   </article></main>;
 }
