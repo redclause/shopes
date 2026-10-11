@@ -13,6 +13,7 @@ const BLOG_DESCRIPTION =
 export const metadata: Metadata = {
   title: "Online Shopping Guides",
   description: BLOG_DESCRIPTION,
+  robots: { index: false, follow: true },
   alternates: { canonical: BLOG_URL },
   openGraph: {
     title: "Online Shopping Guides & Product Research | Shopes Blog",
