@@ -43,26 +43,26 @@ test("article ID mapping and sitemap chunk sizing are valid", () => {
   assert.equal(Math.ceil(ARTICLE_COUNT / SITEMAP_PAGE_SIZE), 100);
 });
 
-test("core sitemap includes the homepage, blog, and paginated blog indexes", () => {
-  const xml = buildCoreSitemapXml(100_000);
+test("core sitemap contains only public URLs approved for indexing", () => {
+  const xml = buildCoreSitemapXml();
 
   assert.match(xml, /<urlset /);
   assert.match(xml, /https:\/\/shopes\.online\//);
-  assert.match(xml, /https:\/\/shopes\.online\/blog<\/loc>/);
-  assert.match(xml, /https:\/\/shopes\.online\/blog\/page\/2<\/loc>/);
-  assert.match(xml, /https:\/\/shopes\.online\/blog\/page\/1000<\/loc>/);
+  assert.match(xml, /https:\/\/shopes\.online\/privacy<\/loc>/);
+  assert.match(xml, /https:\/\/shopes\.online\/terms<\/loc>/);
+  assert.doesNotMatch(xml, /\/blog(?:\/|<\/loc>)/);
 });
 
-test("sitemap index references the core sitemap and all article sitemap chunks", () => {
-  const xml = buildSitemapIndexXml(100_000, 1_000);
+test("sitemap index references only the reviewed core sitemap", () => {
+  const xml = buildSitemapIndexXml();
 
   assert.match(xml, /<sitemapindex /);
   assert.match(xml, /https:\/\/shopes\.online\/core-sitemap\.xml/);
-  assert.match(xml, /https:\/\/shopes\.online\/blog-sitemap\/1<\/loc>/);
-  assert.match(xml, /https:\/\/shopes\.online\/blog-sitemap\/100<\/loc>/);
+  assert.doesNotMatch(xml, /blog-sitemap/);
 });
 
 test("sitemap XML escapes unsafe characters in URL values", () => {
-  const xml = buildCoreSitemapXml(200, 100);
-  assert.doesNotMatch(xml, /&(?!(amp|lt|gt|quot|apos);)/);
+  const xml = buildCoreSitemapXml(["/test?x=<tag>&q='quote'"]);
+  assert.match(xml, /&lt;tag&gt;/);
+  assert.match(xml, /&amp;q=&apos;quote&apos;/);
 });
