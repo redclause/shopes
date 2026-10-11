@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { auth, signOut } from "../../../auth";
 import { redirect } from "next/navigation";
 import KeywordResearchClient from "./KeywordResearchClient";
+export const metadata: Metadata = {
+  title: "Keyword Research",
+  description: "Authenticated Shopes keyword research workspace.",
+  robots: { index: false, follow: false },
+};
+
 
 export default async function KeywordResearchPage() {
   const session = await auth();
