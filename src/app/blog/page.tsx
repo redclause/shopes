@@ -11,7 +11,7 @@ const BLOG_DESCRIPTION =
   "Practical guides to researching products, comparing online stores, understanding delivery and returns, and making informed buying decisions.";
 
 export const metadata: Metadata = {
-  title: "Shopes Blog — Online Shopping",
+  title: "Online Shopping Guides",
   description: BLOG_DESCRIPTION,
   alternates: { canonical: BLOG_URL },
   openGraph: {
