@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { translate } from "../../lib/i18n/messages";
 import { signIn } from "../../../auth";
 import GoogleOneTapButton from "../components/GoogleOneTapButton";
 import { ArrowLeft, ShieldCheck, ShoppingBag } from "lucide-react";
+export const metadata: Metadata = {
+  title: "Sign In",
+  description: "Sign in securely to your Shopes account.",
+  robots: { index: false, follow: false },
+};
+
 
 type LoginPageProps = {
   searchParams: Promise<{ callbackUrl?: string | string[] }>;
