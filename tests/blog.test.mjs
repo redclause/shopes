@@ -80,3 +80,18 @@ test("generated blog routes stay noindex until editorial review", async () => {
     assert.match(source, /robots:\s*\{\s*index:\s*false,\s*follow:\s*true\s*\}/, file);
   }
 });
+
+test("authenticated workspace and sign-in routes are not indexable", async () => {
+  const files = [
+    "src/app/audit/page.tsx",
+    "src/app/backlink-maker/page.tsx",
+    "src/app/keyword-research/page.tsx",
+    "src/app/dashboard/page.tsx",
+    "src/app/login/page.tsx"
+  ];
+
+  for (const file of files) {
+    const source = await readFile(file, "utf8");
+    assert.match(source, /robots:\s*\{\s*index:\s*false,\s*follow:\s*false\s*\}/, file);
+  }
+});
