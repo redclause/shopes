@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { GET as getCoreSitemap } from "../src/app/core-sitemap.xml/route.ts";
+import { GET as getSitemapIndex } from "../src/app/sitemap.xml/route.ts";
 import {
   ARTICLE_COUNT,
   SITEMAP_PAGE_SIZE,
@@ -40,4 +42,28 @@ test("article ID mapping and sitemap chunk sizing are valid", () => {
   assert.equal(articleIdToParts(-1), null);
   assert.equal(SITEMAP_PAGE_SIZE, 1_000);
   assert.equal(Math.ceil(ARTICLE_COUNT / SITEMAP_PAGE_SIZE), 100);
+});
+
+test("core sitemap includes the homepage, blog, and paginated blog indexes", async () => {
+  const response = await getCoreSitemap();
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") ?? "", /application\/xml/);
+
+  const xml = await response.text();
+  assert.match(xml, /<urlset /);
+  assert.match(xml, /https:\/\/shopes\.online\//);
+  assert.match(xml, /https:\/\/shopes\.online\/blog<\/loc>/);
+  assert.match(xml, /https:\/\/shopes\.online\/blog\/page\/2<\/loc>/);
+  assert.match(xml, /https:\/\/shopes\.online\/blog\/page\/1000<\/loc>/);
+});
+
+test("sitemap index references the core sitemap and all article sitemap chunks", async () => {
+  const response = await getSitemapIndex();
+  assert.equal(response.status, 200);
+
+  const xml = await response.text();
+  assert.match(xml, /<sitemapindex /);
+  assert.match(xml, /https:\/\/shopes\.online\/core-sitemap\.xml/);
+  assert.match(xml, /https:\/\/shopes\.online\/blog-sitemap\/1<\/loc>/);
+  assert.match(xml, /https:\/\/shopes\.online\/blog-sitemap\/100<\/loc>/);
 });
