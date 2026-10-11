@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Check, Clipboard, Download, ExternalLink, Link2,
 import UserMenu from "../../components/UserMenu";
 import styles from "./page.module.css";
 import { backlinkSiteCatalog, backlinkSiteCategories } from "./site-catalog";
+import { submissionQueueDestinations } from "./submission-queue-destinations";
 import { canReopenManualWorkflow, getManualWorkflow, hasActiveDuplicate, normalizeStoredRecord, submissionStatusLabel, verificationStatusLabel } from "./submission-tracker.mjs";
 
 type Props = { userName: string; userEmail: string; userImage?: string | null; signOutAction: () => Promise<void> };
@@ -49,6 +50,7 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
   const [catalogPage, setCatalogPage] = useState(1);
   const [policyResults, setPolicyResults] = useState<Record<string, { status: string; message: string; evidence?: { path: string; kind: string; httpStatus: number; matchedKeywords?: string[]; excerpt?: string; summary?: { appliesToAll: boolean; directives: string[] } }[]; submissionCandidates?: { url: string; label: string }[]; note?: string }>>({});
   const [checkingPolicySite, setCheckingPolicySite] = useState("");
+  const [selectedQueueDestinations, setSelectedQueueDestinations] = useState<string[]>([]);
 
   useEffect(() => {
     try {
@@ -151,6 +153,41 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
     setSubmissionRecords((current) => current.map((record) => record.id === id ? { ...record, status, submissionStatus: status, updatedAt: new Date().toISOString() } : record));
   }
 
+  function addSelectedDestinationsToQueue() {
+    if (!generatedUrl || selectedQueueDestinations.length === 0) return;
+    const now = new Date().toISOString();
+    const additions: SubmissionRecord[] = submissionQueueDestinations
+      .filter((destination) => selectedQueueDestinations.includes(destination.id))
+      .filter((destination) => !hasActiveDuplicate(submissionRecords, generatedUrl, `queue-${destination.id}`))
+      .map((destination) => ({
+        id: `queue-${destination.id}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        targetUrl: generatedUrl,
+        candidateUrl: "",
+        siteId: `queue-${destination.id}`,
+        siteName: destination.name,
+        siteDomain: new URL(destination.url).hostname,
+        submissionUrl: destination.url,
+        submissionMethod: destination.method,
+        title: pageTitle.trim() || undefined,
+        description: description.trim() || undefined,
+        status: "prepared",
+        submissionStatus: "prepared",
+        verificationStatus: "not-checked",
+        createdAt: now,
+        updatedAt: now,
+        note: `Queue type: ${destination.kind}. ${destination.guidance} Requirements: ${destination.requirements}`,
+      }));
+    if (additions.length === 0) {
+      setError("These destinations are already in your active queue for this target URL.");
+      return;
+    }
+    setSubmissionRecords((current) => [...additions, ...current].slice(0, 100));
+    setSelectedQueueDestinations([]);
+    setError("");
+  }
+
+  const queuedRecords = submissionRecords.filter((record) => (record.siteId || "").startsWith("queue-"));
+
   const filteredCatalog = useMemo(() => {
     const query = catalogSearch.trim().toLowerCase();
     return backlinkSiteCatalog.filter((site) =>
@@ -251,6 +288,75 @@ export default function BacklinkMakerClient({ userName, userEmail, userImage, si
               })}
             </div>
             <div className={styles.notice}><ShieldCheck size={18} /><p><strong>Important:</strong> These are link snippets, not published backlinks. A backlink only exists after another page publishes the link. Focus on relevant, useful placements; mass automated submissions can be treated as spam and may harm SEO.</p></div>
+          </section>
+        )}
+        {generatedUrl && (
+          <section className={styles.results} aria-labelledby="submission-queue-title">
+            <div className={styles.eyebrow}><Clipboard size={14} /> MULTI-DESTINATION WORKFLOW</div>
+            <h2 id="submission-queue-title" style={{ margin: "9px 0 7px", fontSize: 23 }}>Submission queue</h2>
+            <p style={{ color: "#aabac8", fontSize: 13, lineHeight: 1.7, marginTop: 0 }}>
+              Queue search-engine discovery workflows and relevant directory or community destinations for <strong style={{ color: "#eff6fa" }}>{generatedUrl}</strong>.
+              Shopes opens official workflows for you; it does not submit third-party forms, bypass sign-in or CAPTCHA, or guarantee indexing or publication.
+            </p>
+            <div className={styles.snippetList}>
+              {(["search-engine", "directory-backlink"] as const).map((kind) => (
+                <article className={styles.snippet} key={kind}>
+                  <div className={styles.snippetHead}>
+                    <div>
+                      <h3>{kind === "search-engine" ? "Search engines" : "Directories and backlink destinations"}</h3>
+                      <p>{kind === "search-engine" ? "Sitemaps, URL inspection, and owner-authorized indexing notifications." : "Manual, relevant publishing or listing workflows. No generic mass-posting."}</p>
+                    </div>
+                  </div>
+                  <div style={{ display: "grid", gap: 10, marginTop: 13 }}>
+                    {submissionQueueDestinations.filter((destination) => destination.kind === kind).map((destination) => {
+                      const alreadyQueued = submissionRecords.some((record) => record.siteId === `queue-${destination.id}` && record.targetUrl === generatedUrl && record.status !== "rejected");
+                      return (
+                        <label key={destination.id} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: 12, border: "1px solid #2b3b49", borderRadius: 10, background: "#101923", cursor: alreadyQueued ? "not-allowed" : "pointer", opacity: alreadyQueued ? 0.65 : 1 }}>
+                          <input type="checkbox" checked={selectedQueueDestinations.includes(destination.id)} disabled={alreadyQueued} onChange={(event) => setSelectedQueueDestinations((current) => event.target.checked ? [...current, destination.id] : current.filter((id) => id !== destination.id))} style={{ marginTop: 3, accentColor: "#49ddf5" }} />
+                          <span style={{ display: "grid", gap: 4, minWidth: 0 }}>
+                            <strong style={{ color: "#eff6fa", fontSize: 13 }}>{destination.name}{alreadyQueued ? " · already queued" : ""}</strong>
+                            <span style={{ color: "#a9bac8", fontSize: 12 }}>{destination.method}</span>
+                            <span style={{ color: "#93a7b7", fontSize: 12, lineHeight: 1.6 }}>{destination.guidance}</span>
+                            <span style={{ color: "#e6c77e", fontSize: 11, lineHeight: 1.5 }}>Requirements: {destination.requirements}</span>
+                            <a href={destination.url} target="_blank" rel="noopener noreferrer" className={styles.export} style={{ width: "fit-content", marginTop: 4 }} onClick={(event) => event.stopPropagation()}>Review official workflow <ExternalLink size={12} /></a>
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginTop: 16 }}>
+              <button className={styles.primary} type="button" onClick={addSelectedDestinationsToQueue} disabled={selectedQueueDestinations.length === 0}><Clipboard size={15} /> Add {selectedQueueDestinations.length || ""} selected to queue</button>
+              <span style={{ color: "#9fb0bf", fontSize: 12 }}>Queue and history are stored in this browser, not on the Shopes server.</span>
+            </div>
+            {queuedRecords.length > 0 && (
+              <div style={{ marginTop: 22 }}>
+                <div className={styles.cardHeading}><span className={styles.iconTile}><Check size={19} /></span><div><h2>Queued workflows</h2><p>{queuedRecords.length} queued item(s) across saved target URLs.</p></div></div>
+                <div className={styles.snippetList}>
+                  {queuedRecords.slice(0, 20).map((record) => (
+                    <article className={styles.snippet} key={record.id}>
+                      <div className={styles.snippetHead}>
+                        <div>
+                          <h3>{record.siteName || "Submission destination"} · {submissionStatusLabel(record.status)}</h3>
+                          <p>Target: {record.targetUrl}</p>
+                          {record.submissionMethod && <p>{record.submissionMethod}</p>}
+                          {record.note && <p>{record.note}</p>}
+                        </div>
+                        {record.submissionUrl && <a className={styles.export} href={record.submissionUrl} target="_blank" rel="noopener noreferrer">Open workflow <ExternalLink size={13} /></a>}
+                      </div>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+                        {record.status === "prepared" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "user-reported-submitted")}>I completed this workflow</button>}
+                        {record.status !== "rejected" && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "rejected")}>Mark rejected / not applicable</button>}
+                        {canReopenManualWorkflow(record.status) && <button type="button" className={styles.export} onClick={() => updateSubmissionStatus(record.id, "prepared")}>Reopen workflow</button>}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <div className={styles.notice} style={{ marginTop: 12 }}><ShieldCheck size={18} /><p><strong>Status definitions:</strong> “I completed this workflow” is your report only. It does not mean a search engine indexed the URL or a directory published a backlink. Use the existing verification workflow for public backlink evidence; search-engine indexing must be checked in the search engine's own webmaster tools.</p></div>
+              </div>
+            )}
           </section>
         )}
         {generatedUrl && (
