@@ -1,8 +1,7 @@
-import { ARTICLE_COUNT, SITEMAP_PAGE_SIZE } from "../../lib/blog/shopping-articles";
 import { buildSitemapIndexXml } from "../../lib/seo/sitemaps";
 
 export async function GET() {
-  const xml = buildSitemapIndexXml(ARTICLE_COUNT, SITEMAP_PAGE_SIZE);
+  const xml = buildSitemapIndexXml();
 
   return new Response(xml, {
     headers: {
