@@ -1,3 +1,5 @@
+import { timingSafeEqual } from "node:crypto";
+
 export const SMOLLM2_MODEL_ID = "onnx-community/SmolLM2-360M-ONNX";
 export const SMOLLM2_DTYPE = "q4f16";
 export const SMOLLM2_MAX_NEW_TOKENS = 96;
@@ -28,4 +30,21 @@ export function getSmolLM2BenchmarkPrompt(
 
   const safeTask = task as SmolLM2BenchmarkTask;
   return { task: safeTask, prompt: SMOLLM2_BENCHMARK_PROMPTS[safeTask] };
+}
+
+export function isSmolLM2PreviewBenchmarkEnabled(
+  featureFlag: string | undefined,
+  vercelEnvironment: string | undefined,
+): boolean {
+  return featureFlag === "true" && vercelEnvironment !== "production";
+}
+
+export function isValidSmolLM2PreviewToken(
+  expectedToken: string | undefined,
+  providedToken: string | null,
+): boolean {
+  if (!expectedToken || expectedToken.length < 32 || !providedToken) return false;
+  const expected = Buffer.from(expectedToken, "utf8");
+  const provided = Buffer.from(providedToken, "utf8");
+  return expected.length === provided.length && timingSafeEqual(expected, provided);
 }

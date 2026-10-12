@@ -1,6 +1,8 @@
 import { auth } from "../../../../../auth";
 import {
   getSmolLM2BenchmarkPrompt,
+  isSmolLM2PreviewBenchmarkEnabled,
+  isValidSmolLM2PreviewToken,
   SMOLLM2_DTYPE,
   SMOLLM2_MAX_NEW_TOKENS,
   SMOLLM2_MODEL_ID,
@@ -49,8 +51,14 @@ async function getGenerator(): Promise<TextGenerator> {
 export async function POST(request: Request) {
   // Hard-off by default, and impossible to enable on a Production deployment.
   if (
-    process.env.SHOPES_SMOLLM2_PREVIEW_TEST !== "true" ||
-    process.env.VERCEL_ENV === "production"
+    !isSmolLM2PreviewBenchmarkEnabled(
+      process.env.SHOPES_SMOLLM2_PREVIEW_TEST,
+      process.env.VERCEL_ENV,
+    ) ||
+    !isValidSmolLM2PreviewToken(
+      process.env.SHOPES_SMOLLM2_PREVIEW_TEST_TOKEN,
+      request.headers.get("x-shopes-benchmark-token"),
+    )
   ) {
     return new Response(null, { status: 404 });
   }
@@ -74,9 +82,13 @@ export async function POST(request: Request) {
 
   let body: { task?: unknown };
   try {
-    body = (await request.json()) as { task?: unknown };
+    const rawBody = await request.text();
+    if (Buffer.byteLength(rawBody, "utf8") > 1024) {
+      return Response.json({ error: "Request body is too large." }, { status: 413 });
+    }
+    body = JSON.parse(rawBody) as { task?: unknown };
   } catch {
-    return Response.json({ error: "Expected a JSON body." }, { status: 400 });
+    return Response.json({ error: "Expected a small JSON body." }, { status: 400 });
   }
 
   const selected = getSmolLM2BenchmarkPrompt(body.task);

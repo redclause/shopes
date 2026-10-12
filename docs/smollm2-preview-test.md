@@ -15,6 +15,7 @@ The ONNX repository contains several variants. This test requests the `q4f16` va
 - The endpoint is `POST /api/internal/smollm2-benchmark`.
 - It returns 404 unless `SHOPES_SMOLLM2_PREVIEW_TEST=true`.
 - It also returns 404 whenever `VERCEL_ENV=production`, even if the flag is mistakenly set.
+- It additionally requires a separately configured `SHOPES_SMOLLM2_PREVIEW_TEST_TOKEN` of at least 32 characters and a matching `x-shopes-benchmark-token` request header.
 - It requires an existing authenticated Shopes session.
 - It accepts only a task identifier (`seo`, `keywords`, or `code`); it does not accept arbitrary prompts.
 - It generates at most 96 new tokens, allows only one active run per warm function instance, and has a 60-second function duration cap.
@@ -24,13 +25,18 @@ The ONNX repository contains several variants. This test requests the `q4f16` va
 
 ## Enabling the test (manual action required)
 
-Do not add this variable to Production. To run the benchmark, a maintainer must explicitly add `SHOPES_SMOLLM2_PREVIEW_TEST=true` to the Vercel **Preview environment only**, then redeploy the Preview deployment. This repository change does not modify Vercel settings.
+Do not add either variable to Production. To run the benchmark, a maintainer must explicitly add both variables to the Vercel **Preview environment only**:
+
+- `SHOPES_SMOLLM2_PREVIEW_TEST=true`
+- `SHOPES_SMOLLM2_PREVIEW_TEST_TOKEN` = a newly generated random secret with at least 32 characters
+
+Then redeploy the Preview deployment. Keep the token private and do not put it in a browser URL, logs, issue, or committed file. This repository change does not modify Vercel settings.
 
 If the Vercel Preview deployment has no accessible authenticated session, do not weaken authentication to make the test work.
 
 ## Run the three benchmark cases
 
-Using an authenticated browser session on the Preview deployment, send a POST request to `/api/internal/smollm2-benchmark` with one of these JSON bodies:
+Using an authenticated browser session on the Preview deployment, send a POST request to `/api/internal/smollm2-benchmark` with the `x-shopes-benchmark-token` header and one of these JSON bodies:
 
 ```json
 {"task":"seo"}
@@ -38,7 +44,7 @@ Using an authenticated browser session on the Preview deployment, send a POST re
 {"task":"code"}
 ```
 
-The response records model-load time, inference time, handler time, baseline RSS/heap, peak RSS/heap, peak RSS delta, and the generated output. Platform cold-start time before the handler begins is not included in `handlerTotalMs`; compare it with the request duration shown in Vercel logs.
+The response records model-load time, inference time, handler time, baseline/peak RSS and heap, and the generated output. Platform cold-start time before the handler begins is not included in `handlerTotalMs`; compare it with the request duration shown in Vercel logs.
 
 Run one case at a time. Record the first request separately from later requests to distinguish model download/load from warm inference. Repeat each case only a few times; stop if requests approach the 60-second cap, memory approaches the configured limit, the deployment reports errors, or Vercel usage changes unexpectedly.
 
@@ -51,7 +57,7 @@ The experiment is acceptable only if all of these are true:
 3. No out-of-memory, timeout, ONNX runtime, or model-download errors occur.
 4. Outputs are coherent and in English, and do not fabricate SEO metrics.
 5. Vercel usage shows no unexpected paid usage. A Pro plan and included credit are not proof of zero incremental cost; verify actual usage before repeating tests.
-6. The test route is confirmed to return 404 in Production and when the feature flag is absent.
+6. The test route is confirmed to return 404 in Production, when the feature flag is absent, and when the token is absent or incorrect.
 
 The 3 GiB threshold is a conservative project test criterion, not a claim about Vercel's billing or hard limits.
 

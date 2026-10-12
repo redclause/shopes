@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   getSmolLM2BenchmarkPrompt,
+  isSmolLM2PreviewBenchmarkEnabled,
+  isValidSmolLM2PreviewToken,
   SMOLLM2_BENCHMARK_PROMPTS,
   SMOLLM2_DTYPE,
   SMOLLM2_MAX_NEW_TOKENS,
@@ -38,8 +40,25 @@ test("rejects arbitrary prompts and unknown task names", () => {
   assert.equal(getSmolLM2BenchmarkPrompt(null), null);
 });
 
+test("feature flag is off by default and cannot enable production", () => {
+  assert.equal(isSmolLM2PreviewBenchmarkEnabled(undefined, "preview"), false);
+  assert.equal(isSmolLM2PreviewBenchmarkEnabled("true", "preview"), true);
+  assert.equal(isSmolLM2PreviewBenchmarkEnabled("true", "production"), false);
+  assert.equal(isSmolLM2PreviewBenchmarkEnabled("TRUE", "preview"), false);
+});
+
+test("benchmark token must be configured, long enough, and match exactly", () => {
+  const token = "a".repeat(40);
+  assert.equal(isValidSmolLM2PreviewToken(undefined, token), false);
+  assert.equal(isValidSmolLM2PreviewToken("short", "short"), false);
+  assert.equal(isValidSmolLM2PreviewToken(token, null), false);
+  assert.equal(isValidSmolLM2PreviewToken(token, "b".repeat(40)), false);
+  assert.equal(isValidSmolLM2PreviewToken(token, token), true);
+});
+
 test("does not interpolate user-supplied text into prompts", () => {
-  const first = getSmolLM2BenchmarkPrompt("keywords");
-  const second = getSmolLM2BenchmarkPrompt("keywords");
-  assert.deepEqual(first, second);
+  assert.deepEqual(
+    getSmolLM2BenchmarkPrompt("keywords"),
+    getSmolLM2BenchmarkPrompt("keywords"),
+  );
 });
