@@ -66,6 +66,7 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
   const [importedCount, setImportedCount] = useState(0);
   const [saveMessage, setSaveMessage] = useState("");
 
+  // Recompute suggestions whenever the seed, language, or generation state changes.
   const allIdeas = useMemo(() => {
     if (!generated) return [];
     try { return generateKeywordIdeas(submittedSeed, language); } catch { return []; }
