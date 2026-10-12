@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 const MODEL_ID = "onnx-community/SmolLM2-360M-ONNX";
 const INTENTS = new Set(["Informational", "Commercial", "Transactional", "Navigational", "Local", "Unclassified"]);
-type Generator = (prompt: string, options: { max_new_tokens: number; do_sample: boolean }) => Promise<unknown>;
+type Generator = (prompt: string, options: { max_new_tokens: number; do_sample: boolean; return_full_text: false }) => Promise<unknown>;
 let generatorPromise: Promise<Generator> | undefined;
 let activeRun = false;
 
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       "Keep recommendations practical and based only on the phrases.",
       "Keyword phrases JSON: " + JSON.stringify(keywords),
     ].join("\n");
-    const result = await generator(prompt, { max_new_tokens: 160, do_sample: false });
+    const result = await generator(prompt, { max_new_tokens: 160, do_sample: false, return_full_text: false });
     const first = Array.isArray(result) ? result[0] as { generated_text?: unknown } | undefined : undefined;
     const raw = typeof first?.generated_text === "string" ? first.generated_text : "";
     const output = parseModelJson(raw, new Set(keywords));
