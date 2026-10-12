@@ -21,6 +21,11 @@ test("generates deterministic English keyword ideas with no duplicates", () => {
   assert.ok(first.length > 15);
   assert.equal(new Set(first.map((idea) => idea.normalized)).size, first.length);
   assert.ok(first.some((idea) => idea.phrase === "best organic dog food"));
+  assert.ok(first.some((idea) => idea.category === "Core"));
+  assert.ok(first.some((idea) => idea.category === "Question"));
+  assert.ok(first.some((idea) => idea.category === "Comparison"));
+  assert.ok(first.some((idea) => idea.category === "Long-tail"));
+  assert.ok(first.every((idea) => ["Core", "Long-tail", "Question", "Comparison", "Use-case"].includes(idea.category)));
 });
 
 test("Georgian rules remain internal but are not offered as an AdSense-supported research language", async () => {
@@ -59,6 +64,7 @@ test("CSV escaping quotes values and neutralizes spreadsheet formulas", () => {
   assert.equal(csvEscape("=1+1"), '"\'=1+1"');
   const csv = exportKeywordCsv(generateKeywordIdeas("shop", "English"), "US", "English");
   assert.match(csv, /Shopes Opportunity Score/);
+  assert.match(csv, /Category/);
   assert.match(csv, /Modelled CPC low \(USD\)/);
   assert.match(csv, /Low — uncalibrated heuristic/);
   assert.match(csv, /Unavailable/);
