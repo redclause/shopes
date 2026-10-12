@@ -18,9 +18,11 @@
     "test:backlink": "npm run test:backlink-verification && npm run test:backlink-submission-analysis && npm run test:public-url",
     "test:public-url": "node --experimental-strip-types --test tests/public-url.test.mjs",
     "test:backlink-tracker": "node --test tests/backlink-tracker.test.mjs",
-    "test:backlink-audit-summary": "node --test tests/backlink-audit-summary.test.mjs"
+    "test:backlink-audit-summary": "node --test tests/backlink-audit-summary.test.mjs",
+    "test:smollm2-keyword-intent": "node --test tests/smollm2-keyword-intent.test.mjs"
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.3.1",
     "lucide-react": "^0.468.0",
     "next": "^15.2.0",
     "next-auth": "^5.0.0-beta.25",

@@ -63,6 +63,9 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
   const [datasetError, setDatasetError] = useState("");
   const [importedCount, setImportedCount] = useState(0);
   const [saveMessage, setSaveMessage] = useState("");
+  const [aiIntentLoading, setAiIntentLoading] = useState(false);
+  const [aiIntentError, setAiIntentError] = useState("");
+  const [aiIntentResult, setAiIntentResult] = useState<{label:string;metrics:string;groups:Array<{label:string;intent:string;keywords:string[]}>;recommendations:string[]}|null>(null);
 
   const allIdeas = useMemo(() => {
     if (!generated) return [];
@@ -83,6 +86,19 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const visible = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const domainOverlap = useMemo(() => summarizeDomainOverlap(dataset), [dataset]);
+
+  async function runAiIntentGrouping() {
+    const phrases = allIdeas.slice(0, 30).map((item) => item.phrase);
+    if (!phrases.length) return;
+    setAiIntentLoading(true); setAiIntentError(""); setAiIntentResult(null);
+    try {
+      const response = await fetch("/api/keyword-research/ai-intent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ keywords: phrases }) });
+      const payload = await response.json() as { error?: string; label?: string; metrics?: string; groups?: Array<{label:string;intent:string;keywords:string[]}>; recommendations?: string[] };
+      if (!response.ok || !payload.groups) throw new Error(payload.error || "AI keyword grouping is unavailable.");
+      setAiIntentResult({ label: payload.label || "AI-generated suggestions; review before use.", metrics: payload.metrics || "No verified SEO metrics were used.", groups: payload.groups, recommendations: payload.recommendations || [] });
+    } catch (caught) { setAiIntentError(caught instanceof Error ? caught.message : "AI keyword grouping is unavailable. Your local results are unchanged."); }
+    finally { setAiIntentLoading(false); }
+  }
 
   function generate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -201,6 +217,8 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
       </div>
       {saveMessage && <p className={styles.fieldHelp} role="status">{saveMessage}</p>}
       <div className={styles.sourceNote}><Target size={17} /><div><strong>Source: Shopes local algorithms</strong><p>Opportunity and relevance are transparent heuristics. Modelled CPC is a broad, low-confidence range based on estimated intent—not Google Ads bids or measured keyword data. Verified search volume, competition metrics, and live SERP data are unavailable unless you import a dataset.</p></div></div>
+
+      {generated && language === "English" && <section className={styles.sourceNote} aria-labelledby="smollm2-intent-title"><div><strong id="smollm2-intent-title">Optional AI intent grouping (Preview)</strong><p>Group up to 30 generated phrases with SmolLM2. This experimental feature is off unless explicitly enabled for Preview; local keyword results remain available.</p><button type="button" className={styles.export} onClick={runAiIntentGrouping} disabled={aiIntentLoading || allIdeas.length === 0}>{aiIntentLoading ? "Analyzing…" : "Group first 30 keywords with AI"}</button>{aiIntentError && <p className={styles.errorMessage} role="alert">{aiIntentError}</p>}{aiIntentResult && <div role="status"><p><strong>{aiIntentResult.label}</strong></p><p>{aiIntentResult.metrics}</p>{aiIntentResult.groups.map((group, index) => <p key={group.label + index}><strong>{group.label} · {group.intent}</strong>: {group.keywords.join(", ")}</p>)}{aiIntentResult.recommendations.length > 0 && <><strong>AI recommendations</strong><ul>{aiIntentResult.recommendations.map((item, index) => <li key={index}>{item}</li>)}</ul></>}</div>}</div></section>}
 
       {generated && <div className={styles.filters}>
         <label className={styles.filterSearch}><Search size={15} /><input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Filter keyword ideas" /></label>
