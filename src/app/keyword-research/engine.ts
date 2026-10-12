@@ -201,8 +201,8 @@ function categoryFor(kind: string, phrase: string, seed: string): KeywordCategor
   const label = kind.toLocaleLowerCase();
   const normalizedPhrase = normalizeKeyword(phrase);
   if (/seed keyword/.test(label) || normalizedPhrase === normalizeKeyword(seed)) return "Core";
-  if (/question|კითხვით/.test(label) || /^(what is|how to|why does|when to choose|where to find|which|is it worth)\\b/.test(normalizedPhrase)) return "Question";
-  if (/comparison|review|alternative|შედარებ|მიმოხილვ|ალტერნატივ/.test(label) || /\\bvs\\.?\\b/.test(normalizedPhrase)) return "Comparison";
+  if (/question|კითხვით/.test(label) || /^(what is|how to|why does|when to choose|where to find|which|is it worth)\b/.test(normalizedPhrase)) return "Question";
+  if (/comparison|review|alternative|შედარებ|მიმოხილვ|ალტერნატივ/.test(label) || /\bvs\\.?\b/.test(normalizedPhrase)) return "Comparison";
   if (/audience|use.case|content|topic|სინონიმ|აუდიტორიის|თემატურ/.test(label)) return "Use-case";
   return words(normalizedPhrase).length >= 4 ? "Long-tail" : "Core";
 }
