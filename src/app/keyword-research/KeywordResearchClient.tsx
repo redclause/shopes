@@ -87,7 +87,20 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
   const visible = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const domainOverlap = useMemo(() => summarizeDomainOverlap(dataset), [dataset]);
 
-  async function runAiIntentGrouping() {\n    const phrases = allIdeas.slice(0, 30).map((item) => item.phrase);\n    if (!phrases.length) return;\n    setAiIntentLoading(true); setAiIntentError(""); setAiIntentResult(null);\n    try {\n      const response = await fetch("/api/keyword-research/ai-intent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ keywords: phrases }) });\n      const payload = await response.json() as { error?: string; label?: string; metrics?: string; groups?: Array<{label:string;intent:string;keywords:string[]}>; recommendations?: string[] };\n      if (!response.ok || !payload.groups) throw new Error(payload.error || "AI keyword grouping is unavailable.");\n      setAiIntentResult({ label: payload.label || "AI-generated suggestions; review before use.", metrics: payload.metrics || "No verified SEO metrics were used.", groups: payload.groups, recommendations: payload.recommendations || [] });\n    } catch (caught) { setAiIntentError(caught instanceof Error ? caught.message : "AI keyword grouping is unavailable. Your local results are unchanged."); }\n    finally { setAiIntentLoading(false); }\n  }\n\n  function generate(event: FormEvent<HTMLFormElement>) {
+  async function runAiIntentGrouping() {
+    const phrases = allIdeas.slice(0, 30).map((item) => item.phrase);
+    if (!phrases.length) return;
+    setAiIntentLoading(true); setAiIntentError(""); setAiIntentResult(null);
+    try {
+      const response = await fetch("/api/keyword-research/ai-intent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ keywords: phrases }) });
+      const payload = await response.json() as { error?: string; label?: string; metrics?: string; groups?: Array<{label:string;intent:string;keywords:string[]}>; recommendations?: string[] };
+      if (!response.ok || !payload.groups) throw new Error(payload.error || "AI keyword grouping is unavailable.");
+      setAiIntentResult({ label: payload.label || "AI-generated suggestions; review before use.", metrics: payload.metrics || "No verified SEO metrics were used.", groups: payload.groups, recommendations: payload.recommendations || [] });
+    } catch (caught) { setAiIntentError(caught instanceof Error ? caught.message : "AI keyword grouping is unavailable. Your local results are unchanged."); }
+    finally { setAiIntentLoading(false); }
+  }
+
+  function generate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const clean = seed.trim().replace(/\s+/g, " ");
     if (!clean) return;
