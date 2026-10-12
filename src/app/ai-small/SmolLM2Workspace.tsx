@@ -34,7 +34,7 @@ export default function SmolLM2Workspace() {
     } catch {
       validUrl = false;
     }
-    return { titleHasKeyword, descriptionHasKeyword, validUrl, slugHasKeyword: Boolean(normalizedKeyword) && url.toLocaleLowerCase().includes(normalizedKeyword.replace(/\\s+/g, "-")) };
+    return { titleHasKeyword, descriptionHasKeyword, validUrl, slugHasKeyword: Boolean(normalizedKeyword) && url.toLocaleLowerCase().includes(normalizedKeyword.replace(/\s+/g, "-")) };
   }, [title, description, url, keyword]);
 
   function reset() {
