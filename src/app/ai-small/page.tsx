@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import SmolLM2Workspace from "./SmolLM2Workspace";
 
 export const metadata: Metadata = {
-  title: "SmolLM2 AI Lab",
-  description: "Experiment with local browser-based SmolLM2 for e-commerce SEO and content planning.",
+  title: "Free SEO Snippet Preview Tool",
+  description: "Preview SEO titles, meta descriptions, URLs, and focus keyword placement with a free browser-based Shopes tool.",
   robots: { index: false, follow: false },
 };
 
-export default function SmolLM2Page() {
+export default function SeoPreviewPage() {
   return <SmolLM2Workspace />;
 }
