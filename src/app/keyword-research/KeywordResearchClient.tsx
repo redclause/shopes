@@ -147,11 +147,11 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
         else if (Array.isArray(first.generated_text)) raw = [...first.generated_text].reverse().find((message) => message.role === "assistant")?.content || "";
       }
       const seen = new Set(allIdeas.map((idea) => idea.normalized));
-      const phrases = raw.split(/\\r?\\n/)
-        .map((line) => line.replace(/^\\s*(?:[-*•]|\\d+[.)])\\s*/, "").replace(/^["'“”]+|["'“”]+$/g, "").trim())
+      const phrases = raw.split(/\r?\n/)
+        .map((line) => line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "").replace(/^["'“”]+|["'“”]+$/g, "").trim())
         .filter((line) => line.length >= 2 && line.length <= 120 && !/[<>]/.test(line))
         .filter((line) => {
-          const normalized = line.toLocaleLowerCase().replace(/\\s+/g, " ");
+          const normalized = line.toLocaleLowerCase().replace(/\s+/g, " ");
           if (seen.has(normalized)) return false;
           seen.add(normalized);
           return true;
