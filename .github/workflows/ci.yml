@@ -20,6 +20,8 @@ jobs:
         run: npm run test:keyword-engine
       - name: Product Intelligence tests
         run: npm run test:product-intelligence
+      - name: SmolLM2 benchmark configuration tests
+        run: npm run test:smollm2-benchmark
       - name: Locale and translation tests
         run: npm run test:i18n
       - name: Blog generator tests
