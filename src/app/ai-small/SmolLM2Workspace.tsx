@@ -90,9 +90,9 @@ export default function SmolLM2Workspace() {
       setAnswer((marker >= 0 ? raw.slice(marker + "<|assistant|>".length) : raw).trim() || "The model returned an empty response. Try a shorter prompt.");
       setInferenceSeconds((performance.now() - started) / 1000);
       setStatus("ready");
-    } catch {
-      // loadModel already stores a helpful error when model loading fails.
-      if (!error) setError("Generation failed. Try a shorter prompt or reload the model.");
+    } catch (cause) {
+      const message = cause instanceof Error ? cause.message : "Generation failed.";
+      setError(message + " Try a shorter prompt or reload the model if the issue persists.");
       setStatus("error");
     }
   }
