@@ -26,6 +26,9 @@ test("generates deterministic English keyword ideas with no duplicates", () => {
   assert.ok(first.some((idea) => idea.category === "Comparison"));
   assert.ok(first.some((idea) => idea.category === "Long-tail"));
   assert.ok(first.every((idea) => ["Core", "Long-tail", "Question", "Comparison", "Use-case"].includes(idea.category)));
+  for (const category of ["Core", "Long-tail", "Question", "Comparison", "Use-case"]) {
+    assert.ok(first.some((idea) => idea.category === category), "missing category: " + category);
+  }
 });
 
 test("Georgian rules remain internal but are not offered as an AdSense-supported research language", async () => {
