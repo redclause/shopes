@@ -19,7 +19,8 @@
     "test:public-url": "node --experimental-strip-types --test tests/public-url.test.mjs",
     "test:backlink-tracker": "node --test tests/backlink-tracker.test.mjs",
     "test:backlink-audit-summary": "node --test tests/backlink-audit-summary.test.mjs",
-    "test:smollm2-benchmark": "node --experimental-strip-types --test tests/smollm2-benchmark.test.mjs"
+    "test:smollm2-benchmark": "node --experimental-strip-types --test tests/smollm2-benchmark.test.mjs",
+    "test:smollm2-keyword-intent": "node --test tests/smollm2-keyword-intent.test.mjs"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.3.1",
