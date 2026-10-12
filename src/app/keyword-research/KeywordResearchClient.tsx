@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { ArrowDownUp, Download, FileUp, Save, Search, Sparkles, Target, Upload, X } from "lucide-react";
+import { ArrowDownUp, Copy, Download, FileUp, Save, Search, Sparkles, Target, Upload, X } from "lucide-react";
 import {
   exportKeywordCsv, generateKeywordIdeas, parseImportedSerpData, summarizeDomainOverlap, SUPPORTED_KEYWORD_LANGUAGES,
-  type ImportedSerpRecord, type KeywordIdea, type KeywordLanguage, type SearchIntent,
+  type ImportedSerpRecord, type KeywordIdea, type KeywordLanguage, type SearchIntent, type KeywordCategory,
 } from "./engine";
 import styles from "./page.module.css";
 import UserMenu from "../../components/UserMenu";
@@ -21,6 +21,7 @@ const LOCALE_TO_KEYWORD_LANGUAGE: Record<string, KeywordLanguage> = {
   pl: "Polish", sv: "Swedish",
 };
 const INTENTS: Array<"All" | SearchIntent> = ["All", "Informational", "Commercial", "Transactional", "Navigational", "Local", "Unclassified"];
+const CATEGORIES: Array<"All" | KeywordCategory> = ["All", "Core", "Long-tail", "Question", "Comparison", "Use-case"];
 
 export default function KeywordResearchClient({ userName, userEmail, userImage, signOutAction }: { userName: string; userEmail: string; userImage?: string | null; signOutAction: () => Promise<void> }) {
   const { t } = useShopesTranslation();
@@ -53,6 +54,7 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
   const [query, setQuery] = useState("");
   const [intent, setIntent] = useState<"All" | SearchIntent>("All");
   const [cluster, setCluster] = useState("All");
+  const [category, setCategory] = useState<"All" | KeywordCategory>("All");
   const [sort, setSort] = useState<"opportunity" | "phrase" | "intent">("opportunity");
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<string[]>([]);
@@ -73,12 +75,13 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
     .filter((item) => item.phrase.toLocaleLowerCase().includes(query.toLocaleLowerCase()))
     .filter((item) => intent === "All" || item.intent === intent)
     .filter((item) => cluster === "All" || item.cluster === cluster)
+    .filter((item) => category === "All" || item.category === category)
     .sort((a, b) => sort === "intent"
       ? a.intent.localeCompare(b.intent) || a.phrase.localeCompare(b.phrase)
       : sort === "phrase"
         ? a.phrase.localeCompare(b.phrase)
         : b.opportunityScore - a.opportunityScore || b.relevanceScore - a.relevanceScore || a.phrase.localeCompare(b.phrase)),
-  [allIdeas, query, intent, cluster, sort]);
+  [allIdeas, query, intent, cluster, category, sort]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const visible = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -106,6 +109,19 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
     anchor.click();
     anchor.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  async function copyKeywords(onlySelected: boolean) {
+    const rows = onlySelected
+      ? allIdeas.filter((item) => selected.includes(item.normalized))
+      : filtered;
+    if (!rows.length) return;
+    try {
+      await navigator.clipboard.writeText(rows.map((item) => item.phrase).join("\n"));
+      setSaveMessage("Copied " + rows.length + " keyword ideas to the clipboard.");
+    } catch {
+      setSaveMessage("Clipboard access was blocked by the browser. Use CSV export instead.");
+    }
   }
 
   function exportCsv() {
@@ -197,7 +213,7 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
     <section className={styles.results} aria-live="polite">
       <div className={styles.resultsHead}>
         <div><h2>{t("keywordResearch")}</h2><p>{generated ? (filtered.length + " suggestions · " + country + " · " + language) : "Start with a seed keyword to generate related ideas."}</p></div>
-        <div className={styles.actionGroup}><button className={styles.export} onClick={saveKeywordSet} disabled={!generated}><Save size={15} /> {t("saveSetLocally")}</button><button className={styles.export} onClick={exportCsv} disabled={!generated}><Download size={15} /> {t("exportCsv")}</button></div>
+        <div className={styles.actionGroup}><button className={styles.export} onClick={() => void copyKeywords(false)} disabled={!generated || filtered.length === 0}><Copy size={15} /> Copy filtered</button><button className={styles.export} onClick={() => void copyKeywords(true)} disabled={!generated || selected.length === 0}><Copy size={15} /> Copy selected</button><button className={styles.export} onClick={saveKeywordSet} disabled={!generated}><Save size={15} /> {t("saveSetLocally")}</button><button className={styles.export} onClick={exportCsv} disabled={!generated}><Download size={15} /> {t("exportCsv")}</button></div>
       </div>
       {saveMessage && <p className={styles.fieldHelp} role="status">{saveMessage}</p>}
       <div className={styles.sourceNote}><Target size={17} /><div><strong>Source: Shopes local algorithms</strong><p>Opportunity and relevance are transparent heuristics. Modelled CPC is a broad, low-confidence range based on estimated intent—not Google Ads bids or measured keyword data. Verified search volume, competition metrics, and live SERP data are unavailable unless you import a dataset.</p></div></div>
@@ -205,18 +221,18 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
       {generated && <div className={styles.filters}>
         <label className={styles.filterSearch}><Search size={15} /><input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Filter keyword ideas" /></label>
         <label className={styles.filterSelect}>Intent<select value={intent} onChange={(event) => { setIntent(event.target.value as "All" | SearchIntent); setPage(1); }}>{INTENTS.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label className={styles.filterSelect}>Topic<select value={cluster} onChange={(event) => { setCluster(event.target.value); setPage(1); }}><option value="All">All topics</option>{Array.from(new Set(allIdeas.map((item) => item.cluster))).sort().map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label className={styles.filterSelect}>Category<select value={category} onChange={(event) => { setCategory(event.target.value as "All" | KeywordCategory); setPage(1); }}><option value="All">All categories</option>{CATEGORIES.filter((item) => item !== "All").map((item) => <option key={item} value={item}>{item}</option>)}</select></label>\n        <label className={styles.filterSelect}>Topic<select value={cluster} onChange={(event) => { setCluster(event.target.value); setPage(1); }}><option value="All">All topics</option>{Array.from(new Set(allIdeas.map((item) => item.cluster))).sort().map((item) => <option key={item}>{item}</option>)}</select></label>
         <button type="button" className={styles.sort} onClick={() => setSort(sort === "opportunity" ? "phrase" : sort === "phrase" ? "intent" : "opportunity")}><ArrowDownUp size={15} /> Sort: {sort === "opportunity" ? "Opportunity" : sort === "phrase" ? "Keyword" : "Intent"}</button>
       </div>}
 
       {!generated ? <div className={styles.empty}><div><Search size={24} /></div><h3>Your keyword list starts here</h3><p>Enter a seed phrase above. Shopes will generate deterministic keyword ideas in your browser without external API calls.</p></div> : filtered.length === 0 ? <div className={styles.empty}><h3>No matching ideas</h3><p>Try another filter or seed keyword.</p></div> : <>
         <div className={styles.tableWrap}><table><thead><tr>
           <th><input aria-label="Select all visible keywords" type="checkbox" checked={visible.length > 0 && visible.every((item) => selected.includes(item.normalized))} onChange={(event) => setSelected(event.target.checked ? Array.from(new Set([...selected, ...visible.map((item) => item.normalized)])) : selected.filter((phrase) => !visible.some((item) => item.normalized === phrase)))} /></th>
-          <th>Keyword</th><th>Type</th><th>Intent</th><th>Words</th><th>Opportunity</th><th>Modelled CPC (USD)</th><th>Verified metrics</th>
+          <th>Keyword</th><th>Category</th><th>Type</th><th>Intent</th><th>Words</th><th>Opportunity</th><th>Modelled CPC (USD)</th><th>Verified metrics</th>
         </tr></thead><tbody>{visible.map((item: KeywordIdea) => <tr key={item.normalized}>
           <td><input type="checkbox" aria-label={"Select " + item.phrase} checked={selected.includes(item.normalized)} onChange={(event) => setSelected(event.target.checked ? [...selected, item.normalized] : selected.filter((phrase) => phrase !== item.normalized))} /></td>
           <td className={styles.keyword}>{item.phrase}{item.longTail && <span className={styles.longTail}>LONG-TAIL</span>}</td>
-          <td>{item.kind}</td><td><span className={styles.intent}>{item.intent}</span></td><td>{item.wordCount}</td>
+          <td>{item.category}</td><td>{item.kind}</td><td><span className={styles.intent}>{item.intent}</span></td><td>{item.wordCount}</td>
           <td><span className={styles.score}>{item.opportunityScore}</span><small className={styles.scoreLabel}>heuristic / 100</small></td>
           <td><span className={styles.cpcEstimate}>${item.estimatedCpcLowUsd.toFixed(2)}–${item.estimatedCpcHighUsd.toFixed(2)}</span><small className={styles.scoreLabel}>low confidence</small></td>
           <td><span className={styles.unavailable}>Not available</span></td>

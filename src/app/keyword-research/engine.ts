@@ -1,11 +1,12 @@
 export type SearchIntent = "Informational" | "Commercial" | "Transactional" | "Navigational" | "Local" | "Unclassified";
+export type KeywordCategory = "Core" | "Long-tail" | "Question" | "Comparison" | "Use-case";
 export type KeywordLanguage =
   | "English" | "Georgian" | "Spanish" | "French" | "German" | "Portuguese" | "Italian"
   | "Dutch" | "Russian" | "Ukrainian" | "Turkish" | "Arabic" | "Hindi" | "Chinese"
   | "Japanese" | "Korean" | "Indonesian" | "Vietnamese" | "Polish" | "Swedish";
 
 export type KeywordIdea = {
-  phrase: string; normalized: string; kind: string; intent: SearchIntent;
+  phrase: string; normalized: string; kind: string; category: KeywordCategory; intent: SearchIntent;
   intentConfidence: "heuristic"; cluster: string; wordCount: number; longTail: boolean;
   specificityScore: number; relevanceScore: number; opportunityScore: number;
   estimatedCpcLowUsd: number; estimatedCpcHighUsd: number; cpcConfidence: "low";
@@ -196,6 +197,16 @@ function clusterFor(kind: string, intent: SearchIntent, language: KeywordLanguag
   return language === "Georgian" ? "ძირითადი თემა" : "Core topic";
 }
 
+function categoryFor(kind: string, phrase: string, seed: string): KeywordCategory {
+  const label = kind.toLocaleLowerCase();
+  const normalizedPhrase = normalizeKeyword(phrase);
+  if (/seed keyword/.test(label) || normalizedPhrase === normalizeKeyword(seed)) return "Core";
+  if (/question|კითხვით/.test(label) || /^(what is|how to|why does|when to choose|where to find|which|is it worth)\b/.test(normalizedPhrase)) return "Question";
+  if (/comparison|review|alternative|შედარებ|მიმოხილვ|ალტერნატივ/.test(label) || /\bvs\.?\b/.test(normalizedPhrase)) return "Comparison";
+  if (/audience|use.case|content|topic|სინონიმ|აუდიტორიის|თემატურ/.test(label)) return "Use-case";
+  return words(normalizedPhrase).length >= 4 ? "Long-tail" : "Core";
+}
+
 function estimateCpc(intent: SearchIntent): Pick<KeywordIdea, "estimatedCpcLowUsd" | "estimatedCpcHighUsd" | "cpcConfidence"> {
   // Deliberately broad, uncalibrated ranges based only on heuristic intent—not observed bids or keyword data.
   const ranges: Record<SearchIntent, [number, number]> = {
@@ -252,7 +263,7 @@ export function generateKeywordIdeas(seedInput: string, language: KeywordLanguag
     if (!normalized || normalized.length > 180 || unique.has(normalized)) continue;
     const intent = candidate.intent || classifyIntent(phrase, language);
     unique.set(normalized, {
-      phrase, normalized, kind: candidate.kind, intent, intentConfidence: "heuristic",
+      phrase, normalized, kind: candidate.kind, category: categoryFor(candidate.kind, phrase, seed), intent, intentConfidence: "heuristic",
       cluster: clusterFor(candidate.kind, intent, language), ...scorePhrase(phrase, seed, intent),
       ...estimateCpc(intent), provenance: "locally-generated", metricsStatus: "unavailable",
     });
@@ -351,7 +362,7 @@ export function csvEscape(value: unknown): string {
 }
 
 export function exportKeywordCsv(ideas: KeywordIdea[], country: string, language: string): string {
-  const headers = ["Keyword", "Type", "Intent (heuristic)", "Cluster", "Word count", "Long-tail", "Specificity score", "Relevance score", "Shopes Opportunity Score", "Modelled CPC low (USD)", "Modelled CPC high (USD)", "CPC confidence", "Provenance", "Verified metrics", "Market", "Language"];
-  return [headers, ...ideas.map((item) => [item.phrase, item.kind, item.intent, item.cluster, item.wordCount, item.longTail ? "Yes" : "No", item.specificityScore, item.relevanceScore, item.opportunityScore, item.estimatedCpcLowUsd, item.estimatedCpcHighUsd, "Low — uncalibrated heuristic", item.provenance, "Unavailable", country, language])]
+  const headers = ["Keyword", "Category", "Type", "Intent (heuristic)", "Cluster", "Word count", "Long-tail", "Specificity score", "Relevance score", "Shopes Opportunity Score", "Modelled CPC low (USD)", "Modelled CPC high (USD)", "CPC confidence", "Provenance", "Verified metrics", "Market", "Language"];
+  return [headers, ...ideas.map((item) => [item.phrase, item.category, item.kind, item.intent, item.cluster, item.wordCount, item.longTail ? "Yes" : "No", item.specificityScore, item.relevanceScore, item.opportunityScore, item.estimatedCpcLowUsd, item.estimatedCpcHighUsd, "Low — uncalibrated heuristic", item.provenance, "Unavailable", country, language])]
     .map((row) => row.map(csvEscape).join(",")).join("\r\n");
 }
