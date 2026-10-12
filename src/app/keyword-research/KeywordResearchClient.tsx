@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { ArrowDownUp, Copy, Download, FileUp, Save, Search, Sparkles, Target, Upload, X } from "lucide-react";
 import {
@@ -65,6 +65,12 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
   const [datasetError, setDatasetError] = useState("");
   const [importedCount, setImportedCount] = useState(0);
   const [saveMessage, setSaveMessage] = useState("");
+  const aiGeneratorRef = useRef<((messages: Array<{ role: "system" | "user"; content: string }>, options?: Record<string, unknown>) => Promise<unknown>) | null>(null);
+  const [aiIdeas, setAiIdeas] = useState<string[]>([]);
+  const [aiStatus, setAiStatus] = useState<"idle" | "loading" | "generating" | "ready" | "error">("idle");
+  const [aiError, setAiError] = useState("");
+  const [aiRuntime, setAiRuntime] = useState("");
+  const [aiElapsed, setAiElapsed] = useState<number | null>(null);
 
   // Recompute suggestions whenever the seed, language, or generation state changes.
   const allIdeas = useMemo(() => {
@@ -99,6 +105,75 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
     setGenerated(true);
     setPage(1);
     setSelected([]);
+  }
+
+  async function loadAiGenerator() {
+    if (aiGeneratorRef.current) return aiGeneratorRef.current;
+    setAiStatus("loading");
+    setAiError("");
+    const transformers = await import("@huggingface/transformers");
+    transformers.env.allowLocalModels = false;
+    transformers.env.useBrowserCache = true;
+    const createPipeline = transformers.pipeline as unknown as (
+      task: string, model: string, options?: Record<string, unknown>
+    ) => Promise<(messages: Array<{ role: "system" | "user"; content: string }>, options?: Record<string, unknown>) => Promise<unknown>>;
+    try {
+      aiGeneratorRef.current = await createPipeline("text-generation", "HuggingFaceTB/SmolLM2-360M-Instruct", { device: "webgpu" });
+      setAiRuntime("WebGPU");
+    } catch {
+      aiGeneratorRef.current = await createPipeline("text-generation", "HuggingFaceTB/SmolLM2-360M-Instruct");
+      setAiRuntime("browser fallback");
+    }
+    return aiGeneratorRef.current;
+  }
+
+  async function generateAiSuggestions() {
+    if (!submittedSeed || aiStatus === "loading" || aiStatus === "generating") return;
+    setAiStatus(aiGeneratorRef.current ? "generating" : "loading");
+    setAiError("");
+    setAiIdeas([]);
+    const started = performance.now();
+    try {
+      const generator = await loadAiGenerator();
+      setAiStatus("generating");
+      const result = await generator([
+        { role: "system", content: "You are a careful SEO keyword ideation assistant. Generate search query ideas only. Never claim search volume, ranking, CPC, or keyword difficulty. Return one keyword phrase per line, no numbering, no bullets, no explanations. Avoid duplicates and keep phrases relevant to the seed." },
+        { role: "user", content: "Generate up to 15 distinct keyword suggestions related to this seed keyword: " + submittedSeed + ". Target country: " + country + ". Language: " + language + ". Mix relevant long-tail, question, comparison, and commercial-intent phrases where natural. Return phrases only." },
+      ], { max_new_tokens: 220, do_sample: true, temperature: 0.7, top_p: 0.9, repetition_penalty: 1.15 });
+      let raw = "";
+      if (Array.isArray(result) && result.length) {
+        const first = result[0] as { generated_text?: string | Array<{ role?: string; content?: string }> };
+        if (typeof first.generated_text === "string") raw = first.generated_text;
+        else if (Array.isArray(first.generated_text)) raw = [...first.generated_text].reverse().find((message) => message.role === "assistant")?.content || "";
+      }
+      const seen = new Set(allIdeas.map((idea) => idea.normalized));
+      const phrases = raw.split(/\r?\n/)
+        .map((line) => line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "").replace(/^["'“”]+|["'“”]+$/g, "").trim())
+        .filter((line) => line.length >= 2 && line.length <= 120 && !/[<>]/.test(line))
+        .filter((line) => {
+          const normalized = line.toLocaleLowerCase().replace(/\s+/g, " ");
+          if (seen.has(normalized)) return false;
+          seen.add(normalized);
+          return true;
+        }).slice(0, 15);
+      setAiIdeas(phrases);
+      setAiElapsed((performance.now() - started) / 1000);
+      setAiStatus("ready");
+      if (!phrases.length) setAiError("The model did not return any distinct keyword phrases. Try again with a more specific seed.");
+    } catch (cause) {
+      setAiStatus("error");
+      setAiError((cause instanceof Error ? cause.message : "SmolLM2 could not generate suggestions.") + " Check your connection, browser support, and available memory.");
+    }
+  }
+
+  async function copyAiSuggestions() {
+    if (!aiIdeas.length) return;
+    try {
+      await navigator.clipboard.writeText(aiIdeas.join("\\n"));
+      setSaveMessage("Copied " + aiIdeas.length + " AI-generated keyword ideas.");
+    } catch {
+      setAiError("Clipboard access was blocked. Select and copy the suggestions manually.");
+    }
   }
 
   function downloadCsv(filename: string, csv: string) {
@@ -218,6 +293,18 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
       </div>
       {saveMessage && <p className={styles.fieldHelp} role="status">{saveMessage}</p>}
       <div className={styles.sourceNote}><Target size={17} /><div><strong>Source: Shopes local algorithms</strong><p>Opportunity and relevance are transparent heuristics. Modelled CPC is a broad, low-confidence range based on estimated intent—not Google Ads bids or measured keyword data. Verified search volume, competition metrics, and live SERP data are unavailable unless you import a dataset.</p></div></div>
+
+      {generated && <section className={styles.aiPanel} aria-labelledby="smollm-keywords-title">
+        <div className={styles.aiPanelHead}>
+          <div><span className={styles.aiEyebrow}><Sparkles size={13} /> LOCAL AI ASSIST</span><h3 id="smollm-keywords-title">Explore more ideas with SmolLM2</h3><p>Optional model-generated suggestions run in your browser. They are separate from the rule-based list and have no verified search metrics.</p></div>
+          <button type="button" className={styles.aiButton} onClick={() => void generateAiSuggestions()} disabled={aiStatus === "loading" || aiStatus === "generating"}>
+            {aiStatus === "loading" ? "Loading model…" : aiStatus === "generating" ? "Generating…" : aiStatus === "error" ? "Try again" : aiIdeas.length ? "Regenerate ideas" : "Generate AI ideas"}
+          </button>
+        </div>
+        {(aiStatus === "loading" || aiStatus === "generating") && <p className={styles.aiStatus} role="status">{aiStatus === "loading" ? "Loading SmolLM2 into this browser. The first download can take a little while." : "SmolLM2 is generating keyword ideas…"}</p>}
+        {aiError && <p className={styles.aiError} role="alert">{aiError}</p>}
+        {aiIdeas.length > 0 && <><div className={styles.aiTags}>{aiIdeas.map((idea) => <span key={idea}>{idea}</span>)}</div><div className={styles.aiMeta}><span>{aiIdeas.length} model-generated phrases · {aiRuntime}{aiElapsed !== null ? " · " + aiElapsed.toFixed(1) + "s" : ""}</span><button type="button" className={styles.export} onClick={() => void copyAiSuggestions()}><Copy size={14} /> Copy AI ideas</button></div></>}
+      </section>}
 
       {generated && <div className={styles.filters}>
         <label className={styles.filterSearch}><Search size={15} /><input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Filter keyword ideas" /></label>
