@@ -6,7 +6,8 @@ import { ArrowLeft, BrainCircuit, Check, CircleAlert, Cpu, LoaderCircle, Message
 import styles from "./page.module.css";
 
 const MODEL_ID = "HuggingFaceTB/SmolLM2-360M-Instruct";
-type Generator = (prompt: string, options?: Record<string, unknown>) => Promise<unknown>;
+type ChatMessage = { role: "system" | "user"; content: string };
+type Generator = (prompt: string | ChatMessage[], options?: Record<string, unknown>) => Promise<unknown>;
 type GeneratedItem = { generated_text?: string | Array<{ role?: string; content?: string }> };
 
 const starters = [
@@ -82,12 +83,14 @@ export default function SmolLM2Workspace() {
       const generator = await loadModel();
       setStatus("generating");
       const result = await generator(
-        "<|system|>You are Shopes AI, a concise and practical assistant for e-commerce, SEO, keyword research, and content planning. Be honest about uncertainty and never invent performance data.</|system|>\n<|user|>" + clean + "</|user|>\n<|assistant|>",
+        [
+          { role: "system", content: "You are Shopes AI, a concise and practical assistant for e-commerce, SEO, keyword research, and content planning. Be honest about uncertainty and never invent performance data." },
+          { role: "user", content: clean },
+        ],
         { max_new_tokens: tokens, do_sample: true, temperature: 0.65, top_p: 0.9, repetition_penalty: 1.12 }
       );
       const raw = extractText(result);
-      const marker = raw.lastIndexOf("<|assistant|>");
-      setAnswer((marker >= 0 ? raw.slice(marker + "<|assistant|>".length) : raw).trim() || "The model returned an empty response. Try a shorter prompt.");
+      setAnswer(raw.trim() || "The model returned an empty response. Try a shorter prompt.");
       setInferenceSeconds((performance.now() - started) / 1000);
       setStatus("ready");
     } catch (cause) {
