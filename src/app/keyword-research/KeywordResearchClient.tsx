@@ -117,7 +117,7 @@ export default function KeywordResearchClient({ userName, userEmail, userImage, 
       : filtered;
     if (!rows.length) return;
     try {
-      await navigator.clipboard.writeText(rows.map((item) => item.phrase).join("\\n"));
+      await navigator.clipboard.writeText(rows.map((item) => item.phrase).join("\n"));
       setSaveMessage("Copied " + rows.length + " keyword ideas to the clipboard.");
     } catch {
       setSaveMessage("Clipboard access was blocked by the browser. Use CSV export instead.");
