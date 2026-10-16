@@ -1,5 +1,5 @@
 export const ARTICLE_COUNT = 100_000;
-export const SITEMAP_PAGE_SIZE = 1_000;
+export const SITEMAP_PAGE_SIZE = 50_000;
 
 export const shoppingTopics = [
   "online shopping","ecommerce stores","retail websites","shopping platforms","product research","price comparison","online ordering","digital storefronts","retailer selection","shopping checklists",
