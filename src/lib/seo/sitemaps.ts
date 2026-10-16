@@ -1,6 +1,9 @@
+import { ARTICLE_COUNT, SITEMAP_PAGE_SIZE } from "../blog/shopping-articles";
+
 const BASE_URL = "https://shopes.online";
 
-const INDEXABLE_PUBLIC_PATHS = ["/", "/privacy", "/terms"] as const;
+const INDEXABLE_PUBLIC_PATHS = ["/", "/privacy", "/terms", "/blog"] as const;
+const BLOG_SITEMAP_COUNT = Math.ceil(ARTICLE_COUNT / SITEMAP_PAGE_SIZE);
 
 function xmlEscape(value: string): string {
   return value
@@ -23,10 +26,19 @@ export function buildCoreSitemapXml(paths: readonly string[] = INDEXABLE_PUBLIC_
 }
 
 export function buildSitemapIndexXml(): string {
-  const location = `${BASE_URL}/core-sitemap.xml`;
+  const sitemapLocations = [
+    `${BASE_URL}/core-sitemap.xml`,
+    ...Array.from(
+      { length: BLOG_SITEMAP_COUNT },
+      (_, index) => `${BASE_URL}/blog-sitemap/${index + 1}`
+    )
+  ];
+  const sitemaps = sitemapLocations
+    .map((location) => `<sitemap><loc>${xmlEscape(location)}</loc></sitemap>`)
+    .join("");
 
   return (
     `<?xml version="1.0" encoding="UTF-8"?>` +
-    `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>${xmlEscape(location)}</loc></sitemap></sitemapindex>`
+    `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${sitemaps}</sitemapindex>`
   );
 }
