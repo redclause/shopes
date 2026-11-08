@@ -31,7 +31,7 @@ export default function ShopDirectory({ shops }: { shops: Shop[] }) {
     element?.showModal();
     const old = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => { element?.close(); document.body.style.overflow = old; trigger.current?.focus(); };
+    return () => { element?.close(); document.body.style.overflow = old; if (trigger.current?.isConnected) trigger.current.focus(); else resultsHeading.current?.focus(); };
   }, [selected]);
   function toggleSaved(id: string) {
     const next = saved.includes(id) ? saved.filter(item => item !== id) : [...saved, id];
