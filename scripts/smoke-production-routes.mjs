@@ -24,8 +24,8 @@ await check("/api/health", {
 
 await check("/ai-small", {
   inspect(body) {
-    if (!body.includes("PRIVATE, IN-BROWSER AI") || !body.includes("SmolLM2")) {
-      throw new Error("/ai-small returned HTML but the expected AI Lab content was not found");
+    if (!body.includes("SEO snippet studio") || !body.includes("Preview your search result.")) {
+      throw new Error("/ai-small returned HTML but the expected SEO snippet studio content was not found");
     }
   },
 });
@@ -37,3 +37,9 @@ await check("/", {
 await check("/keyword-research", {
   allowedStatuses: [200, 301, 302, 307, 308],
 });
+
+await check("/shops", { inspect(body) {
+  if (!body.includes("Your next great find.") || !body.includes("Shop details")) {
+    throw new Error("Shop directory did not render storefront cards");
+  }
+}});

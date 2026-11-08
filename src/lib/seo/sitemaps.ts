@@ -1,8 +1,8 @@
-import { ARTICLE_COUNT, SITEMAP_PAGE_SIZE } from "../blog/shopping-articles";
+import { ARTICLE_COUNT, SITEMAP_PAGE_SIZE } from "../blog/shopping-articles.ts";
 
 const BASE_URL = "https://shopes.online";
 
-const INDEXABLE_PUBLIC_PATHS = ["/", "/privacy", "/terms", "/blog"] as const;
+const INDEXABLE_PUBLIC_PATHS = ["/", "/privacy", "/terms", "/blog", "/shops"] as const;
 const BLOG_SITEMAP_COUNT = Math.ceil(ARTICLE_COUNT / SITEMAP_PAGE_SIZE);
 
 function xmlEscape(value: string): string {
