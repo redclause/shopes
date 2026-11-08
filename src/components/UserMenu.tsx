@@ -13,6 +13,7 @@ type UserMenuProps = {
 };
 
 const links = [
+  { href: "/shops", label: "Shop Directory", icon: Search },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/keyword-research", label: "Keyword Research", icon: Search },
   { href: "/ai-small", label: "AI Lab", icon: Bot },

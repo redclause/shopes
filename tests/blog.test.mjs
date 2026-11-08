@@ -40,8 +40,8 @@ test("article content retains structured long-form HTML", () => {
 test("article ID mapping and sitemap chunk sizing are valid", () => {
   assert.deepEqual(articleIdToParts(1), { angleIndex: 0, themeIndex: 0, topicIndex: 0 });
   assert.equal(articleIdToParts(-1), null);
-  assert.equal(SITEMAP_PAGE_SIZE, 1_000);
-  assert.equal(Math.ceil(ARTICLE_COUNT / SITEMAP_PAGE_SIZE), 100);
+  assert.equal(SITEMAP_PAGE_SIZE, 50_000);
+  assert.equal(Math.ceil(ARTICLE_COUNT / SITEMAP_PAGE_SIZE), 2);
 });
 
 test("core sitemap contains only public URLs approved for indexing", () => {
@@ -51,15 +51,16 @@ test("core sitemap contains only public URLs approved for indexing", () => {
   assert.match(xml, /https:\/\/shopes\.online\//);
   assert.match(xml, /https:\/\/shopes\.online\/privacy<\/loc>/);
   assert.match(xml, /https:\/\/shopes\.online\/terms<\/loc>/);
-  assert.doesNotMatch(xml, /\/blog(?:\/|<\/loc>)/);
+  assert.match(xml, /https:\/\/shopes\.online\/blog<\/loc>/);
+  assert.match(xml, /https:\/\/shopes\.online\/shops<\/loc>/);
 });
 
-test("sitemap index references only the reviewed core sitemap", () => {
+test("sitemap index includes core and published blog sitemaps", () => {
   const xml = buildSitemapIndexXml();
 
   assert.match(xml, /<sitemapindex /);
   assert.match(xml, /https:\/\/shopes\.online\/core-sitemap\.xml/);
-  assert.doesNotMatch(xml, /blog-sitemap/);
+  assert.equal((xml.match(/blog-sitemap\//g) || []).length, 2);
 });
 
 test("sitemap XML escapes unsafe characters in URL values", () => {
@@ -68,17 +69,21 @@ test("sitemap XML escapes unsafe characters in URL values", () => {
   assert.match(xml, /&amp;q=&apos;quote&apos;/);
 });
 
-test("generated blog routes stay noindex until editorial review", async () => {
+test("published blog routes allow indexing", async () => {
   const files = [
     "src/app/blog/[slug]/page.tsx",
-    "src/app/blog/page.tsx",
-    "src/app/blog/page/[page]/page.tsx"
+    "src/app/blog/page.tsx"
   ];
 
   for (const file of files) {
     const source = await readFile(file, "utf8");
-    assert.match(source, /robots:\s*\{\s*index:\s*false,\s*follow:\s*true\s*\}/, file);
+    assert.match(source, /robots:\s*\{\s*index:\s*true,\s*follow:\s*true\s*\}/, file);
   }
+});
+
+test("blog pagination remains noindex while links remain crawlable", async () => {
+  const source = await readFile("src/app/blog/page/[page]/page.tsx", "utf8");
+  assert.match(source, /robots:\s*\{\s*index:\s*false,\s*follow:\s*true\s*\}/);
 });
 
 test("authenticated workspace and sign-in routes are not indexable", async () => {
