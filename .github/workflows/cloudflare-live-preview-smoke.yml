@@ -72,9 +72,9 @@ jobs:
           headers="$(mktemp)"
           body="$(mktemp)"
           code="$(curl -sS --max-time 25 -X POST -H 'Content-Type: application/json' -d '{"url":"https://example.com"}' -D "$headers" -o "$body" -w '%{http_code}' "$base/api/audit" || echo 000)"
-          echo "/api/audit POST -> HTTP $code (must fail closed with 503)"
-          if [[ "$code" != "503" ]] || ! grep -q 'CLOUDFLARE_PREVIEW_AUDIT_DISABLED' "$body"; then
-            echo "::error::Preview audit safety gate is missing"; failures=$((failures+1))
+          echo "/api/audit POST -> HTTP $code (must require sign-in with 401)"
+          if [[ "$code" != "401" ]] || ! grep -q 'Sign in to run a technical audit' "$body"; then
+            echo "::error::Preview audit authentication gate is missing"; failures=$((failures+1))
           fi
           rm -f "$headers" "$body"
           code="$(curl -sSL --max-time 25 -o /dev/null -w '%{http_code}' "$base/api/auth/providers" || echo 000)"
