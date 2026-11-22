@@ -57,7 +57,7 @@ jobs:
           echo "Unauthenticated session has no user (200)."
 
           code="$(curl -sS --max-time 25 -X POST -H 'content-type: application/json' -d '{"url":"http://127.0.0.1/"}' -o "$tmp/audit" -w '%{http_code}' "$base/api/audit")"
-          test "$code" = 503
-          node -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1]));if(j.code!=="CLOUDFLARE_PREVIEW_AUDIT_DISABLED")process.exit(1)' "$tmp/audit"
-          echo "Unsafe audit remains fail-closed (503)."
+          test "$code" = 401
+          node -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1]));if(!String(j.error||"").includes("Sign in"))process.exit(1)' "$tmp/audit"
+          echo "Unauthenticated audit is denied (401)."
           echo "OAuth initiation gate passed. Full interactive account login still requires a real browser."
