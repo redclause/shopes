@@ -1,6 +1,6 @@
 # Shopes — production Google OAuth configuration and post-cutover checks
 
-The Cloudflare Worker named `shopes-migration-preview` now powers the **production Custom Domains** `shopes.online` and `www.shopes.online`. The internal Worker name was retained to preserve its existing encrypted secrets and GitHub Builds connection; it is no longer a preview deployment. Its old `workers.dev` URL is disabled.
+The Cloudflare Worker named `shopes` now powers the **production Custom Domains** `shopes.online` and `www.shopes.online`. Cloudflare renamed the Worker in place on 2026-11-22, preserving the same Worker ID, encrypted secrets, Custom Domains and GitHub Builds configuration. Its old `workers.dev` URL is disabled.
 
 ## Google Cloud configuration
 
