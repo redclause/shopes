@@ -1,0 +1,45 @@
+name: RedClause Cloudflare cutover gate
+
+on:
+  push:
+    branches: [migration/cloudflare-vinext-preflight]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  candidate-concurrency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Verify real domain WWW redirect and candidate concurrency
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Existing Hetzner WWW response:"
+          curl -sS -I --max-time 20 https://www.redclause.com/ | grep -iE '^(HTTP/|location:|server:)' | tr -d '\r' || true
+          echo "Cloudflare production candidate:"
+          for route in / /blog /music /robots.txt /sitemap.xml; do
+            code="$(curl -sS -L --max-time 25 -o /dev/null -w '%{http_code}' "https://redclause.egreegregio.workers.dev$route" || echo 000)"
+            echo "$route -> $code"
+            [[ "$code" == "200" ]]
+          done
+          echo "Moderate concurrent dynamic-route test: 24 requests, at most 4 in flight"
+          tmp="$(mktemp -d)"
+          export tmp
+          seq 1 24 | xargs -P 4 -I '{}' bash -c '
+            n="{}"
+            case $((n % 4)) in
+              0) route="/blog";;
+              1) route="/blog?page=2";;
+              2) route="/blog?q=music";;
+              3) route="/blog/how-to-start-making-music-at-home";;
+            esac
+            code="$(curl -sS -L --max-time 25 -o /dev/null -w "%{http_code}" "https://redclause.egreegregio.workers.dev$route" || echo 000)"
+            printf "%s %s %s\n" "$n" "$code" "$route" > "$tmp/$n.txt"
+          '
+          cat "$tmp"/*.txt | sort -n
+          failures="$(awk '$2 != 200 { c++ } END { print c+0 }' "$tmp"/*.txt)"
+          echo "Concurrent failures: $failures"
+          test "$failures" -eq 0
