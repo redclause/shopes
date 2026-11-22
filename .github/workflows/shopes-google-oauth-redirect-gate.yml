@@ -1,0 +1,59 @@
+name: Shopes Google OAuth redirect gate
+
+on:
+  push:
+    branches: [migration/cloudflare-vinext-preflight]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  oauth-redirect-and-session:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Test Google OAuth initiation, CSRF and session guard on Cloudflare preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://shopes-migration-preview.egreegregio.workers.dev"
+          tmp="$(mktemp -d)"
+          trap 'rm -rf "$tmp"' EXIT
+          code="$(curl -sS --max-time 25 -o "$tmp/providers" -w '%{http_code}' "$base/api/auth/providers")"
+          test "$code" = 200
+          node -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1]));if(!j.google||!j["google-one-tap"])process.exit(1)' "$tmp/providers"
+          echo "Google provider registered (200)."
+
+          code="$(curl -sS --max-time 25 -c "$tmp/cookies" -b "$tmp/cookies" -o "$tmp/csrf" -w '%{http_code}' "$base/api/auth/csrf")"
+          test "$code" = 200
+          csrf="$(node -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1]));if(typeof j.csrfToken!=="string"||j.csrfToken.length<15)process.exit(2);process.stdout.write(j.csrfToken)' "$tmp/csrf")"
+          echo "CSRF token created (200), not logged."
+
+          code="$(curl -sS --max-time 25 -c "$tmp/cookies" -b "$tmp/cookies" -D "$tmp/login-headers" -o "$tmp/login-body" -w '%{http_code}' --request POST --data-urlencode "csrfToken=$csrf" --data-urlencode "callbackUrl=$base/dashboard" "$base/api/auth/signin/google")"
+          echo "Google OAuth authorization initiation: HTTP $code"
+          if [[ "$code" != 302 && "$code" != 303 ]]; then
+            echo "::error::Expected a redirect to Google; got $code."
+            exit 1
+          fi
+          node -e '
+            const h=require("fs").readFileSync(process.argv[1],"utf8");
+            const m=h.match(/^location:\s*(\S+)/im);
+            if(!m||!/^https:\/\/(accounts\.google\.com|.*\.google\.com)\//.test(m[1]))process.exit(1);
+            const url=new URL(m[1]);
+            if(url.searchParams.get("response_type")!=="code"||!url.searchParams.has("state")||!url.searchParams.has("redirect_uri")||!url.searchParams.has("client_id"))process.exit(2);
+            const callback=new URL(url.searchParams.get("redirect_uri"));
+            if(callback.origin!=="https://shopes-migration-preview.egreegregio.workers.dev"||callback.pathname!=="/api/auth/callback/google")process.exit(3);
+          ' "$tmp/login-headers"
+          echo "Google OAuth redirect is HTTPS, includes CSRF state, and uses preview callback."
+
+          code="$(curl -sS --max-time 25 -o "$tmp/session" -w '%{http_code}' "$base/api/auth/session")"
+          test "$code" = 200
+          node -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1]));if(j&&j.user)process.exit(1)' "$tmp/session"
+          echo "Unauthenticated session has no user (200)."
+
+          code="$(curl -sS --max-time 25 -X POST -H 'content-type: application/json' -d '{"url":"http://127.0.0.1/"}' -o "$tmp/audit" -w '%{http_code}' "$base/api/audit")"
+          test "$code" = 503
+          node -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1]));if(j.code!=="CLOUDFLARE_PREVIEW_AUDIT_DISABLED")process.exit(1)' "$tmp/audit"
+          echo "Unsafe audit remains fail-closed (503)."
+          echo "OAuth initiation gate passed. Full interactive account login still requires a real browser."
