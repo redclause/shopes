@@ -108,7 +108,7 @@ export default function GoogleOneTapButton({
       // OAuth client ID into a rebuilt static JavaScript bundle.
       let clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
       if (!clientId) {
-        const configResponse = await fetch("/api/auth/google-one-tap/config", {
+        const configResponse = await fetch("/api/google-client-config", {
           method: "GET",
           credentials: "same-origin",
           cache: "no-store",
