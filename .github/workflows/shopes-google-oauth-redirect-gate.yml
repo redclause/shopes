@@ -41,11 +41,15 @@ jobs:
             const m=h.match(/^location:\s*(\S+)/im);
             if(!m||!/^https:\/\/(accounts\.google\.com|.*\.google\.com)\//.test(m[1]))process.exit(1);
             const url=new URL(m[1]);
-            if(url.searchParams.get("response_type")!=="code"||!url.searchParams.has("state")||!url.searchParams.has("redirect_uri")||!url.searchParams.has("client_id"))process.exit(2);
+            const keys=[...url.searchParams.keys()];
+            if(url.searchParams.get("response_type")!=="code"||!url.searchParams.has("redirect_uri")||!url.searchParams.has("client_id")||!url.searchParams.has("code_challenge")){
+              console.error("Google OAuth query keys (values redacted):",keys.join(","));
+              process.exit(2);
+            }
             const callback=new URL(url.searchParams.get("redirect_uri"));
             if(callback.origin!=="https://shopes-migration-preview.egreegregio.workers.dev"||callback.pathname!=="/api/auth/callback/google")process.exit(3);
           ' "$tmp/login-headers"
-          echo "Google OAuth redirect is HTTPS, includes CSRF state, and uses preview callback."
+          echo "Google OAuth redirect is HTTPS, includes PKCE challenge, and uses preview callback."
 
           code="$(curl -sS --max-time 25 -o "$tmp/session" -w '%{http_code}' "$base/api/auth/session")"
           test "$code" = 200
