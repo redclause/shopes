@@ -43,3 +43,40 @@ jobs:
           failures="$(awk '$2 != 200 { c++ } END { print c+0 }' "$tmp"/*.txt)"
           echo "Concurrent failures: $failures"
           test "$failures" -eq 0
+
+  redclause-live-domain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify live redclause.com after Workers routing
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://redclause.com"
+          failures=0
+          for route in "/" "/blog" "/blog?page=2" "/blog?q=music" "/blog/how-to-start-making-music-at-home" "/music" "/sitemap.xml" "/robots.txt" "/treaty/RC-2026-000001?holder=CloudflareLive&matter=Verification" "/treaty/RC-2026-000001/opengraph-image" "/ogimage.png"; do
+            headers="$(mktemp)"
+            body="$(mktemp)"
+            code="$(curl -sS -L --max-time 30 -D "$headers" -o "$body" -w '%{http_code}' "$base$route" || echo 000)"
+            type="$(grep -i '^content-type:' "$headers" | tail -1 | tr -d '\r' || true)"
+            robots="$(grep -i '^x-robots-tag:' "$headers" | tail -1 | tr -d '\r' || true)"
+            ray="$(grep -i '^cf-ray:' "$headers" | tail -1 | tr -d '\r' || true)"
+            echo "LIVE $route -> HTTP $code | $type | $robots | $ray"
+            if [[ "$code" != "200" ]]; then
+              echo "::error::Live domain failed $route $code"; head -c 500 "$body"; echo
+              failures=$((failures+1))
+            fi
+            if grep -qi 'noindex' <<< "$robots"; then
+              echo "::error::Indexable production route carries noindex $route";failures=$((failures+1))
+            fi
+            if [[ -z "$ray" ]]; then echo "::error::Not routed through Cloudflare $route";failures=$((failures+1));fi
+            rm -f "$headers" "$body"
+          done
+          headers="$(mktemp)"
+          code="$(curl -sS --max-time 20 -D "$headers" -o /dev/null -w '%{http_code}' "$base/__redclause_nonexistent_cutover_6829" || echo 000)"
+          location="$(grep -i '^location:' "$headers" | tail -1 | tr -d '\r' || true)"
+          echo "Unknown route -> HTTP $code $location"
+          if [[ "$code" != "308" ]] || [[ "$location" != *"/blog"* ]]; then failures=$((failures+1));fi
+          rm -f "$headers"
+          echo "Live production failures: $failures"
+          test "$failures" -eq 0
