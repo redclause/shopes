@@ -81,3 +81,35 @@ jobs:
           echo "/api/auth/providers -> HTTP $code (informational; preview OAuth secrets not configured)"
           echo "Shopes live smoke failures: $failures"
           test "$failures" -eq 0
+
+  redclause-deep-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify dynamic articles, pagination, search and 404
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://redclause-migration-preview.egreegregio.workers.dev"
+          failures=0
+          for path in "/blog/how-to-start-making-music-at-home" "/blog?page=2" "/blog?q=music" "/blog?q=nonexistent987654321"; do
+            headers="$(mktemp)"
+            body="$(mktemp)"
+            code="$(curl -sSL --max-time 30 -D "$headers" -o "$body" -w '%{http_code}' "$base$path" || echo 000)"
+            robot="$(grep -i '^x-robots-tag:' "$headers" | tail -1 | tr -d '\r' || true)"
+            echo "$path -> HTTP $code | $robot | bytes $(wc -c < "$body")"
+            if [[ "$code" != "200" ]] || ! grep -qi 'noindex' <<< "$robot"; then
+              echo "::error::Article/listing request failed: $path"
+              head -c 600 "$body"; echo
+              failures=$((failures+1))
+            fi
+            if [[ "$path" == "/blog/how-to-start-making-music-at-home" ]] && ! grep -qi 'How to Start Making Music at Home' "$body"; then
+              echo "::error::Article body or title missing"; failures=$((failures+1))
+            fi
+            rm -f "$headers" "$body"
+          done
+          code="$(curl -sSL --max-time 20 -o /dev/null -w '%{http_code}' "$base/__cloudflare_preview_should_404_9345" || echo 000)"
+          echo "Unknown route -> HTTP $code (expected 404)"
+          if [[ "$code" != "404" ]]; then failures=$((failures+1)); fi
+          echo "RedClause deep smoke failures: $failures"
+          test "$failures" -eq 0
