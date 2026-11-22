@@ -25,7 +25,14 @@ jobs:
             ray="$(grep -i '^cf-ray:' "$tmp/head" | tail -1 || true)"
             robots="$(grep -i '^x-robots-tag:' "$tmp/head" | tail -1 || true)"
             echo "$route: $code; Cloudflare=$([[ -n "$ray" ]] && echo yes || echo no); noindex=$([[ "$robots" == *noindex* ]] && echo yes || echo no)"
-            test "$code" = "200"
+            if [[ "$route" == "/keyword-research" || "$route" == "/audit" ]]; then
+              if [[ "$code" != "200" && "$code" != "307" && "$code" != "308" ]]; then echo "::error::Protected page returned unexpected $code"; exit 1; fi
+              if [[ "$code" == "307" || "$code" == "308" ]]; then
+                grep -Eiq '^location:.*(/login|/api/auth)' "$tmp/head" || { echo "::error::Protected redirect missing login target"; exit 1; }
+              fi
+            else
+              test "$code" = "200"
+            fi
             test -n "$ray"
             if [[ "$robots" == *noindex* ]]; then echo "::error::Production Worker has HTTP noindex on $route"; exit 1; fi
           done
