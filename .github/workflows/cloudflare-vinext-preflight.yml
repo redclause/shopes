@@ -14,6 +14,8 @@ jobs:
   vinext-preflight:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      CLOUDFLARE_WORKERS_BUILD: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
