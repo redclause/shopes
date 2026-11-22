@@ -1,0 +1,42 @@
+name: Cloudflare migration live HTTP smoke
+
+on:
+  push:
+    branches: [migration/cloudflare-runtime-preview]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  redclause-preview-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect RedClause Worker routes without production cutover
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://redclause-migration-preview.egreegregio.workers.dev"
+          failures=0
+          for route in "/" "/blog" "/music" "/sitemap.xml" "/robots.txt" "/treaty/RC-2026-000001?holder=Preview&matter=Testing" "/treaty/RC-2026-000001/opengraph-image" "/ogimage.png"; do
+            headers="$(mktemp)"
+            body="$(mktemp)"
+            code="$(curl -sSL --max-time 25 -D "$headers" -o "$body" -w '%{http_code}' "$base$route" || echo 000)"
+            type="$(grep -i '^content-type:' "$headers" | tail -1 | tr -d '\r' || true)"
+            robots="$(grep -i '^x-robots-tag:' "$headers" | tail -1 | tr -d '\r' || true)"
+            echo "$route -> HTTP $code, $type, $robots"
+            if [[ "$code" != "200" ]]; then failures=$((failures+1)); fi
+            if [[ "$route" == "/" || "$route" == "/blog" || "$route" == "/music" || "$route" == /treaty/RC-2026-000001\?* ]]; then
+              if ! grep -qis 'noindex' <<< "$robots"; then
+                echo "::error::Missing HTTP noindex on $route"
+                failures=$((failures+1))
+              fi
+            fi
+            if [[ "$route" == "/" ]] && ! grep -qi 'RedClause' "$body"; then
+              echo "::error::Homepage does not contain RedClause"; failures=$((failures+1))
+            fi
+            rm -f "$headers" "$body"
+          done
+          echo "HTTP/SEO smoke failures: $failures"
+          test "$failures" -eq 0
