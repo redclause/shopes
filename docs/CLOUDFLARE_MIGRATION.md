@@ -4,7 +4,7 @@ Status (2026-11-22): **Production hosting cut over to Cloudflare Workers Custom 
 
 ## Current infrastructure
 
-- Production: `https://shopes.online` and `https://www.shopes.online` → Cloudflare Workers Custom Domains, service `shopes-migration-preview` (historical internal Worker name; this is now the production Worker).
+- Production: `https://shopes.online` and `https://www.shopes.online` → Cloudflare Workers Custom Domains, service `shopes`.
 - Cloudflare DNS zone: `7faba7ca8872451dddb26c3f192d9a1f`; Cloudflare manages proxied `AAAA 100::` placeholder DNS records for both Custom Domains. **Former Hetzner A records at 2.29.135.45 were deleted**.
 - Google/Yandex verification TXT and existing CAA records were retained.
 - Worker GitHub Builds source: `redclause/shopes`, branch `main`; squash merge PR #47 → `42c73e43f23526b0b01dea9de44f71d07acb7be0`.
@@ -52,3 +52,10 @@ The Cloudflare transport in `src/lib/audit/cloudflare-transport.ts`:
 - `CLOUDFLARE_PREVIEW_NOINDEX` is not set on production. Only set it to `1` for an isolated staging build.
 - Automatic Cloudflare Builds deploy from `main`. The CLI uses `cf deploy --prebuilt --mode production --force` because this Worker originated with dashboard variables; verify that every runtime secret and Custom Domain remains configured after deployments.
 - DNS registrar transfer from Vercel to Cloudflare Registrar is independent of hosting migration.
+
+## Worker rename and future deploys (2026-11-22)
+
+- Cloudflare Worker was **renamed in place** from `shopes-migration-preview` to `shopes`, retaining Worker ID `8417efb2eae1441c8888dbfa2b49658f`, both Custom Domains and OAuth/runtime secret bindings.
+- The Cloudflare Builds `vinext init` command now uses `--name shopes`.
+- `scripts/ensure-cloudflare-production-routing.mjs` is executed **after `vinext init`** and before `npm run build:vinext` to set `workersDev: false` and `previewUrls: false` in the generated `cloudflare.config.ts`. This is important: `cf deploy` otherwise re-enables the duplicate, indexable `shopes.egreegregio.workers.dev` URL.
+- Renaming or cleanup does not remove or alter any OKBOT D1 database, Cloudflare DNS zone, or Google OAuth secret.

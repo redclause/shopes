@@ -1,0 +1,20 @@
+name: Shopes Cloudflare worker identity gate
+on:
+  push:
+    branches:
+      - fix/shopes-worker-identity-and-routing-20261122
+      - main
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate Cloudflare production worker configuration hardening
+        run: node --test tests/ensure-cloudflare-production-routing.test.mjs
