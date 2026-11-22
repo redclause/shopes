@@ -102,14 +102,22 @@ export default function GoogleOneTapButton({
   const initialize = useCallback(async () => {
     if (initialized.current || initializing.current || !window.google?.accounts?.id) return;
     initializing.current = true;
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (!clientId) {
-      initializing.current = false;
-      setMessage("Google sign-in is not configured for this deployment.");
-      return;
-    }
-
     try {
+      // Workers secrets/variables are read at request time. Unlike a
+      // NEXT_PUBLIC_* build variable, this does not require embedding the
+      // OAuth client ID into a rebuilt static JavaScript bundle.
+      let clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+      if (!clientId) {
+        const configResponse = await fetch("/api/auth/google-one-tap/config", {
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+        });
+        if (!configResponse.ok) throw new Error("Google sign-in is not configured.");
+        const configData = (await configResponse.json()) as { clientId?: string };
+        clientId = configData.clientId;
+      }
+      if (!clientId) throw new Error("Google sign-in is not configured.");
       const nonceResponse = await fetch("/api/auth/google-one-tap/nonce", {
         method: "GET",
         credentials: "same-origin",
