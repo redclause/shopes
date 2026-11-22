@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 22
       - name: Install existing app dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install --no-audit --no-fund --onnxruntime-node-install-cuda=skip
       - name: Check Next.js to Workers compatibility
         run: npx --yes vinext check
       - name: Initialize parallel Cloudflare build (CI workspace only)
