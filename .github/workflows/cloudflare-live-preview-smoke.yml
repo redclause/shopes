@@ -40,3 +40,44 @@ jobs:
           done
           echo "HTTP/SEO smoke failures: $failures"
           test "$failures" -eq 0
+
+  shopes-preview-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect Shopes Worker routes, noindex, and protected audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://shopes-migration-preview.egreegregio.workers.dev"
+          failures=0
+          for route in "/" "/blog" "/keyword-research" "/audit" "/login" "/api/health" "/sitemap.xml"; do
+            headers="$(mktemp)"
+            body="$(mktemp)"
+            code="$(curl -sSL --max-time 25 -D "$headers" -o "$body" -w '%{http_code}' "$base$route" || echo 000)"
+            type="$(grep -i '^content-type:' "$headers" | tail -1 | tr -d '\r' || true)"
+            robots="$(grep -i '^x-robots-tag:' "$headers" | tail -1 | tr -d '\r' || true)"
+            echo "$route -> HTTP $code, $type, $robots"
+            if [[ "$code" != "200" ]]; then
+              echo "::error::HTTP $code on $route"
+              head -c 500 "$body"; echo
+              failures=$((failures+1))
+            fi
+            if [[ "$type" == *"text/html"* ]] && ! grep -qis 'noindex' <<< "$robots"; then
+              echo "::error::Missing HTTP noindex on $route"
+              failures=$((failures+1))
+            fi
+            rm -f "$headers" "$body"
+          done
+          headers="$(mktemp)"
+          body="$(mktemp)"
+          code="$(curl -sS --max-time 25 -X POST -H 'Content-Type: application/json' -d '{"url":"https://example.com"}' -D "$headers" -o "$body" -w '%{http_code}' "$base/api/audit" || echo 000)"
+          echo "/api/audit POST -> HTTP $code (must fail closed with 503)"
+          if [[ "$code" != "503" ]] || ! grep -q 'CLOUDFLARE_PREVIEW_AUDIT_DISABLED' "$body"; then
+            echo "::error::Preview audit safety gate is missing"; failures=$((failures+1))
+          fi
+          rm -f "$headers" "$body"
+          code="$(curl -sSL --max-time 25 -o /dev/null -w '%{http_code}' "$base/api/auth/providers" || echo 000)"
+          echo "/api/auth/providers -> HTTP $code (informational; preview OAuth secrets not configured)"
+          echo "Shopes live smoke failures: $failures"
+          test "$failures" -eq 0
