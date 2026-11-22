@@ -80,3 +80,33 @@ jobs:
           rm -f "$headers"
           echo "Live production failures: $failures"
           test "$failures" -eq 0
+
+  redclause-www:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify HTTPS WWW Worker route and canonical metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          failures=0
+          for host in redclause.com www.redclause.com; do
+            for path in "/" "/blog" "/music" "/robots.txt" "/sitemap.xml" "/blog/how-to-start-making-music-at-home"; do
+              headers="$(mktemp)"
+              body="$(mktemp)"
+              code="$(curl -sS -L --max-time 30 -D "$headers" -o "$body" -w '%{http_code}' "https://$host$path" || echo 000)"
+              ray="$(grep -i '^cf-ray:' "$headers" | tail -1 | tr -d '\r' || true)"
+              robots="$(grep -i '^x-robots-tag:' "$headers" | tail -1 | tr -d '\r' || true)"
+              echo "$host$path -> HTTP $code | $ray | $robots"
+              [[ "$code" == 200 ]] || failures=$((failures+1))
+              [[ -n "$ray" ]] || failures=$((failures+1))
+              if grep -qi noindex <<< "$robots"; then failures=$((failures+1)); fi
+              if [[ "$path" == "/blog" ]] && ! grep -q 'https://redclause.com/blog' "$body"; then
+                echo "::error::Blog canonical/reference missing on $host"
+                failures=$((failures+1))
+              fi
+              rm -f "$headers" "$body"
+            done
+          done
+          echo "WWW and apex failures: $failures"
+          test "$failures" -eq 0
