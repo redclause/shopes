@@ -1,0 +1,31 @@
+name: Cloudflare vinext migration preflight
+
+on:
+  push:
+    branches: [migration/cloudflare-vinext-preflight]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vinext-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_WORKERS_BUILD: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install existing app dependencies
+        run: npm install --no-audit --no-fund --onnxruntime-node-install-cuda=skip
+      - name: Check Next.js to Workers compatibility
+        run: npx --yes vinext check
+      - name: Initialize parallel Cloudflare build (CI workspace only)
+        run: npx --yes vinext init --platform=cloudflare --cdn-cache=none --data-cache=none --image-optimization=none
+      - name: Verify Cloudflare production bundle
+        run: npm run build:vinext

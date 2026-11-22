@@ -1,0 +1,21 @@
+name: Cloudflare SEO Audit transport security
+
+on:
+  push:
+    branches: [migration/cloudflare-runtime-preview]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safe-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run SSRF, private network and real HTTPS tests
+        run: node --experimental-strip-types --test tests/cloudflare-audit-transport.test.mjs

@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: 22
       - name: Install dependencies
-        run: npm install
+        run: npm install --onnxruntime-node-install-cuda=skip
       - name: Audit up to 10 catalog entries
         run: npm run backlink:audit -- --limit 10 --state backlink-audit-results.json
       - name: Upload audit results

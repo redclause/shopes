@@ -1,0 +1,45 @@
+name: Cloudflare Workers reliability gate
+
+on:
+  push:
+    branches: [migration/cloudflare-runtime-preview]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  redclause-repeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Repeat dynamic routes on candidate and preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          fail=0
+          for host in redclause redclause-migration-preview; do
+            base="https://${host}.egreegregio.workers.dev"
+            for route in "/blog" "/blog?page=2" "/blog?q=music" "/blog/how-to-start-making-music-at-home"; do
+              good=0
+              bad=0
+              for attempt in 1 2 3 4 5; do
+                headers="$(mktemp)"
+                body="$(mktemp)"
+                code="$(curl -sS --max-time 25 -D "$headers" -o "$body" -w '%{http_code}' "$base$route" || echo 000)"
+                if [[ "$code" == 200 ]]; then
+                  good=$((good+1))
+                else
+                  bad=$((bad+1))
+                  echo "ERROR $host $route attempt $attempt -> HTTP $code"
+                  grep -iE '^(server|cf-ray|cf-cache-status|content-type):' "$headers" | tr -d '\r' || true
+                  head -c 250 "$body"; echo
+                fi
+                rm -f "$headers" "$body"
+              done
+              echo "SUMMARY $host $route -> good=$good bad=$bad"
+              fail=$((fail+bad))
+            done
+          done
+          echo "Total HTTP failures: $fail"
+          test "$fail" -eq 0

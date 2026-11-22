@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 
-const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
+const clientId = (process.env.GOOGLE_CLIENT_ID_RUNTIME || process.env.GOOGLE_CLIENT_ID)?.trim();
 const clientSecret =
   process.env.CLIENT_SECRET_ID_GOOGLE?.trim() ||
   process.env.GOOGLE_CLIENT_SECRET_ID?.trim() ||
