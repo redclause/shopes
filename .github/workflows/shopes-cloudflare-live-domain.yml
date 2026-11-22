@@ -1,0 +1,65 @@
+name: Shopes Cloudflare Live Domain Gate
+
+on:
+  push:
+    branches: [migration/shopes-cloudflare-cutover-gate]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-domains:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Validate Cloudflare production custom domains, indexing, Google login and audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          trap 'rm -rf "$tmp"' EXIT
+          for host in shopes.online www.shopes.online; do
+            base="https://$host"
+            for route in / /blog /login /api/health /robots.txt /sitemap.xml; do
+              code="$(curl -sS --max-time 25 -D "$tmp/head" -o "$tmp/body" -w '%{http_code}' "$base$route")"
+              ray="$(grep -i '^cf-ray:' "$tmp/head" | tail -1 || true)"
+              robots="$(grep -i '^x-robots-tag:' "$tmp/head" | tail -1 || true)"
+              echo "$host$route -> HTTP $code; cloudflare=$([[ -n "$ray" ]] && echo yes || echo no); noindex=$([[ "$robots" == *noindex* ]] && echo yes || echo no)"
+              test "$code" = 200
+              test -n "$ray"
+              if [[ "$robots" == *noindex* ]]; then echo "::error::Unexpected HTTP noindex: $host$route"; exit 1; fi
+            done
+            for route in /keyword-research /audit /dashboard; do
+              code="$(curl -sS --max-time 25 -D "$tmp/head" -o "$tmp/body" -w '%{http_code}' "$base$route")"
+              echo "Protected $host$route -> HTTP $code"
+              if [[ "$code" == 307 || "$code" == 308 ]]; then
+                grep -Eiq '^location:.*(/login|/api/auth)' "$tmp/head" || exit 1
+              elif [[ "$code" != 200 ]]; then exit 1
+              fi
+            done
+            code="$(curl -sS --max-time 25 -o "$tmp/body" -w '%{http_code}' -X POST -H 'content-type: application/json' -d '{"url":"https://imageto.one"}' "$base/api/audit")"
+            echo "$host SEO Audit unauthenticated: HTTP $code"
+            test "$code" = 401
+            node -e 'const a=JSON.parse(require("fs").readFileSync(process.argv[1]));if(!String(a.error||"").includes("Sign in"))process.exit(1)' "$tmp/body"
+            code="$(curl -sS --max-time 25 -D "$tmp/head" -o "$tmp/body" -w '%{http_code}' "$base/api/google-client-config")"
+            test "$code" = 200
+            node -e 'const a=JSON.parse(require("fs").readFileSync(process.argv[1]));if(Object.keys(a).join()!=="clientId"||!/^[a-z0-9-]+\.apps\.googleusercontent\.com$/i.test(a.clientId))process.exit(1)' "$tmp/body"
+            code="$(curl -sS --max-time 25 -c "$tmp/cookies" -b "$tmp/cookies" -o "$tmp/csrf" -w '%{http_code}' "$base/api/auth/csrf")"
+            test "$code" = 200
+            csrf="$(node -e 'const a=JSON.parse(require("fs").readFileSync(process.argv[1]));if(typeof a.csrfToken!=="string"||a.csrfToken.length<15)process.exit(2);process.stdout.write(a.csrfToken)' "$tmp/csrf")"
+            code="$(curl -sS --max-time 25 -b "$tmp/cookies" -c "$tmp/cookies" -D "$tmp/oauthhead" -o "$tmp/oauthbody" -w '%{http_code}' --request POST --data-urlencode "csrfToken=$csrf" --data-urlencode "callbackUrl=$base/dashboard" "$base/api/auth/signin/google")"
+            echo "$host Google OAuth redirect -> HTTP $code"
+            test "$code" = 302
+            node -e '
+              const h=require("fs").readFileSync(process.argv[1],"utf8");
+              const m=h.match(/^location:\s*(\S+)/im);
+              if(!m||!/^https:\/\/(accounts\.google\.com|.*\.google\.com)\//.test(m[1]))process.exit(1);
+              const u=new URL(m[1]);
+              const c=new URL(u.searchParams.get("redirect_uri"));
+              if(u.searchParams.get("response_type")!=="code"||!u.searchParams.has("code_challenge")||c.host!==process.argv[2]||c.pathname!=="/api/auth/callback/google")process.exit(2);
+            ' "$tmp/oauthhead" "$host"
+            echo "OAuth PKCE + callback match $host (no secrets shown)."
+            rm -f "$tmp/cookies"
+          done
+          echo "Live Shopes apex and www: SUCCESS."
