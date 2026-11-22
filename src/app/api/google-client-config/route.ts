@@ -13,7 +13,7 @@ const headers = {
 // Reading this at runtime removes the need to expose a build environment
 // variable to every CI build, and works with Cloudflare Workers' process.env.
 export async function GET() {
-  const clientId = process.env.GOOGLE_CLIENT_ID?.trim() || "";
+  const clientId = (process.env.GOOGLE_CLIENT_ID_RUNTIME || process.env.GOOGLE_CLIENT_ID)?.trim() || "";
   if (!/^[a-z0-9-]+\.apps\.googleusercontent\.com$/i.test(clientId)) {
     return NextResponse.json(
       { error: "Google sign-in is not configured." },
