@@ -20,7 +20,7 @@ jobs:
           base="https://shopes-migration-preview.egreegregio.workers.dev"
           headers="$(mktemp)"
           body="$(mktemp)"
-          code="$(curl -sS --max-time 25 -D "$headers" -o "$body" -w '%{http_code}' "$base/api/auth/google-one-tap/config")"
+          code="$(curl -sS --max-time 25 -D "$headers" -o "$body" -w '%{http_code}' "$base/api/google-client-config")"
           echo "OAuth public config: HTTP $code"
           if [[ "$code" == "503" ]]; then
             grep -q 'Google sign-in is not configured' "$body"
