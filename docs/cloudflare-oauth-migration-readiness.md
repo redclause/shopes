@@ -25,7 +25,7 @@ Workers & Pages → `shopes-migration-preview` → Settings → Variables and Se
 - `GOOGLE_CLIENT_SECRET`: **Secret** (never post or commit).
 - `AUTH_SECRET`: **Secret** (already provisioned for preview on 2026-11-22). Retain this securely; do not publish or expose it. Production must use its own stable secret; reusing Hetzner's existing Auth.js secret is preferred for zero forced logouts, if existing session cookies are to remain valid.
 
-The public OAuth Client ID is now fetched at runtime via `GET /api/auth/google-one-tap/config`. No client ID needs to be embedded in Cloudflare Builds. Do not set `AUTH_URL` to production on the preview: `trustHost: true` in `auth.ts` derives the incoming preview hostname.
+The public OAuth Client ID is now fetched at runtime via `GET /api/google-client-config`. No client ID needs to be embedded in Cloudflare Builds. Do not set `AUTH_URL` to production on the preview: `trustHost: true` in `auth.ts` derives the incoming preview hostname.
 
 The application supports `GOOGLE_CLIENT_SECRET` (or legacy names `CLIENT_SECRET_ID_GOOGLE` and `GOOGLE_CLIENT_SECRET_ID`); use exactly one new canonical name.
 
@@ -33,7 +33,7 @@ All secrets go directly into Cloudflare's encrypted Worker secrets. Never paste 
 
 ## Required verification before cutover
 
-1. `GET /api/auth/google-one-tap/config` returns the public Client ID, and no other OAuth secrets.
+1. `GET /api/google-client-config` returns the public Client ID, and no other OAuth secrets.
 2. `GET /api/auth/providers` responds with 200 and includes Google and Google One Tap.
 3. Google OAuth callback succeeds on the preview domain, and both standard sign-in and One Tap are tested with a real authorized user. JWT cookies, session reads, sign-out and dashboard protection work across page reloads.
 4. The SEO Audit endpoint must not be silently downgraded to a non-pinned fetch. The Hetzner implementation validates DNS answers and pins requests to the checked IP, which the Workers `node:http` wrapper does not support. It currently deliberately returns 503 on preview until a secure replacement or an explicitly approved, authenticated hybrid-backend integration is verified.
