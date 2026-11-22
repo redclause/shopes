@@ -225,7 +225,9 @@ export async function fetchPublicHtml(input: string): Promise<{ html: string; st
   let current = input;
   for (let redirects = 0; redirects <= MAX_REDIRECTS; redirects++) {
     const target = await resolvePublicTarget(current);
-    const result = target.allCloudflare ? await cloudflareFetch(target) : await pinnedRequest(target);
+    const result = target.allCloudflare && process.env.SHOPES_CLOUDFLARE_RUNTIME === "1"
+      ? await cloudflareFetch(target)
+      : await pinnedRequest(target);
     if ([301, 302, 303, 307, 308].includes(result.status)) {
       if (!result.headers.location || redirects === MAX_REDIRECTS) throw new Error("The website redirected too many times or returned an invalid redirect.");
       current = new URL(result.headers.location, target.url).toString();
