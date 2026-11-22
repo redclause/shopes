@@ -1,0 +1,56 @@
+name: Shopes Cloudflare OAuth readiness
+
+on:
+  push:
+    branches: [migration/cloudflare-runtime-preview]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify OAuth config is public-only and nonce is protected
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://shopes-migration-preview.egreegregio.workers.dev"
+          headers="$(mktemp)"
+          body="$(mktemp)"
+          code="$(curl -sS --max-time 25 -D "$headers" -o "$body" -w '%{http_code}' "$base/api/auth/google-one-tap/config")"
+          echo "OAuth public config: HTTP $code"
+          if [[ "$code" == "503" ]]; then
+            grep -q 'Google sign-in is not configured' "$body"
+            echo "::notice::Google OAuth Client ID is still required in Cloudflare runtime variables."
+          elif [[ "$code" == "200" ]]; then
+            node -e 'const x=JSON.parse(require("fs").readFileSync(process.argv[1]));if(Object.keys(x).join()!=="clientId"||!/^[a-z0-9-]+\.apps\.googleusercontent\.com$/i.test(x.clientId)){process.exit(1)}' "$body"
+            echo "Configured public Client ID shape verified (value not logged)."
+          else
+            head -c 120 "$body";echo
+            echo "::error::OAuth config endpoint failed: $code";exit 1
+          fi
+          ! grep -Eiq '(clientSecret|AUTH_SECRET|GOOGLE_CLIENT_SECRET|private_key|access_token)' "$body"
+          grep -iq '^cache-control: no-store' "$headers"
+          grep -iq '^x-robots-tag: noindex' "$headers"
+          rm -f "$headers" "$body"
+          headers="$(mktemp)"
+          body="$(mktemp)"
+          code="$(curl -sS --max-time 25 -D "$headers" -o "$body" -w '%{http_code}' "$base/api/auth/google-one-tap/nonce")"
+          echo "One Tap nonce: HTTP $code"
+          test "$code" == "200"
+          node -e 'const x=JSON.parse(require("fs").readFileSync(process.argv[1]));if(typeof x.nonce!=="string"||x.nonce.length<30)process.exit(1)' "$body"
+          grep -iq '^set-cookie:.*shopes_google_one_tap_nonce=' "$headers"
+          grep -iq '^set-cookie:.*httponly' "$headers"
+          grep -iq '^set-cookie:.*secure' "$headers"
+          grep -iq '^cache-control: no-store' "$headers"
+          rm -f "$headers" "$body"
+          body="$(mktemp)"
+          code="$(curl -sS --max-time 25 -o "$body" -w '%{http_code}' "$base/api/auth/providers")"
+          echo "Auth.js providers: HTTP $code"
+          test "$code" == "200"
+          node -e 'const x=JSON.parse(require("fs").readFileSync(process.argv[1]));if(!x.google||!x["google-one-tap"])process.exit(1)' "$body"
+          rm -f "$body"
+          echo "OAuth runtime structural smoke checks passed. End-to-end Google sign-in still requires real Google credentials."
