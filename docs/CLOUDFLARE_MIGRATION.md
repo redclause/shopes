@@ -1,34 +1,54 @@
-# Cloudflare Workers migration — Shopes
+# Shopes — Cloudflare Workers production migration
 
-Status: **compatibility preflight only**. Do not change production DNS or the current Hetzner app.
+Status (2026-11-22): **Production hosting cut over to Cloudflare Workers Custom Domains**. Domain registrar remains at Vercel; this does not affect the website's hosting.
 
-## Inventory
+## Current infrastructure
 
-- Source: `redclause/shopes`, Next.js 15 App Router, Auth.js v5 with Google OAuth.
-- Existing hosting: Hetzner standalone Next.js app, domain `shopes.online`.
-- Cloudflare DNS zone exists; A/WWW currently point to existing origin (inspected 2026-11-22).
-- No Shopes Cloudflare Worker has been deployed.
+- Production: `https://shopes.online` and `https://www.shopes.online` → Cloudflare Workers Custom Domains, service `shopes-migration-preview` (historical internal Worker name; this is now the production Worker).
+- Cloudflare DNS zone: `7faba7ca8872451dddb26c3f192d9a1f`; Cloudflare manages proxied `AAAA 100::` placeholder DNS records for both Custom Domains. **Former Hetzner A records at 2.29.135.45 were deleted**.
+- Google/Yandex verification TXT and existing CAA records were retained.
+- Worker GitHub Builds source: `redclause/shopes`, branch `main`; squash merge PR #47 → `42c73e43f23526b0b01dea9de44f71d07acb7be0`.
+- Cloudflare production build `6924582d-a380-4ac7-9fbc-f6e5b7a34d36` succeeded. Worker version `c08838f4-139c-40a6-937a-a7c138fd9acd`.
+- `workers.dev` public endpoint is **disabled** so it does not expose an SEO-duplicate copy of production.
+- Cloudflare Free plan; no additional paid provider, database, or Redis introduced by the migration.
+- **Hetzner's old Docker app still needs to be stopped separately using host access**; public DNS no longer points there. Do not shut down the whole Hetzner VPS because other sites may share it.
 
-## Identified blockers requiring engineering
+## Google authentication
 
-- `src/app/api/audit/route.ts` uses `node:dns/promises`, `node:net`, and `node:http(s)` for an SSRF-protected HTML audit with DNS/IP pinning. A direct switch to Workers `fetch` would remove important security guarantees. **Do not silently replace this with ordinary fetch or bypass the private-network validation.** Adapt the transport while maintaining protections and test public-IP, DNS-rebinding, redirect, response-size, and timeout edge cases. If not possible, retain a separate, protected origin for this endpoint until a compatible safe solution is available.
-- `auth.ts` and `middleware.ts` use Auth.js v5 Google sign-in and JWT sessions. Workers compatibility, cookies, and callback URLs must be tested end to end, not inferred from a successful build.
-- Cloudflare Worker preview must receive `AUTH_SECRET`, Google OAuth client ID and client secret through encrypted secret bindings or secure deployment environment; never commit secret values or expose them in `NEXT_PUBLIC_*`.
-- `next.config.ts` currently specifies `output: "standalone"` for Hetzner; the Workers build must use the Cloudflare-specific output without breaking the existing production build.
+Auth.js v5 Google OAuth and One Tap are configured using Cloudflare Worker secrets:
+- `AUTH_SECRET`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_CLIENT_ID_RUNTIME` (public client ID stored under a secret binding to survive forced CI deployments, though the ID itself is not confidential).
 
-## Non-destructive preflight
+The public ID is served by `GET /api/google-client-config`, and all Google client secrets remain server-side. `GET /api/auth/csrf` and `GET /api/auth/providers` function normally. Google sign-in initiation returns an HTTPS 302 redirect to Google with PKCE and a correctly derived host-specific callback (`/api/auth/callback/google`). The user must complete a **real Google login in the browser**, then confirm the session, sign-out, and re-login. Static/CI tests alone do not prove the full Google callback has worked with a real account.
 
-The `cloudflare-vinext-preflight.yml` workflow runs `vinext check`, creates a parallel Cloudflare build in CI only, and builds it. This is a diagnostic; a green build does not establish runtime or authentication safety.
+Ensure Google Cloud OAuth **Authorized JavaScript origins** and **Authorized redirect URIs** include apex and www hosts.
 
-## Cutover acceptance criteria
+## Technical SEO Audit
 
-1. Vinext compatibility, bundle and CI tests pass.
-2. Cloudflare preview is isolated and has HTTP `X-Robots-Tag: noindex, nofollow`.
-3. Test all API routes, especially SEO audit, backlink endpoints, Google One Tap and Auth.js.
-4. Confirm OAuth authorized redirect URI matches final `https://shopes.online/api/auth/callback/google` and test sign-in/sign-out/session refresh.
-5. Test site crawling and SSRF protections with adversarial redirects, private IPs and DNS changes.
-6. Verify all blog, sitemap, robots, canonical, dashboard and static asset routes, and compare with old origin.
-7. Check Cloudflare usage and cost; no paid products without approval.
-8. Only after verified preview, change apex/WWW Worker routes and keep Hetzner for rollback. Preserve TXT/CAA and all unrelated DNS records.
+`src/app/api/audit/route.ts` is restored (not stubbed). The endpoint requires authentication (HTTP 401 when signed out) and returns its prior full HTML audit findings for successful authenticated audits.
 
-Do **not** cut over Shopes if its audit endpoint is degraded or its Google login has not been tested.
+The Cloudflare transport in `src/lib/audit/cloudflare-transport.ts`:
+- Accepts only standard HTTP/HTTPS 80/443 public domain URLs.
+- Rejects IP literals, local/internal/special-use IP addresses, nonstandard ports and userinfo.
+- Validates DNS answers for every hop of a redirect chain, rejects private results, caps redirects.
+- Uses IP-pinned TLS/TCP with hostname/SNI verification for ordinary sites; Cloudflare-fronted DNS answers use runtime-gated Workers fetch because Cloudflare blocks outgoing TCP sockets to Cloudflare IP ranges.
+- Limits HTML to 1 MB and network calls to 8 seconds.
+- Does not enable public unauthenticated crawling.
+
+**Important release distinction:** Node/GitHub CI validates SSRF checks and outbound request logic; the live Worker HTTP test validates unauthenticated rejection. A **real signed-in SEO Audit run against a public URL is still a manual end-to-end acceptance check**, not something those tests can replace.
+
+## Verification
+
+- Main CI, Vinext preflight and backlink audit: successful on PR #47.
+- Edge preview transport and SSRF guard unit tests: 4/4 passed.
+- Cloudflare Worker production-readiness GH Actions: `45054361457`, success.
+- Live apex/www Custom Domain smoke GH Actions: `45054447148`, success including its post-workers.dev-disable rerun. Pages, sitemap, robots, HTTP indexing, Google OAuth initiation, PKCE, HTTPS callbacks and unauthenticated Audit endpoint passed on both domains.
+- Public pages have no global `X-Robots-Tag: noindex`. The app may intentionally noindex certain login/auth pages.
+
+## Operational notes
+
+- Worker build-specific `CLOUDFLARE_WORKERS_BUILD=1` disables Next.js Hetzner standalone output.
+- `CLOUDFLARE_PREVIEW_NOINDEX` is not set on production. Only set it to `1` for an isolated staging build.
+- Automatic Cloudflare Builds deploy from `main`. The CLI uses `cf deploy --prebuilt --mode production --force` because this Worker originated with dashboard variables; verify that every runtime secret and Custom Domain remains configured after deployments.
+- DNS registrar transfer from Vercel to Cloudflare Registrar is independent of hosting migration.
