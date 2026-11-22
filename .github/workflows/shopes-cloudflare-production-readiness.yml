@@ -1,0 +1,55 @@
+name: Shopes Cloudflare Production Readiness Gate
+
+on:
+  push:
+    branches: [migration/shopes-cloudflare-cutover-gate]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  worker-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Verify indexable Cloudflare Worker, SEO routes and Google OAuth
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://shopes-migration-preview.egreegregio.workers.dev"
+          tmp="$(mktemp -d)"
+          trap 'rm -rf "$tmp"' EXIT
+          for route in / /blog /keyword-research /audit /login /api/health /sitemap.xml /robots.txt; do
+            code="$(curl -sS --max-time 25 -D "$tmp/head" -o "$tmp/body" -w '%{http_code}' "$base$route")"
+            ray="$(grep -i '^cf-ray:' "$tmp/head" | tail -1 || true)"
+            robots="$(grep -i '^x-robots-tag:' "$tmp/head" | tail -1 || true)"
+            echo "$route: $code; Cloudflare=$([[ -n "$ray" ]] && echo yes || echo no); noindex=$([[ "$robots" == *noindex* ]] && echo yes || echo no)"
+            test "$code" = "200"
+            test -n "$ray"
+            if [[ "$robots" == *noindex* ]]; then echo "::error::Production Worker has HTTP noindex on $route"; exit 1; fi
+          done
+          code="$(curl -sS --max-time 25 -D "$tmp/head" -o "$tmp/body" -w '%{http_code}' "$base/api/google-client-config")"
+          test "$code" = 200
+          node -e 'const a=JSON.parse(require("fs").readFileSync(process.argv[1]));if(Object.keys(a).join()!=="clientId" || !/^[a-z0-9-]+\.apps\.googleusercontent\.com$/i.test(a.clientId))process.exit(1)' "$tmp/body"
+          echo "Public Google Client ID: 200 and shape valid; ID value not logged."
+          code="$(curl -sS --max-time 25 -c "$tmp/cookies" -b "$tmp/cookies" -o "$tmp/csrf" -w '%{http_code}' "$base/api/auth/csrf")"
+          test "$code" = 200
+          csrf="$(node -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1]));if(typeof j.csrfToken!=="string"||j.csrfToken.length<15)process.exit(2);process.stdout.write(j.csrfToken)' "$tmp/csrf")"
+          code="$(curl -sS --max-time 25 -c "$tmp/cookies" -b "$tmp/cookies" -D "$tmp/login-headers" -o "$tmp/login-body" -w '%{http_code}' --request POST --data-urlencode "csrfToken=$csrf" --data-urlencode "callbackUrl=$base/dashboard" "$base/api/auth/signin/google")"
+          test "$code" = 302
+          node -e '
+            const h=require("fs").readFileSync(process.argv[1],"utf8");
+            const m=h.match(/^location:\s*(\S+)/im);
+            if(!m||!/^https:\/\/(accounts\.google\.com|.*\.google\.com)\//.test(m[1]))process.exit(1);
+            const a=new URL(m[1]);
+            if(a.searchParams.get("response_type")!=="code"||!a.searchParams.has("code_challenge")||!a.searchParams.has("redirect_uri"))process.exit(2);
+            const callback=new URL(a.searchParams.get("redirect_uri"));
+            if(callback.origin!=="https://shopes-migration-preview.egreegregio.workers.dev"||callback.pathname!=="/api/auth/callback/google")process.exit(3);
+          ' "$tmp/login-headers"
+          echo "Google OAuth: 302 with PKCE and correct callback."
+          code="$(curl -sS --max-time 25 -o "$tmp/body" -w '%{http_code}' -X POST -H 'content-type: application/json' -d '{"url":"https://imageto.one"}' "$base/api/audit")"
+          test "$code" = 401
+          node -e 'const a=JSON.parse(require("fs").readFileSync(process.argv[1]));if(!String(a.error||"").includes("Sign in"))process.exit(1)' "$tmp/body"
+          echo "Technical SEO Audit protected: unauthenticated requests correctly denied (401)."
+          echo "Cloudflare Worker readiness gate PASS."
